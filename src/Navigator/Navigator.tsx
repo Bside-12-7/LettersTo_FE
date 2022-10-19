@@ -16,6 +16,9 @@ import {InterestsForm} from '../Screens/SignUp/InterestsForm';
 import {PersonalityForm} from '../Screens/SignUp/PersonalityForm';
 import {LocationForm} from '../Screens/SignUp/LocationForm';
 
+// 편지 작성
+import {TextEditor} from '../Screens/TextEditor/TextEditor';
+
 const Stack = createNativeStackNavigator<StackParamsList>();
 
 export default function StackNavigator() {
@@ -28,6 +31,8 @@ export default function StackNavigator() {
       ) : isLoggedIn ? (
         <Stack.Group>
           <Stack.Screen name="Home" component={Home} />
+
+          <Stack.Screen name="TextEditor" component={TextEditor} />
         </Stack.Group>
       ) : (
         <Stack.Group screenOptions={{headerShown: false}}>

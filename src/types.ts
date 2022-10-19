@@ -13,4 +13,7 @@ export type StackParamsList = {
   InterestsForm: undefined;
   PersonalityForm: undefined;
   LocationForm: undefined;
+
+  // 편지 작성
+  TextEditor: undefined;
 };

@@ -94,7 +94,7 @@ PODS:
   - fmt (6.2.1)
   - glog (0.3.5)
   - hermes-engine (0.70.1)
-  - kakao-login (5.2.3):
+  - kakao-login (5.2.2):
     - KakaoSDKAuth (= 2.11.1)
     - KakaoSDKCommon (= 2.11.1)
     - KakaoSDKUser (= 2.11.1)
@@ -617,15 +617,15 @@ SPEC CHECKSUMS:
   boost: a7c83b31436843459a1961bfd74b96033dc77234
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
-  EXApplication: e418d737a036e788510f2c4ad6c10a7d54d18586
-  EXConstants: 7c44785d41d8e959d527d23d29444277a4d1ee73
-  EXErrorRecovery: 74d71ee59f6814315457b09d68e86aa95cc7d05d
-  EXFileSystem: 927e0a8885aa9c49e50fc38eaba2c2389f2f1019
-  EXFont: 06df627203afcb8a3b3152ec06eb2f11f46f0cff
-  Expo: 7e821e708a35d2720ef6baa658e224dd91c4821e
-  ExpoKeepAwake: 0e8f18142e71bbf2c7f6aa66ebed249ba1420320
-  ExpoLinearGradient: 1a3af07c6dab3c612967a294836df9ae717431df
-  ExpoModulesCore: 2d60ec04c49641afb55fee3faac86fb108c68fe0
+  EXApplication: 64a38a15788ec0a9d01eb69683288f30c0726a64
+  EXConstants: e15cbb0181ab1411ef2b5d4b5e8ecdc9b30aeed5
+  EXErrorRecovery: 550d48c3575dcd83538abd7f13f52d30c4fecdb0
+  EXFileSystem: 3b71e2d1d4a3cd7cc4e2875913b9a96b34d323e3
+  EXFont: 0be44924d5000938c74715b2056fd7972ba65a05
+  Expo: df720d1621976459f4c03bc483e4c124ecd18a4d
+  ExpoKeepAwake: d8ca9d3195d7d30f39d04ce79d2f0890f8d7ba00
+  ExpoLinearGradient: 6d3047fddff1b61fafac00968dc1e1116499888f
+  ExpoModulesCore: 3266ff8a46e34d54f82c0bb97c35ff8bdff26161
   FBLazyVector: d3cdc05875c89782840d2f38e1d6174fab24e4d2
   FBReactNativeSpec: 0612c8f2dbd774414bb778247c6ec6cb05aa4c50
   Flipper: 26fc4b7382499f1281eb8cb921e5c3ad6de91fe0
@@ -640,7 +640,7 @@ SPEC CHECKSUMS:
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
   hermes-engine: 9cd393f741bfa14d1d0cd90cc373e3619c0bc7ea
-  kakao-login: d506fe760be606181e206f89bf42fd082720a068
+  kakao-login: d8504d2ccdf840678e78e80ad489f59e01c41329
   KakaoSDKAuth: bb2dfa7be30daa8403c9cfc8001aa6fde7a5b779
   KakaoSDKCommon: 555e1bb46595b842ded01cf7888cc17bbae4e113
   KakaoSDKUser: 08c0a4f40bebdebdf948a9e3d0e44ed5c2754f99
@@ -661,7 +661,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 47201924064085223b63ec7e3ee9fd40ad8508e8
   React-jsinspector: 1363be638eccfe1aea1b10dd42e632b0397e5ec8
   React-logger: 7bd569e3857d74ed412ce0a5c51f421ff7d4ca7f
-  react-native-safe-area-context: dfe5aa13bee37a0c7e8059d14f72ffc076d120e9
+  react-native-safe-area-context: ccadc67fb5d75884dbcf993192de3105205dbff9
   React-perflogger: 48c6b363e867d64b682e84f80ca45636bd65e19c
   React-RCTActionSheet: 33c74fe5c754835e3715c300618da9aa2f7203fa
   React-RCTAnimation: 2dbf0120d4d1ab7716079b4180f2ca89c465e46b
@@ -674,7 +674,7 @@ SPEC CHECKSUMS:
   React-RCTVibration: e9164827303fb6a5cf79e4c4af4846a09956b11f
   React-runtimeexecutor: a11d0c2e14140baf1e449264ca9168ae9ae6bbd0
   ReactCommon: 7f86326b92009925c6dcf93f8e825060171c379f
-  RNCAsyncStorage: 0c357f3156fcb16c8589ede67cc036330b6698ca
+  RNCAsyncStorage: 73b194e58ded504eee17b9a3c125651e2507ddde
   RNScreens: 0df01424e9e0ed7827200d6ed1087ddd06c493f9
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   Yoga: 6c8252e38d65aa387daee699eacf027e055e0b31

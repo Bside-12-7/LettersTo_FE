@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Props = NativeStackScreenProps<StackParamsList, 'Home'>;
 
-export function Home({}: Props) {
+export function Home({navigation}: Props) {
   const {setIsLoggedIn} = useStore();
 
   async function logout() {
@@ -15,10 +15,15 @@ export function Home({}: Props) {
     setIsLoggedIn(false);
   }
 
+  const goToTextEditor = () => {
+    navigation.navigate('TextEditor');
+  };
+
   return (
     <View style={styles.container}>
       <Text>Home Screen</Text>
       <Button title="로그아웃" onPress={logout} />
+      <Button title="텍스트 에디터" onPress={goToTextEditor} />
     </View>
   );
 }
