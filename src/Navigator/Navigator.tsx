@@ -18,6 +18,7 @@ import {LocationForm} from '../Screens/SignUp/LocationForm';
 
 // 편지 작성
 import {TextEditor} from '../Screens/TextEditor/TextEditor';
+import {Multiline} from '../Screens/TextEditor/Multiline';
 
 const Stack = createNativeStackNavigator<StackParamsList>();
 
@@ -29,10 +30,11 @@ export default function StackNavigator() {
       {isLoading ? (
         <Stack.Screen name="Splash" component={Splash} />
       ) : isLoggedIn ? (
-        <Stack.Group>
+        <Stack.Group screenOptions={{headerShown: false}}>
           <Stack.Screen name="Home" component={Home} />
 
           <Stack.Screen name="TextEditor" component={TextEditor} />
+          <Stack.Screen name="Multiline" component={Multiline} />
         </Stack.Group>
       ) : (
         <Stack.Group screenOptions={{headerShown: false}}>

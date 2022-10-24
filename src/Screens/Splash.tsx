@@ -35,7 +35,10 @@ export function Splash({}: Props) {
   useEffect(() => {
     console.log('Splash for checking...');
     setTimeout(() => {
-      checkForService();
+      // checkForService();
+      setIsLoggedIn(true);
+      setAnimating(false);
+      setIsLoading(false);
     }, 1000);
   }, []);
 

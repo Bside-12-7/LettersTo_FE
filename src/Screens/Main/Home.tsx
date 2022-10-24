@@ -19,11 +19,16 @@ export function Home({navigation}: Props) {
     navigation.navigate('TextEditor');
   };
 
+  const goToTextEditor2 = () => {
+    navigation.navigate('Multiline');
+  };
+
   return (
     <View style={styles.container}>
       <Text>Home Screen</Text>
       <Button title="로그아웃" onPress={logout} />
       <Button title="텍스트 에디터" onPress={goToTextEditor} />
+      <Button title="텍스트 에디터2" onPress={goToTextEditor2} />
     </View>
   );
 }

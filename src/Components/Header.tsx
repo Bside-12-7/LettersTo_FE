@@ -21,15 +21,16 @@ export function Header({navigation, title}: Props) {
           <Text style={styles.backButtonText}>{' < '}</Text>
         </View>
       </TouchableWithoutFeedback>
-      <Text>{title}</Text>
+      <Text style={styles.title}>{title}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   headerWrap: {
-    height: 52,
+    height: 76,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   backButton: {
     position: 'absolute',
@@ -40,5 +41,10 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontFamily: 'Galmuri11',
     fontSize: 35,
+  },
+  title: {
+    fontFamily: 'Galmuri11',
+    fontSize: 15,
+    color: '#0000cc',
   },
 });
