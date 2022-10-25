@@ -16,4 +16,5 @@ export type StackParamsList = {
 
   // 편지 작성
   TextEditor: undefined;
+  Multiline: undefined;
 };
