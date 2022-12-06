@@ -25,7 +25,11 @@ class Instance {
       options.body = JSON.stringify(body);
     }
     const res = await fetch(url, options);
-    const data = await res.json();
+    let data;
+    const contentType = res.headers.get('content-type');
+    if (contentType && contentType.indexOf('application/json') !== -1) {
+      data = await res.json();
+    }
     loggingRequest('POST', url, res.status);
 
     if (res.ok) {
@@ -91,7 +95,11 @@ class InstanceWithAuth {
       body: JSON.stringify(body),
     };
     const res = await fetch(url, options);
-    const data = await res.json();
+    let data;
+    const contentType = res.headers.get('content-type');
+    if (contentType && contentType.indexOf('application/json') !== -1) {
+      data = await res.json();
+    }
     loggingRequest('POST', url, res.status);
 
     if (res.ok) {

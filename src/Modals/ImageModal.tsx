@@ -41,9 +41,10 @@ export const ImageModal = React.memo(
           </View>
           <ScrollView
             horizontal
+            showsHorizontalScrollIndicator={false}
             alwaysBounceHorizontal={false}
             pagingEnabled
-            snapToInterval={SCREEN_WIDTH - 70}
+            snapToInterval={SCREEN_WIDTH - 100}
             snapToAlignment="start"
             decelerationRate="fast"
             contentContainerStyle={styles.imageWrap}>
@@ -79,7 +80,7 @@ const styles = StyleSheet.create({
     width: SCREEN_WIDTH - 100,
     minHeight: SCREEN_HEIGHT - 300,
     resizeMode: 'contain',
-    marginRight: 30,
+    marginRight: 0,
   },
   paddingBottom: {marginBottom: 40},
 });
