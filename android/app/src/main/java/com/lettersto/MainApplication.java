@@ -19,7 +19,7 @@ import java.util.List;
 // react-native-splash-screen >= 0.3.1
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 // react-native-splash-screen < 0.3.1
-import com.cboy.rn.splashscreen.SplashScreenReactPackage;
+// import com.cboy.rn.splashscreen.SplashScreenReactPackage;
 
 public class MainApplication extends Application implements ReactApplication {
 
