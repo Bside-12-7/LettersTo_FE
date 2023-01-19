@@ -1,4 +1,4 @@
-import {BASE_URL_TEST} from '../Constants/common';
+import {BASE_URL_PROD} from '../Constants/common';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function loggingRequest(method: string, url: string, status: number): void {
@@ -289,5 +289,5 @@ class InstanceWithAuth {
   }
 }
 
-export const instance = new Instance(BASE_URL_TEST);
-export const instanceWithAuth = new InstanceWithAuth(BASE_URL_TEST);
+export const instance = new Instance(BASE_URL_PROD);
+export const instanceWithAuth = new InstanceWithAuth(BASE_URL_PROD);
