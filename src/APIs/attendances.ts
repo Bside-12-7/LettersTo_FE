@@ -1,5 +1,5 @@
-import {instanceWithAuth} from '../Utils/http';
+import {axiosInstance} from '@utils/http';
 
 export async function sendAttendance() {
-  return await instanceWithAuth.post('/attendances');
+  return await axiosInstance.post<null>('/attendances');
 }

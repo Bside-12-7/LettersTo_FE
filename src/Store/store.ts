@@ -1,65 +1,13 @@
 import create from 'zustand';
 import {
-  Personalities,
-  Topics,
   Stamps,
   PaperColor,
   PaperStyle,
   DeliveryLetterWriteRequest,
-} from '../types/types';
-import {subDate} from '../Utils/dateFormatter';
+} from '@type/types';
+import {subDate} from '@utils/dateFormatter';
 
 interface Store {
-  isLoggedIn: boolean;
-  setIsLoggedIn: (value: boolean) => void;
-
-  isLoading: boolean;
-  setIsLoading: (value: boolean) => void;
-
-  registerToken: string | undefined;
-  setRegisterToken: (value: string) => void;
-
-  topics: Topics;
-  setTopics: (value: Topics) => void;
-
-  personalities: Personalities;
-  setPersonalities: (value: Personalities) => void;
-
-  signUpInfo: {
-    nickname: string | undefined;
-    personalityIds: number[] | undefined;
-    topicIds: number[] | undefined;
-    geolocationId: number | undefined;
-  };
-  setNickname: (value: string) => void;
-  setTopicIds: (value: number[]) => void;
-  setPersonalityIds: (value: number[]) => void;
-  setAddress: (value: number) => void;
-  clearSignupInfo: () => void;
-
-  userInfo:
-    | {
-        nickname: string;
-        personalityIds: number[];
-        topicIds: number[];
-        geolocationId: number;
-        parentGeolocationId: number;
-        stampQuantity: number;
-      }
-    | undefined;
-  setUserInfo: (value: {
-    nickname: string;
-    personalityIds: number[];
-    topicIds: number[];
-    geolocationId: number;
-    parentGeolocationId: number;
-    stampQuantity: number;
-  }) => void;
-
-  setStampQuantity: (value: number) => void;
-
-  signOut: () => void;
-
   letter:
     | {
         title: string;
@@ -84,77 +32,23 @@ interface Store {
     topicIds: number[];
     personalityIds: number[];
     stamp: number | undefined;
+    nickname: string;
+    address: {
+      region: string;
+      city: string;
+    };
   };
   setCoverTopicIds: (topicIds: number[]) => void;
   setCoverPersonalityIds: (personalityIds: number[]) => void;
   setCoverStampId: (stampId: number | undefined) => void;
-  setInitialCoverData: () => void;
+  setCoverNickname: (nickname: string) => void;
+  setCoverAddress: (region: string, city: string) => void;
 
   stamps: Stamps;
   setStamps: (value: Stamps) => void;
 }
 
 const useStore = create<Store>(set => ({
-  isLoggedIn: false,
-  setIsLoggedIn: value => set(() => ({isLoggedIn: value})),
-
-  isLoading: true,
-  setIsLoading: value => set(() => ({isLoading: value})),
-
-  registerToken: undefined,
-  setRegisterToken: value => set(() => ({registerToken: value})),
-
-  topics: [],
-  setTopics: value => set(() => ({topics: value})),
-
-  personalities: [],
-  setPersonalities: value => set(() => ({personalities: value})),
-
-  signUpInfo: {
-    nickname: undefined,
-    personalityIds: undefined,
-    topicIds: undefined,
-    geolocationId: undefined,
-  },
-
-  setNickname: value =>
-    set(state => ({signUpInfo: {...state.signUpInfo, nickname: value}})),
-
-  setTopicIds: value =>
-    set(state => ({signUpInfo: {...state.signUpInfo, topicIds: value}})),
-
-  setPersonalityIds: value =>
-    set(state => ({signUpInfo: {...state.signUpInfo, personalityIds: value}})),
-
-  setAddress: value =>
-    set(state => ({signUpInfo: {...state.signUpInfo, geolocationId: value}})),
-
-  clearSignupInfo: () =>
-    set(() => ({
-      signUpInfo: {
-        nickname: undefined,
-        personalityIds: undefined,
-        topicIds: undefined,
-        geolocationId: undefined,
-      },
-    })),
-
-  userInfo: undefined,
-
-  setUserInfo: value => set(() => ({userInfo: value})),
-
-  setStampQuantity: value =>
-    set(state => {
-      if (state.userInfo) {
-        return {userInfo: {...state.userInfo, stampQuantity: value}};
-      } else {
-        return {};
-      }
-    }),
-
-  signOut: () =>
-    set(() => ({userInfo: undefined, isLoggedIn: false, isLoading: true})),
-
   letter: undefined,
 
   setLetter: letterData => set(() => ({letter: {...letterData}})),
@@ -163,6 +57,11 @@ const useStore = create<Store>(set => ({
     topicIds: [],
     personalityIds: [],
     stamp: undefined,
+    nickname: '',
+    address: {
+      region: '',
+      city: '',
+    },
   },
 
   setCoverTopicIds: topicIds =>
@@ -174,24 +73,21 @@ const useStore = create<Store>(set => ({
   setCoverStampId: stampId =>
     set(state => ({cover: {...state.cover, stamp: stampId}})),
 
-  setInitialCoverData: () =>
-    set(state => ({
-      cover: {
-        topicIds: state.userInfo?.topicIds ?? [],
-        personalityIds: state.userInfo?.personalityIds ?? [],
-        stamp: undefined,
-      },
-    })),
+  setCoverNickname: nickname =>
+    set(state => ({cover: {...state.cover, nickname}})),
+
+  setCoverAddress: (region, city) =>
+    set(state => ({cover: {...state.cover, address: {region, city}}})),
 
   stamps: [
-    {id: 1, image: require('../Assets/stamp/1.png')},
-    {id: 2, image: require('../Assets/stamp/2.png')},
-    {id: 3, image: require('../Assets/stamp/3.png')},
-    {id: 4, image: require('../Assets/stamp/4.png')},
-    {id: 5, image: require('../Assets/stamp/5.png')},
-    {id: 6, image: require('../Assets/stamp/6.png')},
-    {id: 7, image: require('../Assets/stamp/7.png')},
-    {id: 8, image: require('../Assets/stamp/8.png')},
+    {id: 1, image: require('@assets/Image/stamp/1.png')},
+    {id: 2, image: require('@assets/Image/stamp/2.png')},
+    {id: 3, image: require('@assets/Image/stamp/3.png')},
+    {id: 4, image: require('@assets/Image/stamp/4.png')},
+    {id: 5, image: require('@assets/Image/stamp/5.png')},
+    {id: 6, image: require('@assets/Image/stamp/6.png')},
+    {id: 7, image: require('@assets/Image/stamp/7.png')},
+    {id: 8, image: require('@assets/Image/stamp/8.png')},
   ],
 
   setStamps: value => set(() => ({stamps: [...value]})),

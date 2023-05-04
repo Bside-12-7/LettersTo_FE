@@ -3,57 +3,57 @@ import {
   PublicLetterContent,
   PublicLetters,
   PublicLetterWriteRequest,
-} from '../types/types';
-import {instance, instanceWithAuth} from '../Utils/http';
+} from '@type/types';
+import {axiosInstance} from '@utils/http';
 
 type PublicLetterData = {
   content: PublicLetters | [];
   cursor: number;
 };
 
-export async function getPublicLetters(
-  cursor?: number,
-): Promise<PublicLetterData> {
+export async function getPublicLetters(cursor?: number) {
   if (cursor) {
-    return await instance.get('/public-letters', {cursor});
+    return await axiosInstance.get<PublicLetterData>('/public-letters', {
+      params: {cursor},
+    });
   } else {
-    return await instance.get('/public-letters');
+    return await axiosInstance.get<PublicLetterData>('/public-letters');
   }
 }
 
-export async function getPublicLetterContent(
-  id: number,
-): Promise<PublicLetterContent> {
-  return await instanceWithAuth.get(`/public-letters/${id}`);
+export async function getPublicLetterContent(id: number) {
+  return await axiosInstance.get<PublicLetterContent>(`/public-letters/${id}`);
 }
 
 export async function postPublicLetter(
   publicLetterData: PublicLetterWriteRequest,
 ) {
-  return await instanceWithAuth.post('/public-letters', publicLetterData);
+  return await axiosInstance.post('/public-letters', publicLetterData);
 }
 
 export async function replyPublicLetter(
   deliveryLetterData: DeliveryLetterWriteRequest,
 ) {
-  return await instanceWithAuth.post(
-    '/public-letters/reply',
-    deliveryLetterData,
-  );
+  return await axiosInstance.post('/public-letters/reply', deliveryLetterData);
 }
 
 export async function postDeliveryLetter(
   deliveryLetterData: DeliveryLetterWriteRequest,
 ) {
-  return await instanceWithAuth.post('/delivery-letters', deliveryLetterData);
+  return await axiosInstance.post('/delivery-letters', deliveryLetterData);
 }
 
 export async function getDeliveryLetterContent(id: number) {
-  return await instanceWithAuth.post(`/delivery-letters/${id}/open`);
+  return await axiosInstance.post(`/delivery-letters/${id}/open`);
 }
 
 export async function getDeliveryDate(id: number) {
-  return await instanceWithAuth.get(`/letters/${id}/delivery-date`, {
-    deliveryType: 'STANDARD',
-  });
+  return await axiosInstance.get<{deliveryDate: string}>(
+    `/letters/${id}/delivery-date`,
+    {
+      params: {
+        deliveryType: 'STANDARD',
+      },
+    },
+  );
 }

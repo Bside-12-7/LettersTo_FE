@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "434685819233",
+    "project_id": "lettersto-9432b",
+    "storage_bucket": "lettersto-9432b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:434685819233:android:232d9e89cad3a8e2dcad20",
+        "android_client_info": {
+          "package_name": "com.lettersto"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "434685819233-o487ub1d0e148o01c4qds736r2ald3gu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEp2ABBO24kAbuNF1FOIYriWq8my_JX1M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "434685819233-o487ub1d0e148o01c4qds736r2ald3gu.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "434685819233-175dbo7aa0fnlp2pqcn2sdj6s4b2av44.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.lettersto.beside12"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

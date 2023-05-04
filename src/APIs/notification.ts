@@ -1,12 +1,21 @@
-import {instanceWithAuth} from '../Utils/http';
+import {axiosInstance} from '@utils/http';
 
-export const getNotifications = async (data: {
+interface NotificationsRequestParams {
   read?: boolean;
   cursor?: number;
-}) => {
-  return await instanceWithAuth.get('/notifications', data);
+}
+
+interface NotificationsResponse {
+  content: any[];
+  cursor: number;
+}
+
+export const getNotifications = async (data: NotificationsRequestParams) => {
+  return await axiosInstance.get<NotificationsResponse>('/notifications', {
+    params: data,
+  });
 };
 
 export const setNotificationRead = async (id: number) => {
-  return await instanceWithAuth.post(`/notifications/${id}/read`);
+  return await axiosInstance.post(`/notifications/${id}/read`);
 };

@@ -1,12 +1,10 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useMemo, useRef, useState} from 'react';
 import {Animated} from 'react-native';
-import {getTopics} from '../../APIs/topic';
-import Toast from '../../Components/Toast/toast';
-import {MAX_TOPIC_LIMIT} from '../../Constants/user';
-import {Topics} from '../../types/types';
+import {useQuery} from 'react-query';
+import {getTopics} from '@apis/topic';
+import {MAX_TOPIC_LIMIT} from '@constants/user';
 
-export const useTopic = () => {
-  const [topics, setTopics] = useState<Topics>([]);
+export const useTopic = (currentTopics: number[] = []) => {
   const [selectedTopicIds, setSelectedTopicIds] = useState<number[]>([]);
 
   const counter = useMemo(() => selectedTopicIds.length, [selectedTopicIds]);
@@ -26,44 +24,38 @@ export const useTopic = () => {
     }),
   ]);
 
-  const resetAlert = () => {
+  const resetAlert = useCallback(() => {
     alert.reset();
-  };
+  }, [alert]);
 
-  const selectTopic = (topicId: number) => {
-    alert.reset();
-    if (
-      counter < MAX_TOPIC_LIMIT &&
-      selectedTopicIds.includes(topicId) === false
-    ) {
-      setSelectedTopicIds([...selectedTopicIds, topicId]);
-    } else if (selectedTopicIds.includes(topicId) === true) {
-      setSelectedTopicIds([...selectedTopicIds].filter(e => e !== topicId));
-    } else {
-      alert.start();
-    }
-  };
+  const selectTopic = useCallback(
+    (topicId: number) => {
+      alert.reset();
+      if (
+        counter < MAX_TOPIC_LIMIT &&
+        selectedTopicIds.includes(topicId) === false
+      ) {
+        setSelectedTopicIds([...selectedTopicIds, topicId]);
+      } else if (selectedTopicIds.includes(topicId) === true) {
+        setSelectedTopicIds([...selectedTopicIds].filter(e => e !== topicId));
+      } else {
+        alert.start();
+      }
+    },
+    [alert, counter, selectedTopicIds, setSelectedTopicIds],
+  );
 
-  const reset = () => {
-    setSelectedTopicIds([]);
-  };
+  const reset = useCallback(() => {
+    setSelectedTopicIds(currentTopics);
+  }, [setSelectedTopicIds, currentTopics]);
 
-  useEffect(() => {
-    try {
-      getTopics().then(topicData => {
-        setTopics([...topicData]);
-      });
-    } catch (error: any) {
-      console.error(error.message);
-      Toast.show('문제가 발생했습니다');
-    }
-  }, []);
+  const {data: topics} = useQuery('topics', getTopics);
 
   return {
-    topics,
+    topics: topics || [],
     selectedTopicIds,
-    setSelectedTopicIds,
     selectTopic,
+    initUserTopicIds: setSelectedTopicIds,
     alertOpacity,
     counter,
     reset,

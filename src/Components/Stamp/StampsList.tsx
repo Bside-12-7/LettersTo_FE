@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import {StampButton} from './StampButton';
-import type {Stamps} from '../../types/types';
+import type {Stamps} from '@type/types';
 
 type Props = {
   stamps: Stamps;

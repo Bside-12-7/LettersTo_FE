@@ -1,7 +1,7 @@
 import {LinearGradient} from 'expo-linear-gradient';
 import React, {useMemo} from 'react';
-import {GRADIENT_COLORS, PAPER_COLORS} from '../../../Constants/letter';
-import type {PaperColor, PaperStyle as _PaperStyle} from '../../../types/types';
+import {GRADIENT_COLORS, PAPER_COLORS} from '@constants/letter';
+import type {PaperColor, PaperStyle as _PaperStyle} from '@type/types';
 import {PaperStyle} from '../../LetterEditor/Bottom/PaperStyle';
 
 type Props = {

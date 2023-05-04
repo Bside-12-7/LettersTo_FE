@@ -1,27 +1,29 @@
-import type {RegisterToken, UserInfo} from '../types/types';
-import {instance, instanceWithAuth} from '../Utils/http';
+import type {
+  UserInfo,
+  RegisterInfo,
+  AuthTokens,
+  PatchUserInfoRequest,
+} from '@type/auth';
+import {axiosInstance} from '@utils/http';
 
-export async function signUp(userInfo: UserInfo): Promise<RegisterToken> {
-  return await instance.post('/members', {...userInfo});
+export async function signUp(registerInfo: RegisterInfo) {
+  return await axiosInstance.post<AuthTokens>('/members', {...registerInfo});
 }
 
-export async function logIn() {
-  return await instanceWithAuth.get('/members');
+export async function getUserInfo() {
+  return await axiosInstance.get<UserInfo>('/members');
 }
 
-export async function existsNickname(nickname: string): Promise<boolean> {
-  return await instance.get('/members/nickname/exists', {nickname});
+export async function existsNickname(nickname: string) {
+  return await axiosInstance.get<boolean>('/members/nickname/exists', {
+    params: {nickname},
+  });
 }
 
-export async function patchUserInfo(userInfo: {
-  nickname?: string;
-  geolocationId?: number;
-  topicIds?: number[];
-  personalityIds?: number[];
-}) {
-  return await instanceWithAuth.patch('/members', userInfo);
+export async function patchUserInfo(userInfo: PatchUserInfoRequest) {
+  return await axiosInstance.patch<null>('/members', userInfo);
 }
 
 export async function deleteAccount() {
-  return await instanceWithAuth.delete('/members');
+  return await axiosInstance.delete<null>('/members');
 }

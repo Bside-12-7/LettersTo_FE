@@ -1,6 +1,6 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
-import {SCREEN_HEIGHT, SCREEN_WIDTH} from '../../../Constants/screen';
+import {SCREEN_HEIGHT, SCREEN_WIDTH} from '@constants/screen';
 
 const Dots = ({lineColor}: {lineColor: string}) => {
   const result = [];

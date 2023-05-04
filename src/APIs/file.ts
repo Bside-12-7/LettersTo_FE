@@ -1,5 +1,10 @@
-import {instance} from '../Utils/http';
+import {axiosInstance} from '@utils/http';
+
+type PresignUrl = {
+  uploadUrl: string;
+  id: string;
+};
 
 export async function getImageUploadUrl(filename: string) {
-  return await instance.post(`/files?filename=${filename}`);
+  return await axiosInstance.post<PresignUrl>(`/files?filename=${filename}`);
 }

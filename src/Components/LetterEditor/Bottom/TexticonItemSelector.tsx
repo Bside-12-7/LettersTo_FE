@@ -1,7 +1,7 @@
 import React from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {TEXTICONS} from '../../../Constants/letter';
-import type {TexticonCategory} from '../../../types/types';
+import {TEXTICONS} from '@constants/letter';
+import type {TexticonCategory} from '@type/types';
 import {TexticonItem} from './TexticonItem';
 
 type Props = {

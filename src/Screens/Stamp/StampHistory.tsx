@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react';
-import useStore from '../../Store/store';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {StackParamsList} from '../../types/stackParamList';
+import type {NativeStackScreenProps} from '@react-navigation/native-stack';
+import type {StackParamsList} from '@type/stackParamList';
 import {
   ScrollView,
   StyleSheet,
@@ -12,17 +11,21 @@ import {
   StatusBar,
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {Header2} from '../../Components/Headers/Header2';
-import {getStampHistories} from '../../APIs/stamp';
-import {StampHistories} from '../../types/types';
-import {dateFormatter} from '../../Utils/dateFormatter';
-import Toast from '../../Components/Toast/toast';
+import {Header2} from '@components/Headers/Header2';
+import {getStampHistories} from '@apis/stamp';
+import {StampHistories} from '@type/types';
+import {dateFormatter} from '@utils/dateFormatter';
+import Toast from '@components/Toast/toast';
+import {useQuery} from 'react-query';
+import {getUserInfo} from '@apis/member';
+
+const nextImg = require('@assets/Icon/next/next_blue.png');
 
 type Props = NativeStackScreenProps<StackParamsList, 'StampHistory'>;
 
 export const StampHistory = ({navigation}: Props) => {
   const {top: SAFE_AREA_TOP, bottom: SAFE_AREA_BOTTOM} = useSafeAreaInsets();
-  const {userInfo} = useStore();
+  // const {userInfo} = useStore();
 
   const onPressBack = () => {
     navigation.pop();
@@ -41,6 +44,8 @@ export const StampHistory = ({navigation}: Props) => {
     }
   }, []);
 
+  const {data: userInfo} = useQuery('userInfo', getUserInfo);
+
   return (
     <View style={[styles.container, {paddingTop: SAFE_AREA_TOP}]}>
       <StatusBar barStyle={'light-content'} />
@@ -48,7 +53,7 @@ export const StampHistory = ({navigation}: Props) => {
 
       <View style={styles.totalArea}>
         <Image
-          source={require('../../Assets/numberStamps_white.png')}
+          source={require('@assets/numberStamps_white.png')}
           style={{width: 24, height: 24}}
         />
         <Text style={[styles.totalText, {marginLeft: 2}]}>나의 보유 우표</Text>
@@ -61,7 +66,7 @@ export const StampHistory = ({navigation}: Props) => {
           </Text>
           <Image
             style={styles.tooltipTail}
-            source={require('../../Assets/tooltip.png')}
+            source={require('@assets/tooltip.png')}
           />
         </View>
       </View>
@@ -79,10 +84,7 @@ export const StampHistory = ({navigation}: Props) => {
               <Text style={styles.eventText}>
                 앱 리뷰 남기고 추가 우표 받기
               </Text>
-              <Image
-                style={{width: 20, height: 20}}
-                source={require('../../Assets/next_blue.png')}
-              />
+              <Image style={{width: 20, height: 20}} source={nextImg} />
             </View>
           </TouchableOpacity>
           {stampHistories?.map((item: any, idx: number) => {

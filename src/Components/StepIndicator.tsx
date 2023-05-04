@@ -1,5 +1,6 @@
 import React from 'react';
 import {ImageBackground, Text, View} from 'react-native';
+const stepImg = require('@assets/Icon/stepIndicator/step.png');
 
 type Props = {
   current: number;
@@ -12,7 +13,7 @@ export const StepIndicator = React.memo(({current, of}: Props) => {
       return (
         <ImageBackground
           key={i}
-          source={require('../Assets/step.png')}
+          source={stepImg}
           style={{
             height: 20,
             width: 20,
@@ -34,6 +35,7 @@ export const StepIndicator = React.memo(({current, of}: Props) => {
     }
     return (
       <View
+        key={i}
         style={{
           height: 4,
           width: 4,

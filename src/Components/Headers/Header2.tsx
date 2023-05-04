@@ -1,8 +1,8 @@
 import * as React from 'react';
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-
-import {BackButton} from './BackButton';
-import {NextButton} from './NextButton';
+import {StyleSheet, Text, View} from 'react-native';
+import {ReportButton} from '@components/Button/Report/ReportButton';
+import {BackButton} from '@components/Button/Header/BackButton';
+import {NextButton} from '@components/Button/Header/NextButton';
 
 type Props = {
   title?: string;
@@ -45,15 +45,7 @@ export const Header2 = React.memo(
         {onPressNext && disableNext !== undefined ? (
           <NextButton onPress={onPressNext} disable={disableNext} />
         ) : onPressReport ? (
-          <TouchableOpacity
-            onPress={onPressReport}
-            activeOpacity={0.7}
-            style={styles.reportButton}>
-            <Image
-              style={styles.report}
-              source={require('../../Assets/report.png')}
-            />
-          </TouchableOpacity>
+          <ReportButton onPress={onPressReport} />
         ) : (
           <View style={{marginRight: 50}} />
         )}
@@ -77,11 +69,4 @@ const styles = StyleSheet.create({
   },
   titleWrap: {justifyContent: 'center'},
   title: {fontFamily: 'Galmuri11', fontSize: 15},
-  reportButton: {
-    marginLeft: 22,
-  },
-  report: {
-    width: 28,
-    height: 28,
-  },
 });

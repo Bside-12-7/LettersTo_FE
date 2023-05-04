@@ -9,11 +9,14 @@ import {
   Easing,
   TouchableOpacity,
 } from 'react-native';
-import {DeliveryLetter, PaperColor} from '../../types/types';
+import {DeliveryLetter, PaperColor} from '@type/types';
 import {LinearGradient} from 'expo-linear-gradient';
-import {GRADIENT_COLORS} from '../../Constants/letter';
-import {dateFormatter} from '../../Utils/dateFormatter';
-import {SCREEN_WIDTH} from '../../Constants/screen';
+import {GRADIENT_COLORS} from '@constants/letter';
+import {dateFormatter} from '@utils/dateFormatter';
+import {SCREEN_WIDTH} from '@constants/screen';
+import {STAMP_IMAGES} from '@constants/stamp';
+const stampBgImg = require('@assets/Icon/stamp/bg_stamp.png');
+const fromImg = require('@assets/Icon/letter/from.png');
 
 interface LetterItemProps {
   data: DeliveryLetter;
@@ -38,20 +41,6 @@ export function LetterItem(props: LetterItemProps) {
     fromAddress,
   } = data;
 
-  type StampType = {
-    [key: number]: any;
-  };
-  const STAMPS: StampType = {
-    1: require('../../Assets/stamp/1.png'),
-    2: require('../../Assets/stamp/2.png'),
-    3: require('../../Assets/stamp/3.png'),
-    4: require('../../Assets/stamp/4.png'),
-    5: require('../../Assets/stamp/5.png'),
-    6: require('../../Assets/stamp/6.png'),
-    7: require('../../Assets/stamp/7.png'),
-    8: require('../../Assets/stamp/8.png'),
-  };
-
   // 애니메이션
   const moveAnim = useRef(
     new Animated.ValueXY({x: SCREEN_WIDTH, y: 0}),
@@ -66,7 +55,7 @@ export function LetterItem(props: LetterItemProps) {
   useEffect(() => {
     moveX.reset();
     moveX.start();
-  }, []);
+  }, [moveX]);
 
   const IsArrived = useMemo(() => {
     const arrivalDate = new Date(deliveryDate);
@@ -124,48 +113,42 @@ export function LetterItem(props: LetterItemProps) {
           {/* 우표 */}
           {deliveryType === 'STANDARD' ? (
             <View style={styles.stampArea}>
-              <ImageBackground
-                source={require('../../Assets/bg_stamp.png')}
-                style={styles.stampBg}>
-                <Image style={styles.stampImg} source={STAMPS[stampId]} />
+              <ImageBackground source={stampBgImg} style={styles.stampBg}>
+                <Image style={styles.stampImg} source={STAMP_IMAGES[stampId]} />
                 <Image
                   style={styles.stampType}
-                  source={require('../../Assets/stamp_standard.png')}
+                  source={require('@assets/stamp_standard.png')}
                 />
               </ImageBackground>
             </View>
           ) : deliveryType === 'EXPRESS' ? (
             <View style={styles.stampArea}>
               <ImageBackground
-                source={require('../../Assets/bg_stamp.png')}
+                source={stampBgImg}
                 style={[
                   styles.stampBg,
                   {position: 'absolute', transform: [{rotate: '10deg'}]},
                 ]}
               />
               <ImageBackground
-                source={require('../../Assets/bg_stamp.png')}
+                source={stampBgImg}
                 style={[
                   styles.stampBg,
                   {position: 'absolute', transform: [{rotate: '-5deg'}]},
                 ]}
               />
-              <ImageBackground
-                source={require('../../Assets/bg_stamp.png')}
-                style={styles.stampBg}>
-                <Image style={styles.stampImg} source={STAMPS[stampId]} />
+              <ImageBackground source={stampBgImg} style={styles.stampBg}>
+                <Image style={styles.stampImg} source={STAMP_IMAGES[stampId]} />
                 <Image
                   style={styles.stampType}
-                  source={require('../../Assets/stamp_express.png')}
+                  source={require('@assets/stamp_express.png')}
                 />
               </ImageBackground>
             </View>
           ) : (
             <View style={styles.stampArea}>
-              <ImageBackground
-                source={require('../../Assets/bg_stamp.png')}
-                style={styles.stampBg}>
-                <Image style={styles.stampImg} source={STAMPS[stampId]} />
+              <ImageBackground source={stampBgImg} style={styles.stampBg}>
+                <Image style={styles.stampImg} source={STAMP_IMAGES[stampId]} />
               </ImageBackground>
             </View>
           )}
@@ -175,7 +158,7 @@ export function LetterItem(props: LetterItemProps) {
               <>
                 <Image
                   style={[styles.fromImg, {width: 25}]}
-                  source={require('../../Assets/to.png')}
+                  source={require('@assets/to.png')}
                 />
                 <Text
                   style={
@@ -184,10 +167,7 @@ export function LetterItem(props: LetterItemProps) {
               </>
             ) : (
               <>
-                <Image
-                  style={[styles.fromImg, {width: 48}]}
-                  source={require('../../Assets/from.png')}
-                />
+                <Image style={[styles.fromImg, {width: 48}]} source={fromImg} />
                 <Text
                   style={
                     styles.fromText
@@ -201,7 +181,7 @@ export function LetterItem(props: LetterItemProps) {
               <Image
                 style={styles.arrow}
                 resizeMode="contain"
-                source={require('../../Assets/arrow.png')}
+                source={require('@assets/arrow.png')}
               />
               <Text style={styles.deliveryAddressText}>{toAddress}</Text>
             </View>
@@ -212,10 +192,7 @@ export function LetterItem(props: LetterItemProps) {
         </LinearGradient>
       </View>
       {read && (
-        <Image
-          source={require('../../Assets/read_white.png')}
-          style={styles.read}
-        />
+        <Image source={require('@assets/read_white.png')} style={styles.read} />
       )}
     </TouchableOpacity>
   );
@@ -234,12 +211,12 @@ export function LetterItem(props: LetterItemProps) {
           </Text>
           <Image
             style={styles.tooltipTail}
-            source={require('../../Assets/tooltip.png')}
+            source={require('@assets/tooltip.png')}
           />
         </View>
         <Image
           style={styles.pendingImg}
-          source={require('../../Assets/pending.png')}
+          source={require('@assets/pending.png')}
         />
         <Text style={styles.pendingText}>{DdayText}</Text>
       </LinearGradient>

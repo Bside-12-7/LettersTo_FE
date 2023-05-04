@@ -1,4 +1,6 @@
-export type StackParamsList = {
+export interface StackParamsList {
+  [keys: string]: any;
+
   // Splash
   Splash: undefined;
 
@@ -6,7 +8,7 @@ export type StackParamsList = {
   Main: undefined;
 
   // 편지 관련 스택
-  ReadLetter: {id: number; to: 'PUBLIC' | 'DELIVERY'};
+  LetterViewer: {id: number; to: 'PUBLIC' | 'DELIVERY'};
   LetterBoxList: undefined;
   LetterBoxDetail: {id: number; fromMemberId: number; color: string};
 
@@ -18,6 +20,8 @@ export type StackParamsList = {
   TopicsForm: undefined;
   PersonalityForm: undefined;
   LocationForm: undefined;
+
+  Coachmark: undefined;
 
   // 회원 정보 수정 스택
   MyPage: undefined;
@@ -38,4 +42,4 @@ export type StackParamsList = {
 
   // 우표
   StampHistory: undefined;
-};
+}

@@ -1,6 +1,6 @@
 import React from 'react';
 import {View} from 'react-native';
-import {PaperStyle as _PaperStyle} from '../../../types/types';
+import {PaperStyle as _PaperStyle} from '@type/types';
 import {Dotted} from '../../Letter/PaperStyle/Dotted';
 import {Grid} from '../../Letter/PaperStyle/Grid';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import {Image, ImageBackground, TouchableOpacity} from 'react-native';
-import {SCREEN_WIDTH} from '../../Constants/screen';
+import {SCREEN_WIDTH} from '@constants/screen';
 
 export function StampButton({stamp, onPress: selectStamp}: any) {
   return (
@@ -14,7 +14,7 @@ export function StampButton({stamp, onPress: selectStamp}: any) {
         padding: 10,
       }}>
       <ImageBackground
-        source={require('../../Assets/stamp.png')}
+        source={require('@assets/stamp.png')}
         style={{
           width: '100%',
           height: undefined,

@@ -1,16 +1,22 @@
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect, useMemo, useState} from 'react';
 import {FlatList, StatusBar, StyleSheet, Text, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {getNotifications, setNotificationRead} from '../../APIs/notification';
-import {Header2} from '../../Components/Headers/Header2';
-import {NotificationItem} from '../../Components/Notification/NotificationItem';
-import {NotificationSlideSwitch} from '../../Components/Notification/NotificationSlideSwitch';
-import Toast from '../../Components/Toast/toast';
-import {StackParamsList} from '../../types/stackParamList';
-import {Notification, NotificationList} from '../../types/types';
+import {getNotifications, setNotificationRead} from '@apis/notification';
+import {Header2} from '@components/Headers/Header2';
+import {NotificationItem} from '@components/Notification/NotificationItem';
+import {NotificationSlideSwitch} from '@components/Notification/NotificationSlideSwitch';
+import Toast from '@components/Toast/toast';
+import type {StackParamsList} from '@type/stackParamList';
+import {Feedback, Notification, NotificationList} from '@type/types';
+import {FeedbackItem} from '@components/Feedback/FeedbackItem';
 
 type Props = NativeStackScreenProps<StackParamsList, 'Notifications'>;
+
+const FEEDBACK_ITEM: Feedback = {
+  id: -1,
+  type: 'FEEDBACK',
+};
 
 export const Notifications = ({navigation}: Props) => {
   const [excludeReadNotifications, setExcludeReadNotifications] =
@@ -44,7 +50,7 @@ export const Notifications = ({navigation}: Props) => {
 
   const notificationList = useMemo(() => {
     if (excludeReadNotifications === true) {
-      return notifications.filter(e => e.read === false);
+      return notifications.filter(notification => notification.read === false);
     } else {
       return notifications;
     }
@@ -98,16 +104,24 @@ export const Notifications = ({navigation}: Props) => {
         {(excludeReadNotifications === true && notificationList.length > 0) ||
         (excludeReadNotifications === false && notificationList.length > 0) ? (
           <FlatList
-            data={notifications}
-            contentContainerStyle={{paddingBottom: SAFE_AREA_BOTTOM}}
+            data={[FEEDBACK_ITEM, ...notifications]}
+            contentContainerStyle={{
+              paddingBottom: SAFE_AREA_BOTTOM,
+              borderTopColor: '#0000cc40',
+              borderTopWidth: 1,
+            }}
             onEndReached={handleEndReached}
-            renderItem={({item}) => (
-              <NotificationItem
-                key={item.id}
-                notification={item}
-                onPress={onPressNotification}
-              />
-            )}
+            renderItem={({item}) =>
+              item.type === 'FEEDBACK' ? (
+                <FeedbackItem />
+              ) : (
+                <NotificationItem
+                  key={item.id}
+                  notification={item}
+                  onPress={onPressNotification}
+                />
+              )
+            }
           />
         ) : (
           <View style={styles.noUnreadNotification}>

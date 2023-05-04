@@ -1,4 +1,4 @@
-import {Texticons, PaperColor} from '../types/types';
+import {Texticons, PaperColor} from '@type/types';
 
 export const MAX_TEXT_LIMIT = 1000;
 export const MIN_TEXT_LIMIT = 100;

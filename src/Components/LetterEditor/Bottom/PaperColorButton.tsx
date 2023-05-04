@@ -1,9 +1,9 @@
 import React, {useMemo} from 'react';
 import {Image, StyleSheet, TouchableOpacity} from 'react-native';
-import {PAPER_COLORS} from '../../../Constants/letter';
-import {PaperColor} from '../../../types/types';
+import {PAPER_COLORS} from '@constants/letter';
+import {PaperColor} from '@type/types';
 
-const checkMark = require('../../../Assets/check.png');
+const checkMark = require('@assets/check.png');
 
 type Props = {
   color: PaperColor;

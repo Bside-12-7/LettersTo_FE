@@ -1,22 +1,24 @@
-import type {LetterBoxes, LetterBoxInfo, DeliveryLetters} from '../types/types';
-import {instanceWithAuth} from '../Utils/http';
-
-export async function getLetterBoxes(): Promise<LetterBoxes> {
-  return await instanceWithAuth.get('/letter-boxes');
-}
-
-export async function getLetterBoxInfo(id: number): Promise<LetterBoxInfo> {
-  return await instanceWithAuth.get(`/letter-boxes/${id}`);
-}
+import type {LetterBoxes, LetterBoxInfo, DeliveryLetters} from '@type/types';
+import {axiosInstance} from '@utils/http';
 
 type DeliveryLetterData = {
   content: DeliveryLetters | [];
   cursor: number;
 };
 
+export async function getLetterBoxes() {
+  return await axiosInstance.get<LetterBoxes>('/letter-boxes');
+}
+
+export async function getLetterBoxInfo(id: number) {
+  return await axiosInstance.get<LetterBoxInfo>(`/letter-boxes/${id}`);
+}
+
 export async function getDeliveryLetters(data: {
   cursor?: number;
   fromMemberId: number;
 }): Promise<DeliveryLetterData> {
-  return await instanceWithAuth.get('/delivery-letters', data);
+  return await axiosInstance.get<DeliveryLetterData>('/delivery-letters', {
+    params: data,
+  });
 }

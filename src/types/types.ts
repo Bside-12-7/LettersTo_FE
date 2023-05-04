@@ -31,10 +31,12 @@ export type Personality = {
 
 export type Personalities = Personality[];
 
-export type Regions = {
+export type Region = {
   id: number;
   name: string;
-}[];
+};
+
+export type Regions = Region[];
 
 export type Cities = {
   id: number;
@@ -209,6 +211,11 @@ export interface Notification {
   intent: string;
   read: boolean;
   createdDate: Date;
+}
+
+export interface Feedback {
+  id: -1;
+  type: 'FEEDBACK';
 }
 
 export type NotificationList = Notification[];

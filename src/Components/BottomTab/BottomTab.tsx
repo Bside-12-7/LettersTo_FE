@@ -2,6 +2,8 @@ import React from 'react';
 import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
+const triangleImg = require('@assets/Icon/tool/bottomTabButtonEdge.png');
+
 interface Params {
   currentScreen: 'Home' | 'LetterBox';
   onPressHome: () => void;
@@ -22,7 +24,7 @@ export const BottomTab = ({
           <Pressable disabled>
             <View style={styles.tabActive}>
               <Image
-                source={require('../../Assets/triangle.png')}
+                source={triangleImg}
                 style={[styles.triangle, {right: '100%'}]}
               />
               <Text style={styles.tabActiveText}>편지탐색</Text>
@@ -33,7 +35,7 @@ export const BottomTab = ({
             <View style={styles.tabInactive}>
               <Text style={styles.tabInactiveText}>편지탐색</Text>
               <Image
-                source={require('../../Assets/triangle.png')}
+                source={triangleImg}
                 style={[styles.triangle, {right: 0}]}
               />
             </View>
@@ -43,7 +45,7 @@ export const BottomTab = ({
           <Pressable disabled>
             <View style={styles.tabActive}>
               <Image
-                source={require('../../Assets/triangle.png')}
+                source={triangleImg}
                 style={[
                   styles.triangle,
                   {right: -4, transform: [{scaleX: -1}]},
@@ -56,7 +58,7 @@ export const BottomTab = ({
           <Pressable onPress={onPressLetterBox}>
             <View style={styles.tabInactive}>
               <Image
-                source={require('../../Assets/triangle.png')}
+                source={triangleImg}
                 style={[styles.triangle, {left: 0, transform: [{scaleX: -1}]}]}
               />
               <Text style={styles.tabInactiveText}>내 사서함</Text>

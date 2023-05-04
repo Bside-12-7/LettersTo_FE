@@ -8,9 +8,13 @@ import {
   ImageBackground,
   Platform,
 } from 'react-native';
-import {PublicLetter} from '../types/types';
+import {PublicLetter} from '@type/types';
 import {LinearGradient} from 'expo-linear-gradient';
 import {GRADIENT_COLORS} from '../Constants/letter';
+import {STAMP_IMAGES} from '@constants/stamp';
+
+const stampBgImg = require('@assets/Icon/stamp/bg_stamp.png');
+const fromImg = require('@assets/Icon/letter/from.png');
 
 interface PublicLetterItemProps extends PublicLetter {
   style?: object;
@@ -30,20 +34,6 @@ export function PublicLetterItem(props: PublicLetterItemProps) {
     onOpenLetter,
   } = props;
 
-  type StampType = {
-    [key: number]: any;
-  };
-  const STAMPS: StampType = {
-    1: require('../Assets/stamp/1.png'),
-    2: require('../Assets/stamp/2.png'),
-    3: require('../Assets/stamp/3.png'),
-    4: require('../Assets/stamp/4.png'),
-    5: require('../Assets/stamp/5.png'),
-    6: require('../Assets/stamp/6.png'),
-    7: require('../Assets/stamp/7.png'),
-    8: require('../Assets/stamp/8.png'),
-  };
-
   const letterTitle = useMemo(() => {
     if (!title) return '무제';
     if (title.length > 26) {
@@ -58,17 +48,12 @@ export function PublicLetterItem(props: PublicLetterItemProps) {
         locations={[0, 0.5]}
         colors={[GRADIENT_COLORS[paperColor], 'white']}
         style={styles.background}>
-        <ImageBackground
-          source={require('../Assets/bg_stamp.png')}
-          style={styles.stampArea}>
-          <Image style={styles.stampImg} source={STAMPS[stampId]} />
+        <ImageBackground source={stampBgImg} style={styles.stampArea}>
+          <Image style={styles.stampImg} source={STAMP_IMAGES[stampId]} />
         </ImageBackground>
         <Text style={styles.title}>⌜{letterTitle}⌟︎︎</Text>
         <View style={styles.fromArea}>
-          <Image
-            style={styles.fromImg}
-            source={require('../Assets/from.png')}
-          />
+          <Image style={styles.fromImg} source={fromImg} />
           <Text
             style={styles.fromText}>{`${fromNickname},\n${fromAddress}`}</Text>
         </View>

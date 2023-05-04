@@ -1,8 +1,6 @@
 import React, {useState, useEffect} from 'react';
-import useStore from '../../Store/store';
-// import {TabActions} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import type {StackParamsList} from '../../types/stackParamList';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import type {StackParamsList} from '@type/stackParamList';
 import {
   StyleSheet,
   View,
@@ -16,11 +14,15 @@ import {
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {LinearGradient} from 'expo-linear-gradient';
-import {SCREEN_HEIGHT} from '../../Constants/screen';
-import {LetterBoxes, PaperColor} from '../../types/types';
-import {getLetterBoxes} from '../../APIs/letterBox';
-import {GRADIENT_COLORS} from '../../Constants/letter';
-import Toast from '../../Components/Toast/toast';
+import {SCREEN_HEIGHT} from '@constants/screen';
+import {LetterBoxes, PaperColor} from '@type/types';
+import {getLetterBoxes} from '@apis/letterBox';
+import {GRADIENT_COLORS} from '@constants/letter';
+import Toast from '@components/Toast/toast';
+import {getUserInfo} from '@apis/member';
+import {useQuery} from 'react-query';
+import {useFeedbackStore} from '@stores/feedback';
+import {FeedbackButton} from '@components/Feedback/FeedbackButton';
 
 type Props = {
   navigation: NativeStackNavigationProp<StackParamsList, 'Main', undefined>;
@@ -29,11 +31,13 @@ type Props = {
 
 export function LetterBoxList({navigation, onPressHome}: Props) {
   const {top: SAFE_AREA_TOP} = useSafeAreaInsets();
-  const {userInfo} = useStore();
+  // const {userInfo} = useStore();
 
   // 내 사서함 목록
   const [letterBoxes, setLetterBoxes] = useState<LetterBoxes>([]);
   const [loading, setLoading] = useState<boolean>(false);
+
+  const {isFeedbackButtonShown} = useFeedbackStore();
 
   const getLetterBoxesInit = () => {
     try {
@@ -51,6 +55,8 @@ export function LetterBoxList({navigation, onPressHome}: Props) {
     setLoading(true);
     getLetterBoxesInit();
   }, []);
+
+  const {data: userInfo} = useQuery('userInfo', getUserInfo);
 
   // 내 사서함 상세
   const goToDetail = (id: number, fromMemberId: number, color: PaperColor) => {
@@ -73,7 +79,7 @@ export function LetterBoxList({navigation, onPressHome}: Props) {
   const Empty = () => (
     <View style={styles.emptyArea}>
       <Image
-        source={require('../../Assets/no_data.png')}
+        source={require('@assets/no_data.png')}
         style={styles.emptyImage}
       />
       <Text style={styles.emptyText}>
@@ -111,41 +117,45 @@ export function LetterBoxList({navigation, onPressHome}: Props) {
           <View style={{position: 'absolute', left: 16, flexDirection: 'row'}}>
             <TouchableOpacity activeOpacity={0.7} onPress={goToNotification}>
               <Image
-                source={require('../../Assets/alert_off.png')}
+                source={require('@assets/Icon/Alert/alert_off.png')}
                 style={styles.icon}
               />
             </TouchableOpacity>
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={goToStampHistory}
-              style={[styles.headerButton, {marginLeft: 12, width: 40}]}>
-              <Image
-                source={require('../../Assets/numberStamps.png')}
-                style={{width: 24, height: 24, marginLeft: -3}}
-              />
-              <View style={styles.stampArea}>
-                <Text
-                  style={styles.stampText}
-                  numberOfLines={1}
-                  ellipsizeMode="clip">
-                  {userInfo && userInfo.stampQuantity > 999
-                    ? `999+`
-                    : userInfo?.stampQuantity}
-                </Text>
-              </View>
-            </TouchableOpacity>
+            {userInfo && (
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={goToStampHistory}
+                style={[styles.headerButton, {marginLeft: 12, width: 40}]}>
+                <Image
+                  source={require('@assets/Icon/stamp/stamps_blue.png')}
+                  style={{width: 24, height: 24, marginLeft: -3}}
+                />
+                <View style={styles.stampArea}>
+                  <Text
+                    style={styles.stampText}
+                    numberOfLines={1}
+                    ellipsizeMode="clip">
+                    {userInfo.stampQuantity > 999
+                      ? '999+'
+                      : userInfo.stampQuantity}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )}
           </View>
           <Text style={styles.pageTitle}>내 사서함</Text>
           <View style={{position: 'absolute', right: 16, flexDirection: 'row'}}>
             <TouchableOpacity activeOpacity={0.7} onPress={goToMyPage}>
-              <Image
-                source={require('../../Assets/menu.png')}
-                style={styles.icon}
-              />
+              <Image source={require('@assets/menu.png')} style={styles.icon} />
             </TouchableOpacity>
           </View>
         </View>
       </View>
+      {isFeedbackButtonShown.LetterBox || (
+        <View style={[styles.feedbackBtn, {top: SAFE_AREA_TOP + 50}]}>
+          <FeedbackButton screenName={'LETTERBOX'} />
+        </View>
+      )}
       <FlatList
         ListEmptyComponent={loading ? Loading : Empty}
         contentContainerStyle={{marginTop: SAFE_AREA_TOP}}
@@ -189,7 +199,7 @@ export function LetterBoxList({navigation, onPressHome}: Props) {
               </Text>
               <View style={styles.letterArea}>
                 <Image
-                  source={require('../../Assets/letter_blank.png')}
+                  source={require('@assets/letter_blank.png')}
                   resizeMode="contain"
                   style={[styles.letterBlank]}
                 />
@@ -197,7 +207,7 @@ export function LetterBoxList({navigation, onPressHome}: Props) {
                   <>
                     <View style={styles.dot} />
                     <Image
-                      source={require('../../Assets/letter_new.png')}
+                      source={require('@assets/letter_new.png')}
                       resizeMode="contain"
                       style={[styles.letterNew]}
                     />
@@ -325,4 +335,10 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   emptyBtnIcon: {width: 20, height: 20, marginLeft: 2},
+  feedbackBtn: {
+    position: 'absolute',
+    width: '100%',
+    zIndex: 11,
+    padding: 16,
+  },
 });

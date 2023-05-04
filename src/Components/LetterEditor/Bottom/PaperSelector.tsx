@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
-import {SCREEN_HEIGHT} from '../../../Constants/screen';
-import {PaperColor, PaperStyle} from '../../../types/types';
+import {SCREEN_HEIGHT} from '@constants/screen';
+import {PaperColor, PaperStyle} from '@type/types';
 import {PaperColorSelector} from './PaperColorSelector';
 import {PaperStyleSelector} from './PaperStyleSelector';
 

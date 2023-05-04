@@ -8,12 +8,12 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
-import {SCREEN_WIDTH} from '../../Constants/screen';
-import {getImageUrl} from '../../Utils/image';
+import {SCREEN_WIDTH} from '@constants/screen';
+import {getImageUrl} from '@utils/image';
+const closeImg = require('@assets/Icon/close/close_blue.png');
 
-const foldButton = require('../../Assets/fold.png');
-const unfoldButton = require('../../Assets/unfold.png');
-const closeButton = require('../../Assets/close.png');
+const foldButton = require('@assets/fold.png');
+const unfoldButton = require('@assets/unfold.png');
 
 export const ImagePicker = React.memo(
   ({
@@ -158,7 +158,7 @@ export const ImagePicker = React.memo(
                         backgroundColor: 'white',
                       }}>
                       <Image
-                        source={closeButton}
+                        source={closeImg}
                         style={{
                           height: 16,
                           width: 16,

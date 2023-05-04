@@ -1,5 +1,5 @@
 import {LinearGradient} from 'expo-linear-gradient';
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
 type Props = {
@@ -9,46 +9,51 @@ type Props = {
   white?: true;
 };
 
-export function BottomButton({buttonText, onPress, disable, white}: Props) {
-  const [pressed, setPressed] = useState(false);
+export const BottomButton = React.memo(
+  ({buttonText, onPress, disable, white}: Props) => {
+    const [pressed, setPressed] = useState(false);
 
-  const GradientButton = () => (
-    <TouchableOpacity
-      activeOpacity={0.7}
-      disabled={disable || pressed}
-      onPress={async () => {
-        setPressed(true);
-        await onPress();
-        setPressed(false);
-      }}>
-      {disable === true ? (
-        <View style={[styles.button]}>
-          <Text style={styles.buttonText}>{buttonText}</Text>
+    const onPressButton = useCallback(async () => {
+      setPressed(true);
+      await onPress();
+      setPressed(false);
+    }, [onPress]);
+
+    const GradientButton = () => (
+      <TouchableOpacity
+        activeOpacity={0.7}
+        disabled={disable || pressed}
+        onPress={onPressButton}>
+        {disable === true ? (
+          <View style={[styles.button]}>
+            <Text style={styles.buttonText}>{buttonText}</Text>
+          </View>
+        ) : (
+          <LinearGradient
+            colors={['#FF6ECE', '#FF3DBD']}
+            style={[styles.button]}>
+            <Text style={styles.buttonText}>{buttonText}</Text>
+          </LinearGradient>
+        )}
+      </TouchableOpacity>
+    );
+
+    const WhiteButton = () => (
+      <TouchableOpacity activeOpacity={0.5} onPress={onPressButton}>
+        <View style={[styles.whiteButton]}>
+          <Text style={styles.whiteButtonText}>{buttonText}</Text>
         </View>
-      ) : (
-        <LinearGradient colors={['#FF6ECE', '#FF3DBD']} style={[styles.button]}>
-          <Text style={styles.buttonText}>{buttonText}</Text>
-        </LinearGradient>
-      )}
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
 
-  const WhiteButton = () => (
-    <TouchableOpacity
-      activeOpacity={0.5}
-      onPress={async () => {
-        setPressed(true);
-        await onPress();
-        setPressed(false);
-      }}>
-      <View style={[styles.whiteButton]}>
-        <Text style={styles.whiteButtonText}>{buttonText}</Text>
+    // return white ? <WhiteButton /> : <GradientButton />;
+    return (
+      <View style={{paddingBottom: 10}}>
+        {white ? <WhiteButton /> : <GradientButton />}
       </View>
-    </TouchableOpacity>
-  );
-
-  return white ? <WhiteButton /> : <GradientButton />;
-}
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   button: {

@@ -11,3 +11,7 @@ export const onPressTermsOfService = async () => {
     'https://alert-athlete-d7c.notion.site/36b5d2ff6eb74d9490c178a6d9faf6d3',
   );
 };
+
+export const onPressFeedback = async () => {
+  Linking.openURL('https://forms.gle/ZfTxDW2TSWWV2Wph7');
+};

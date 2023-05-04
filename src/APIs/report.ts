@@ -1,6 +1,6 @@
-import {instanceWithAuth} from '../Utils/http';
-import {ReportData} from '../types/types';
+import {axiosInstance} from '@utils/http';
+import {ReportData} from '@type/types';
 
 export async function reportLetter(reportData: ReportData) {
-  return await instanceWithAuth.post('/reports', reportData);
+  return await axiosInstance.post('/reports', reportData);
 }

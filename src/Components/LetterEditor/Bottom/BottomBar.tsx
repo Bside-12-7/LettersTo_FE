@@ -1,17 +1,17 @@
 import React from 'react';
 import {Image, Pressable, StyleSheet, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useKeyboard} from '../../../Hooks/Hardware/useKeyboard';
+import {useKeyboard} from '@hooks/Hardware/useKeyboard';
 
-const photoButton = require('../../../Assets/photo.png');
-const paperButton = require('../../../Assets/paper.png');
-const texticonButton = require('../../../Assets/texticon.png');
-const keyboardButton = require('../../../Assets/keyboardDismiss.png');
+const photoButton = require('@assets/photo.png');
+const paperButton = require('@assets/paper.png');
+const texticonButton = require('@assets/texticon.png');
+const keyboardButton = require('@assets/keyboardDismiss.png');
 
 const textAlign = {
-  left: require('../../../Assets/textAlignLeft.png'),
-  center: require('../../../Assets/textAlignCenter.png'),
-  right: require('../../../Assets/textAlignRight.png'),
+  left: require('@assets/textAlignLeft.png'),
+  center: require('@assets/textAlignCenter.png'),
+  right: require('@assets/textAlignRight.png'),
 };
 
 type Props = {

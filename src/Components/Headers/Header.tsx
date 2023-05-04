@@ -1,10 +1,10 @@
 import * as React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import type {StackParamsList} from '../../types/stackParamList';
-import {BackButton} from './BackButton';
-import {NextButton} from './NextButton';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import type {StackParamsList} from '@type/stackParamList';
+import {BackButton} from '../Button/Header/BackButton';
+import {NextButton} from '../Button/Header/NextButton';
 import {useCallback} from 'react';
 
 type Props = {
