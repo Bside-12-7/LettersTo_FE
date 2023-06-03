@@ -39,6 +39,7 @@ import {Notifications} from '@screens/Notifications/Notifications';
 import {StampHistory} from '@screens/Stamp/StampHistory';
 
 import {useAuthStore} from '@stores/auth';
+import {SCREEN_NAMES} from '@constants/navigation';
 
 const Stack = createNativeStackNavigator<StackParamsList>();
 
@@ -51,50 +52,83 @@ export default function StackNavigator() {
   return (
     <Stack.Navigator
       screenOptions={{headerShown: false}}
-      initialRouteName="Splash">
+      initialRouteName={SCREEN_NAMES.SPLASH}>
       {isLoading ? (
-        <Stack.Screen name="Splash" component={Splash} />
+        <Stack.Screen name={SCREEN_NAMES.SPLASH} component={Splash} />
       ) : isLoggedIn ? (
         <Stack.Group screenOptions={{headerShown: false}}>
-          <Stack.Screen name="Main" component={Main} />
-          <Stack.Screen name="LetterViewer" component={LetterViewer} />
-          <Stack.Screen name="LetterBoxDetail" component={LetterBoxDetail} />
+          <Stack.Screen name={SCREEN_NAMES.MAIN.MAIN} component={Main} />
+          <Stack.Screen
+            name={SCREEN_NAMES.LETTER_VIEWER}
+            component={LetterViewer}
+          />
+          <Stack.Screen
+            name={SCREEN_NAMES.LETTER_BOX_DETAIL}
+            component={LetterBoxDetail}
+          />
 
           {/* 회원정보 수정 */}
-          <Stack.Screen name="MyPage" component={MyPage} />
-          <Stack.Screen name="AccountDelete" component={AccountDelete} />
+          <Stack.Screen name={SCREEN_NAMES.MY_PAGE} component={MyPage} />
+          <Stack.Screen
+            name={SCREEN_NAMES.ACCOUNT_DELETE}
+            component={AccountDelete}
+          />
 
           {/* 편지 작성 */}
-          <Stack.Screen name="LetterEditor" component={LetterEditor} />
           <Stack.Screen
-            name="CoverDeliverySelector"
+            name={SCREEN_NAMES.LETTER_EDITOR}
+            component={LetterEditor}
+          />
+          <Stack.Screen
+            name={SCREEN_NAMES.COVER_DELIVERY_SELECTOR}
             component={CoverDeliverySelector}
           />
-          <Stack.Screen name="CoverTopicEditor" component={CoverTopicEditor} />
           <Stack.Screen
-            name="CoverPersonalityEditor"
+            name={SCREEN_NAMES.COVER_TOPIC_EDITOR}
+            component={CoverTopicEditor}
+          />
+          <Stack.Screen
+            name={SCREEN_NAMES.COVER_PERSONALITY_EDITOR}
             component={CoverPersonalityEditor}
           />
           <Stack.Screen
-            name="CoverStampSelector"
+            name={SCREEN_NAMES.COVER_STAMP_SELECTOR}
             component={CoverStampSelector}
           />
-          <Stack.Screen name="LetterComplete" component={LetterComplete} />
+          <Stack.Screen
+            name={SCREEN_NAMES.LETTER_COMPLETE}
+            component={LetterComplete}
+          />
 
           {/* 알림 */}
-          <Stack.Screen name="Notifications" component={Notifications} />
+          <Stack.Screen
+            name={SCREEN_NAMES.NOTIFICATIONS}
+            component={Notifications}
+          />
 
           {/* 우표 */}
-          <Stack.Screen name="StampHistory" component={StampHistory} />
+          <Stack.Screen
+            name={SCREEN_NAMES.STAMP_HISTORY}
+            component={StampHistory}
+          />
         </Stack.Group>
       ) : (
         <Stack.Group>
-          <Stack.Screen name="Auth" component={Auth} />
-          <Stack.Screen name="NicknameForm" component={NicknameForm} />
-          <Stack.Screen name="TopicsForm" component={TopicsForm} />
-          <Stack.Screen name="PersonalityForm" component={PersonalityForm} />
-          <Stack.Screen name="LocationForm" component={LocationForm} />
-          <Stack.Screen name="Coachmark" component={Coachmark} />
+          <Stack.Screen name={SCREEN_NAMES.AUTH} component={Auth} />
+          <Stack.Screen
+            name={SCREEN_NAMES.NICKNAME_FORM}
+            component={NicknameForm}
+          />
+          <Stack.Screen name={SCREEN_NAMES.TOPIC_FORM} component={TopicsForm} />
+          <Stack.Screen
+            name={SCREEN_NAMES.PERSONALITY_FORM}
+            component={PersonalityForm}
+          />
+          <Stack.Screen
+            name={SCREEN_NAMES.LOCATION_FORM}
+            component={LocationForm}
+          />
+          <Stack.Screen name={SCREEN_NAMES.COACHMARK} component={Coachmark} />
         </Stack.Group>
       )}
     </Stack.Navigator>

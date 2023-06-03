@@ -27,7 +27,12 @@ export function Splash({}: Props) {
   const {isError, isLoading, isSuccess} = useQuery(
     'login',
     loginWithStoredToken,
-    {retry: false},
+    {
+      retry: false,
+      onError: (error: any) => {
+        console.error('Query Error: ', error.message);
+      },
+    },
   );
 
   useEffect(() => {
