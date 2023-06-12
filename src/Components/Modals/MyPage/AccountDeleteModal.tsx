@@ -1,15 +1,37 @@
+import React, {PropsWithChildren} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React from 'react';
 import {Modal, Pressable, StyleSheet, Text, View} from 'react-native';
 import {deleteAccount} from '../../../APIs/member';
 import Toast from '../../Toast/toast';
 import {useMutation} from 'react-query';
 import {useAuthAction} from '@stores/auth';
+import {withButtonClickEventLogger} from '@components/Button/withButtonClickEventLogger';
+import {CLICK_BUTTON_EVENT_PARAMS} from '@constants/analytics';
 
 type Props = {
   hideModal: () => void;
   isModalVisible: boolean;
 };
+
+const OKButton = ({
+  onPress,
+  ...props
+}: {onPress: () => void} & PropsWithChildren) => (
+  <Pressable style={styles.buttonYes} onPress={onPress}>
+    <Text style={styles.buttonTextYes}>{props.children}</Text>
+  </Pressable>
+);
+
+const CancelButtonWithoutLogger = ({
+  onPress,
+  ...props
+}: {onPress: () => void} & PropsWithChildren) => (
+  <Pressable style={styles.buttonNo} onPress={onPress}>
+    <Text style={styles.buttonTextNo}>{props.children}</Text>
+  </Pressable>
+);
+
+const CancelButton = withButtonClickEventLogger(CancelButtonWithoutLogger);
 
 export function AccountDeleteModal({hideModal, isModalVisible}: Props) {
   const {logout} = useAuthAction();
@@ -45,14 +67,12 @@ export function AccountDeleteModal({hideModal, isModalVisible}: Props) {
             </Text>
           </View>
           <View style={styles.buttonWrap}>
-            <Pressable style={styles.buttonYes} onPress={() => signOut()}>
-              <Text style={styles.buttonTextYes}>탈퇴할께요</Text>
-            </Pressable>
-            <Pressable style={styles.buttonNo} onPress={hideModal}>
-              <View>
-                <Text style={styles.buttonTextNo}>취소할께요</Text>
-              </View>
-            </Pressable>
+            <OKButton onPress={() => signOut()}>탈퇴할께요</OKButton>
+            <CancelButton
+              clickButtonEvent={CLICK_BUTTON_EVENT_PARAMS.CANCEL_SIGN_OUT_POPUP}
+              onPress={hideModal}>
+              취소할께요
+            </CancelButton>
           </View>
         </View>
       </View>

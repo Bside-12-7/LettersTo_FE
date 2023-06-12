@@ -27,6 +27,7 @@ import {LogoutModal} from '@components/Modals/MyPage/LogoutModal';
 
 import type {StackParamsList} from '@type/stackParamList';
 import {FeedbackButton} from '@components/Feedback/FeedbackButton';
+import {CLICK_BUTTON_EVENT_PARAMS} from '@constants/analytics';
 
 type Props = NativeStackScreenProps<StackParamsList, 'MyPage'>;
 
@@ -131,10 +132,14 @@ export const MyPage = ({navigation}: Props) => {
       <Header2 title={'MY'} color={'white'} onPressBack={goBack} />
       <View style={styles.nicknameWrap}>
         <Profile nickname={userInfo.nickname} />
-        <EditNicknameButton onPress={toggleModal(MODAL_NAME.NICKNAME)} />
+        <EditNicknameButton
+          clickButtonEvent={CLICK_BUTTON_EVENT_PARAMS.EDIT_NICKNAME}
+          onPress={toggleModal(MODAL_NAME.NICKNAME)}
+        />
       </View>
 
       <StampBox
+        clickButtonEvent={CLICK_BUTTON_EVENT_PARAMS.STAMP_BOX}
         stampQuantity={userInfo.stampQuantity}
         onPress={goToStampHistory}
       />
@@ -142,14 +147,17 @@ export const MyPage = ({navigation}: Props) => {
       <View style={styles.userInfoWrapper}>
         <EditUserInfoButton
           text="관심사 관리"
+          clickButtonEvent={CLICK_BUTTON_EVENT_PARAMS.EDIT_TOPIC}
           onPress={toggleModal(MODAL_NAME.TOPIC)}
         />
         <EditUserInfoButton
           text="성향 관리"
+          clickButtonEvent={CLICK_BUTTON_EVENT_PARAMS.EDIT_PERSONALITY}
           onPress={toggleModal(MODAL_NAME.PERSONALITY)}
         />
         <EditUserInfoButton
           text="위치 정보 관리"
+          clickButtonEvent={CLICK_BUTTON_EVENT_PARAMS.EDIT_LOCATION}
           onPress={toggleModal(MODAL_NAME.LOCATION)}
         />
       </View>

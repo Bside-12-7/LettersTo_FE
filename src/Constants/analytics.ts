@@ -15,8 +15,24 @@ export const CLICK_BUTTON_EVENT_PARAMS = {
     button_class: 'StampBox',
     button_name: '나의 보유 우표',
   },
+  EDIT_TOPIC: {
+    button_class: 'EditPersonality',
+    button_name: '관심사 관리',
+  },
   EDIT_PERSONALITY: {
     button_class: 'EditPersonality',
-    button_name: '성향 관리F',
+    button_name: '성향 관리',
+  },
+  EDIT_LOCATION: {
+    button_class: 'EditLocation',
+    button_name: '위치 정보 관리',
+  },
+  CANCEL_SIGN_OUT: {
+    button_class: 'CancelSignOut',
+    button_name: '한번 더 생각해볼께요',
+  },
+  CANCEL_SIGN_OUT_POPUP: {
+    button_class: 'CancelSignOut(PopUp)',
+    button_name: '취소할께요',
   },
 };

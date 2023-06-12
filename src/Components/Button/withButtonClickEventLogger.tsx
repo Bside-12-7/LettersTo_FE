@@ -1,22 +1,20 @@
 import React from 'react';
-import {
-  TouchableWithoutFeedback as RNTouchableWithoutFeedback,
-  TouchableOpacity as RNTouchableOpacity,
-} from 'react-native';
 import type {
   GestureResponderEvent,
   TouchableWithoutFeedbackProps,
   TouchableOpacityProps,
+  PressableProps,
 } from 'react-native';
 import analytics from '@react-native-firebase/analytics';
 import {EVENT_TYPES} from '@constants/analytics';
 
-export const withLogginButtonClickEvent = <
-  P extends RNTouchableComponentsProps,
->(
+export const withButtonClickEventLogger = <P extends object>(
   InnerComponent: React.ComponentType<P>,
 ) => {
-  return ({clickButtonEvent, ...props}: LoggingButtonClickEventProps) => {
+  return ({
+    clickButtonEvent,
+    ...props
+  }: ButtonProps & RNTouchableComponentsProps & P) => {
     const onPress = (event: GestureResponderEvent) => {
       analytics().logEvent(EVENT_TYPES.CLICK_BUTTON, clickButtonEvent);
       props.onPress?.(event);
@@ -25,16 +23,11 @@ export const withLogginButtonClickEvent = <
   };
 };
 
-export const TouchableWithoutFeedback = withLogginButtonClickEvent(
-  RNTouchableWithoutFeedback,
-);
-
-export const TouchableOpacity = withLogginButtonClickEvent(RNTouchableOpacity);
-
 type RNTouchableComponentsProps = TouchableWithoutFeedbackProps &
-  TouchableOpacityProps;
+  TouchableOpacityProps &
+  PressableProps;
 
-interface LoggingButtonClickEventProps extends RNTouchableComponentsProps {
+interface ButtonProps {
   clickButtonEvent: {
     button_class: string;
     button_name: string;
