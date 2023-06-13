@@ -35,6 +35,7 @@
     "react": "18.1.0",
     "react-native": "0.70.1",
     "react-native-dropdown-picker": "^5.4.2",
+    "react-native-kakao-share-link": "^1.0.10",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-modal": "^13.0.1",
     "react-native-responsive-screen": "^1.4.2",
