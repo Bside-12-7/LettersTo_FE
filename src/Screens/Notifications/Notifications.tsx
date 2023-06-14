@@ -8,7 +8,7 @@ import {NotificationItem} from '@components/Notification/NotificationItem';
 import {NotificationSlideSwitch} from '@components/Notification/NotificationSlideSwitch';
 import Toast from '@components/Toast/toast';
 import type {StackParamsList} from '@type/stackParamList';
-import {Feedback, Notification, NotificationList} from '@type/types';
+import {Feedback, NotificationList} from '@type/types';
 import {FeedbackItem} from '@components/Feedback/FeedbackItem';
 
 type Props = NativeStackScreenProps<StackParamsList, 'Notifications'>;
@@ -36,13 +36,20 @@ export const Notifications = ({navigation}: Props) => {
 
   const {top: SAFE_AREA_TOP, bottom: SAFE_AREA_BOTTOM} = useSafeAreaInsets();
 
-  const onPressNotification = (notification: Notification) => async () => {
-    if (notification.read) {
+  const onPressNotification = (selectedNotificationId: number) => async () => {
+    const selectedNotificationIndex = notifications.findIndex(
+      item => item.id === selectedNotificationId,
+    );
+
+    if (notifications[selectedNotificationIndex].read === true) {
       return;
     }
 
     try {
-      await setNotificationRead(notification.id);
+      await setNotificationRead(selectedNotificationId);
+
+      notifications[selectedNotificationIndex].read = true;
+      setNotifications([...notifications]);
     } catch (error: any) {
       Toast.show('문제가 발생했습니다');
     }

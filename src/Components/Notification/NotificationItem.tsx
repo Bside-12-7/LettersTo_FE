@@ -1,12 +1,12 @@
 import React, {useMemo} from 'react';
-import {TouchableWithoutFeedback, View, Text} from 'react-native';
+import {View, Text, TouchableOpacity} from 'react-native';
 import {Notification} from '@type/types';
 import {subDate} from '@utils/dateFormatter';
 import {Avatar} from '../Avatar/Avatar';
 
 type Props = {
   notification: Notification;
-  onPress: (notification: Notification) => () => void;
+  onPress: (notificationId: number) => () => void;
 };
 
 export const NotificationItem = ({notification, onPress}: Props) => {
@@ -27,7 +27,7 @@ export const NotificationItem = ({notification, onPress}: Props) => {
     }
   }, [notification]);
   return (
-    <TouchableWithoutFeedback onPress={onPress(notification)}>
+    <TouchableOpacity activeOpacity={0.7} onPress={onPress(notification.id)}>
       <View
         style={{
           minHeight: 100,
@@ -74,6 +74,6 @@ export const NotificationItem = ({notification, onPress}: Props) => {
           </View>
         </View>
       </View>
-    </TouchableWithoutFeedback>
+    </TouchableOpacity>
   );
 };
