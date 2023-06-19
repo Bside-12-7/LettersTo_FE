@@ -8,8 +8,10 @@ import {
 } from 'react-native';
 
 const textBalloonImg = require('@assets/Icon/reward/reward_balloon.png');
+
 const timerProgressingImg = require('@assets/Icon/reward/reward_timer.png');
 const timerDoneImg = require('@assets/Icon/reward/reward_timer_done.png');
+const timerEndImg = require('@assets/Icon/reward/reward_timer_end.png');
 
 type DoneProps = {
   onPressReward: () => void;
@@ -50,7 +52,19 @@ export const RewardTimer = {
       </TouchableOpacity>
     </View>
   ),
-  End: () => <></>,
+  End: () => (
+    <View style={styles.container}>
+      <View style={styles.textBalloon}>
+        <ImageBackground style={styles.textBalloonImg} source={textBalloonImg}>
+          <Text style={styles.textBalloonText}>
+            {'하루에 다섯개까지 받을 수 있어요:)'}
+          </Text>
+        </ImageBackground>
+      </View>
+
+      <ImageBackground style={styles.timerImg} source={timerEndImg} />
+    </View>
+  ),
 };
 
 const styles = StyleSheet.create({

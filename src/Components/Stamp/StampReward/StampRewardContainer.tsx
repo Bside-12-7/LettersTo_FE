@@ -8,12 +8,12 @@ import {StyleSheet, View} from 'react-native';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {RemainingDailyRewardsCounter} from './RemainingDailyRewardsCounter';
 import {RewardInformationButton} from './RewardInformationButton';
-import {BottomButton} from '@components/Button/Bottom/BottomButton';
 import KakaoLink from 'react-native-kakao-share-link';
 import {RewardTimer} from './RewardTimer';
 import {useInterval} from '@hooks/useInterval';
 import {KAKAO_LINK_INVITATION_DATA} from '@constants/share';
 import Toast from '@components/Toast/toast';
+import {ShareButton} from './ShareButton';
 
 type Props = {
   toggleRewardInformationModal: () => void;
@@ -88,6 +88,11 @@ export const StampReward = React.memo(
       );
     }, [timer]);
 
+    const isDailyRewardEnd = useMemo(
+      () => rewardQuery.data?.remainingDailyCount === 0,
+      [rewardQuery],
+    );
+
     useInterval(() => {
       if (!rewardQuery.isSuccess) {
         return setTimer(0);
@@ -109,23 +114,28 @@ export const StampReward = React.memo(
             remainCnt={rewardQuery.data.remainingDailyCount}
           />
           <RewardInformationButton onPress={openRewardInformationModal} />
-          {isDailyRewardReady ? (
-            <RewardTimer.Done
-              onPressReward={() => {
-                dailyRewardMutation.mutate();
-                openRewardSuccessModal();
-              }}
-            />
+          {!isDailyRewardEnd ? (
+            isDailyRewardReady ? (
+              <RewardTimer.Done
+                onPressReward={() => {
+                  dailyRewardMutation.mutate();
+                  openRewardSuccessModal();
+                }}
+              />
+            ) : (
+              <RewardTimer.Progressing timer={formattedTimer} />
+            )
           ) : (
-            <RewardTimer.Progressing timer={formattedTimer} />
+            <RewardTimer.End />
           )}
         </View>
-        <View>
-          <BottomButton
-            buttonText={'친구 초대하고 바로 받기!'}
-            onPress={onPressShareAndGetReward}
-          />
-        </View>
+        {!isDailyRewardReady && !isDailyRewardEnd && (
+          <View style={styles.shareButton}>
+            <ShareButton onPress={onPressShareAndGetReward}>
+              {'친구 초대하고 바로 받기!'}
+            </ShareButton>
+          </View>
+        )}
       </View>
     );
   },
@@ -141,5 +151,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFECFA',
     borderRadius: 20,
     padding: 12,
+  },
+  shareButton: {
+    marginTop: 12,
   },
 });
