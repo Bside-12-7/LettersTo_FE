@@ -39,7 +39,7 @@ export const BottomButton = React.memo(
     );
 
     const WhiteButton = () => (
-      <TouchableOpacity activeOpacity={0.5} onPress={onPressButton}>
+      <TouchableOpacity activeOpacity={0.7} onPress={onPressButton}>
         <View style={[styles.whiteButton]}>
           <Text style={styles.whiteButtonText}>{buttonText}</Text>
         </View>

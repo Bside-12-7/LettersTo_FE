@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useReducer, useMemo} from 'react';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import type {StackParamsList} from '@type/stackParamList';
 import {
@@ -7,44 +7,82 @@ import {
   Text,
   View,
   Image,
-  TouchableOpacity,
   StatusBar,
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {Header2} from '@components/Headers/Header2';
 import {getStampHistories} from '@apis/stamp';
-import {StampHistories} from '@type/types';
 import {dateFormatter} from '@utils/dateFormatter';
-import Toast from '@components/Toast/toast';
 import {useQuery} from 'react-query';
 import {getUserInfo} from '@apis/member';
-
-const nextImg = require('@assets/Icon/next/next_blue.png');
-
+import {StampReward} from '@components/Stamp/StampReward/StampRewardContainer';
+import {ModalBlur} from '@components/Modals/ModalBlur';
+import {RewardInformationModal} from '@components/Modals/Reward/RewardInformationModal';
+import {RewardSuccessModal} from '@components/Modals/Reward/RewardSuccessModal';
 type Props = NativeStackScreenProps<StackParamsList, 'StampHistory'>;
+
+type ModalName = 'REWARD_INFORMATION' | 'REWARD_SUCCESS';
+
+const MODAL_NAME: {[key in ModalName]: key} = {
+  REWARD_INFORMATION: 'REWARD_INFORMATION',
+  REWARD_SUCCESS: 'REWARD_SUCCESS',
+};
+
+type ModalState = {
+  [key in ModalName]: boolean;
+};
+
+const INITIAL_MODAL_STATE: ModalState = {
+  REWARD_INFORMATION: false,
+  REWARD_SUCCESS: false,
+};
+
+const MODAL_ACTION = {
+  TOGGLE_REWARD_INFORMATION_MODAL: 'TOGGLE_REWARD_INFORMATION_MODAL',
+  TOGGLE_REWARD_SUCCESS_MODAL: 'TOGGLE_REWARD_SUCCESS_MODAL',
+} as const;
+
+const modalReducer = (
+  state: ModalState,
+  action: {type: keyof typeof MODAL_ACTION},
+) => {
+  switch (action.type) {
+    case MODAL_ACTION.TOGGLE_REWARD_INFORMATION_MODAL:
+      return {...state, REWARD_INFORMATION: !state.REWARD_INFORMATION};
+    case MODAL_ACTION.TOGGLE_REWARD_SUCCESS_MODAL:
+      return {...state, REWARD_SUCCESS: !state.REWARD_SUCCESS};
+  }
+};
 
 export const StampHistory = ({navigation}: Props) => {
   const {top: SAFE_AREA_TOP, bottom: SAFE_AREA_BOTTOM} = useSafeAreaInsets();
-  // const {userInfo} = useStore();
 
   const onPressBack = () => {
     navigation.pop();
   };
 
-  const [stampHistories, setStampHistories] = useState<StampHistories>();
-  useEffect(() => {
-    // 우표 지급 내역 조회
-    try {
-      getStampHistories().then(data => {
-        setStampHistories(data);
-      });
-    } catch (error: any) {
-      console.error(error.message);
-      Toast.show('문제가 발생했습니다');
-    }
-  }, []);
+  const {data: stampHistories} = useQuery('stampHistories', getStampHistories);
 
   const {data: userInfo} = useQuery('userInfo', getUserInfo);
+
+  const [isModalVisible, dispatch] = useReducer(
+    modalReducer,
+    INITIAL_MODAL_STATE,
+  );
+
+  const toggleModal = (modalName: ModalName) => () => {
+    dispatch({type: `TOGGLE_${modalName}_MODAL`});
+  };
+
+  const isAnyModalVisible = useMemo(
+    () => isModalVisible.REWARD_INFORMATION || isModalVisible.REWARD_SUCCESS,
+    [isModalVisible],
+  );
+
+  const onPressGoToLetterEditor = () => {
+    navigation.popToTop();
+    navigation.navigate('LetterEditor');
+  };
 
   return (
     <View style={[styles.container, {paddingTop: SAFE_AREA_TOP}]}>
@@ -60,33 +98,18 @@ export const StampHistory = ({navigation}: Props) => {
         <Text style={[styles.totalText, {marginLeft: 'auto'}]}>
           {userInfo?.stampQuantity.toLocaleString()}개
         </Text>
-        <View style={[styles.tooltipArea, {display: 'none'}]}>
-          <Text style={styles.tooltipText}>
-            매일 앱에 접속하고 우표 받아가세요!
-          </Text>
-          <Image
-            style={styles.tooltipTail}
-            source={require('@assets/tooltip.png')}
-          />
-        </View>
       </View>
 
       <View style={styles.contentContainer}>
         <ScrollView contentContainerStyle={{paddingBottom: SAFE_AREA_BOTTOM}}>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            style={[
-              styles.item,
-              {backgroundColor: '#F2F2FC', display: 'none'},
-            ]}>
-            <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
-              <Text style={styles.event}>EVENT</Text>
-              <Text style={styles.eventText}>
-                앱 리뷰 남기고 추가 우표 받기
-              </Text>
-              <Image style={{width: 20, height: 20}} source={nextImg} />
-            </View>
-          </TouchableOpacity>
+          <View style={{margin: 16}}>
+            <StampReward
+              toggleRewardInformationModal={toggleModal(
+                MODAL_NAME.REWARD_INFORMATION,
+              )}
+              toggleRewardSuccessModal={toggleModal(MODAL_NAME.REWARD_SUCCESS)}
+            />
+          </View>
           {stampHistories?.map((item: any, idx: number) => {
             return (
               <View key={idx} style={styles.item}>
@@ -106,6 +129,17 @@ export const StampHistory = ({navigation}: Props) => {
           })}
         </ScrollView>
       </View>
+
+      {isAnyModalVisible && <ModalBlur />}
+      <RewardInformationModal
+        onPressClose={toggleModal(MODAL_NAME.REWARD_INFORMATION)}
+        isModalVisible={isModalVisible.REWARD_INFORMATION}
+      />
+      <RewardSuccessModal
+        onPressClose={toggleModal(MODAL_NAME.REWARD_SUCCESS)}
+        onPressGoToLetterEditor={onPressGoToLetterEditor}
+        isModalVisible={isModalVisible.REWARD_SUCCESS}
+      />
     </View>
   );
 };
