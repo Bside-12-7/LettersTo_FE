@@ -44,7 +44,7 @@ type ModalState = {
   [key in ModalName]: boolean;
 };
 
-const initialModalState: ModalState = {
+const INITIAL_MODAL_STATE: ModalState = {
   NICKNAME: false,
   TOPIC: false,
   PERSONALITY: false,
@@ -81,7 +81,7 @@ const modalReducer = (
 export const MyPage = ({navigation}: Props) => {
   const [isModalVisible, dispatch] = useReducer(
     modalReducer,
-    initialModalState,
+    INITIAL_MODAL_STATE,
   );
 
   const isAnyModalVisible = useMemo(
