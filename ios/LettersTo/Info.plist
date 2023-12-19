@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.1.1</string>
+	<string>2.1.2</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -25,14 +25,16 @@
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.lettersto.beside12</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>kakao6d103f05f54b404a5f9e96eb2550ef77</string>
+				<string>letterstoapp</string>
 			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>230916</string>
+	<string>231204</string>
 	<key>KAKAO_APP_KEY</key>
 	<string>6d103f05f54b404a5f9e96eb2550ef77</string>
 	<key>LSApplicationQueriesSchemes</key>

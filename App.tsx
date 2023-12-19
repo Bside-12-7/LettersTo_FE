@@ -11,6 +11,8 @@ import {RootSiblingParent} from 'react-native-root-siblings';
 import {QueryClientProvider, QueryClient} from 'react-query';
 import Toast from '@components/Toast/toast';
 import analytics from '@react-native-firebase/analytics';
+import {Linking} from 'react-native';
+import PushNotification from 'react-native-push-notification';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -58,10 +60,61 @@ export default function App() {
     routeNameRef.current = navigationRef.current?.getCurrentRoute()?.name;
   }, [navigationRef]);
 
+  const linking = {
+    prefixes: ['letterstoapp://'],
+
+    // Custom function to get the URL which was used to open the app
+    async getInitialURL() {
+      // check for notification deep linking
+      PushNotification.popInitialNotification(notification => {
+        // <---- 1
+        if (!notification) return;
+
+        const {link = null} = notification?.data || {};
+        link && Linking.openURL(link); // <---- 2
+      });
+      // As a fallback, you may want to do the default deep link handling
+      const url = await Linking.getInitialURL();
+
+      return url;
+    },
+
+    // Custom function to subscribe to incoming links
+    subscribe(listener: any) {
+      // Listen to incoming links from deep linking
+      const linkingSubscription = Linking.addEventListener('url', ({url}) => {
+        console.log(url);
+        listener(url);
+      });
+
+      return () => {
+        linkingSubscription.remove();
+      };
+    },
+
+    config: {
+      screens: {
+        // Profile: {
+        //   path: 'user/:id/:section',
+        //   parse: {
+        //     id: (id) => `user-${id}`,
+        //   },
+        //   stringify: {
+        //     id: (id) => id.replace(/^user-/, ''),
+        //   },
+        // },
+        LetterBoxDetail: {
+          path: 'letterbox/:id/:fromMemberId/:color',
+        },
+      },
+    },
+  };
+
   return (
     <RootSiblingParent>
       <QueryClientProvider client={queryClient}>
         <NavigationContainer
+          linking={linking}
           ref={navigationRef}
           onReady={getInitialRouteName}
           onStateChange={analyzeScreenView}>

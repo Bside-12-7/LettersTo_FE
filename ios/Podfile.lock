@@ -15,7 +15,7 @@ PODS:
   - EXImageLoader (3.2.0):
     - ExpoModulesCore
     - React-Core
-  - Expo (46.0.20):
+  - Expo (46.0.21):
     - ExpoModulesCore
   - ExpoImagePicker (13.3.1):
     - ExpoModulesCore
@@ -477,7 +477,9 @@ PODS:
     - React-Core
   - RNCMaskedView (0.2.8):
     - React-Core
-  - RNDeviceInfo (10.9.0):
+  - RNCPushNotificationIOS (1.11.0):
+    - React-Core
+  - RNDeviceInfo (10.12.0):
     - React-Core
   - RNFBAnalytics (17.3.2):
     - Firebase/Analytics (= 10.6.0)
@@ -490,7 +492,7 @@ PODS:
     - Firebase/AppDistribution (= 10.6.0)
     - React-Core
     - RNFBApp
-  - RNFBMessaging (18.4.0):
+  - RNFBMessaging (17.3.2):
     - Firebase/Messaging (= 10.6.0)
     - FirebaseCoreExtension (= 10.6.0)
     - React-Core
@@ -554,6 +556,7 @@ DEPENDENCIES:
   - "RNAppleAuthentication (from `../node_modules/@invertase/react-native-apple-authentication`)"
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCMaskedView (from `../node_modules/@react-native-masked-view/masked-view`)"
+  - "RNCPushNotificationIOS (from `../node_modules/@react-native-community/push-notification-ios`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - "RNFBAnalytics (from `../node_modules/@react-native-firebase/analytics`)"
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
@@ -689,6 +692,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNCMaskedView:
     :path: "../node_modules/@react-native-masked-view/masked-view"
+  RNCPushNotificationIOS:
+    :path: "../node_modules/@react-native-community/push-notification-ios"
   RNDeviceInfo:
     :path: "../node_modules/react-native-device-info"
   RNFBAnalytics:
@@ -714,7 +719,7 @@ SPEC CHECKSUMS:
   EXFileSystem: 927e0a8885aa9c49e50fc38eaba2c2389f2f1019
   EXFont: 319606bfe48c33b5b5063fb0994afdc496befe80
   EXImageLoader: b88e053d760f85a82405b1db2de4abf11978fc9f
-  Expo: c2afed3f226befffaed962e9bacb5e0296acd254
+  Expo: 99284f9f697b6def5988fdf50652e21f062991e3
   ExpoImagePicker: ca4207f2952a78e6dac2d7852d7e170dd2eaf1d0
   ExpoKeepAwake: 0e8f18142e71bbf2c7f6aa66ebed249ba1420320
   ExpoLinearGradient: 1a3af07c6dab3c612967a294836df9ae717431df
@@ -777,11 +782,12 @@ SPEC CHECKSUMS:
   RNAppleAuthentication: 46cbc67739bae83ca229497f9b0038f3f5431443
   RNCAsyncStorage: 0c357f3156fcb16c8589ede67cc036330b6698ca
   RNCMaskedView: bc0170f389056201c82a55e242e5d90070e18e5a
-  RNDeviceInfo: 02ea8b23e2280fa18e00a06d7e62804d74028579
+  RNCPushNotificationIOS: 64218f3c776c03d7408284a819b2abfda1834bc8
+  RNDeviceInfo: db5c64a060e66e5db3102d041ebe3ef307a85120
   RNFBAnalytics: e1c916bd60f2f8ea9a46999b3b3842e0031eec37
   RNFBApp: dd22a306a31189e99126a35962498c83b06520ab
   RNFBAppDistribution: 7e19d235f6771d65a2b475efc16b52eec75426e2
-  RNFBMessaging: 8ff6d671c33dd7319ab61654409b73ff3416cc77
+  RNFBMessaging: 8c6192acc48b9daacbfe9da9cacca8bee740ce46
   RNScreens: 0df01424e9e0ed7827200d6ed1087ddd06c493f9
   Yoga: 6c8252e38d65aa387daee699eacf027e055e0b31
 

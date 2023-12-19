@@ -1,4 +1,4 @@
-import {BASE_URL_PROD} from '../Constants/common';
+import {BASE_URL_TEST} from '../Constants/common';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import axios, {
@@ -26,7 +26,7 @@ interface CustomInstance extends AxiosInstance {
 }
 
 const axiosInstance: CustomInstance = axios.create({
-  baseURL: BASE_URL_PROD,
+  baseURL: BASE_URL_TEST,
 });
 
 const refreshAccessToken = async () => {
