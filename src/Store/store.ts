@@ -88,6 +88,12 @@ const useStore = create<Store>(set => ({
     // {id: 6, image: require('@assets/Image/stamp/6.png')},
     {id: 7, image: require('@assets/Image/stamp/7.png')},
     // {id: 8, image: require('@assets/Image/stamp/8.png')},
+    {id: 9, image: require('@assets/Image/stamp/9.png')},
+    {id: 10, image: require('@assets/Image/stamp/10.png')},
+    {id: 11, image: require('@assets/Image/stamp/11.png')},
+    {id: 12, image: require('@assets/Image/stamp/12.png')},
+    {id: 13, image: require('@assets/Image/stamp/13.png')},
+    {id: 14, image: require('@assets/Image/stamp/14.png')},
   ],
 
   setStamps: value => set(() => ({stamps: [...value]})),
