@@ -37,7 +37,7 @@ export function StampSelector({
     <View style={styles.container}>
       <View style={styles.titleBox}>
         <View style={styles.titleWrap}>
-          <Title title={'나의 관심사를\n모두 선택해주세요'} />
+          <Title title={'우표를\n선택해주세요'} />
         </View>
         <View style={styles.counterWrap}>
           <Text style={styles.counter}>보유 우표</Text>
