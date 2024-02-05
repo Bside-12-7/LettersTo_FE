@@ -1,11 +1,14 @@
 #import <Firebase.h>
 #import <RNKakaoLogins.h>
+#import <UserNotifications/UserNotifications.h>
+#import <RNCPushNotificationIOS.h>
 
 #import "AppDelegate.h"
 
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
+#import <React/RCTLinkingManager.h>
 #import "RNSplashScreen.h"
 
 #import <React/RCTAppSetupUtils.h>
@@ -66,10 +69,13 @@ static NSString *const kRNConcurrentRoot = @"concurrentRoot";
   [super application:application didFinishLaunchingWithOptions:launchOptions];
   
   [RNSplashScreen show];
-  
+
+  // Define UNUserNotificationCenter
+  UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+  center.delegate = self;
+
   return YES;
 }
-
 
 - (BOOL)application:(UIApplication *)app
      openURL:(NSURL *)url
@@ -78,7 +84,37 @@ static NSString *const kRNConcurrentRoot = @"concurrentRoot";
     return [RNKakaoLogins handleOpenUrl: url];
  }
 
- return NO;
+  return [RCTLinkingManager application:app openURL:url options:options];
+}
+
+// //Called when a notification is delivered to a foreground app.
+-(void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler
+{
+  completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge);
+}
+
+// Required for the register event.
+- (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
+{
+ [RNCPushNotificationIOS didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
+}
+// Required for the notification event. You must call the completion handler after handling the remote notification.
+- (void)application:(UIApplication *)app didReceiveRemoteNotification:(NSDictionary *)userInfo
+fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
+{
+  [RNCPushNotificationIOS didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
+}
+// Required for the registrationError event.
+- (void)application:(UIApplication *)app didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
+{
+ [RNCPushNotificationIOS didFailToRegisterForRemoteNotificationsWithError:error];
+}
+// Required for localNotification event
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center
+didReceiveNotificationResponse:(UNNotificationResponse *)response
+         withCompletionHandler:(void (^)(void))completionHandler
+{
+  [RNCPushNotificationIOS didReceiveNotificationResponse:response];
 }
 
 /// This method controls whether the `concurrentRoot`feature of React18 is turned on or off.
