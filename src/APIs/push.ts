@@ -9,5 +9,5 @@ interface RegisterPushTokenRequestParams {
 export const registerPushNotificationToken = async (
   data: RegisterPushTokenRequestParams,
 ) => {
-  return await axiosInstance.post('/push/register', data);
+  return await axiosInstance.post<{deviceId: string}>('/push/register', data);
 };

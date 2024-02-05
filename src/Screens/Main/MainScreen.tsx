@@ -5,11 +5,11 @@ import {getUserInfo} from '@apis/member';
 import {BottomTab} from '@components/BottomTab/BottomTab';
 import {LetterBoxList} from '../LetterBox/LetterBoxList';
 import {Home} from './HomeScreen';
-import messaging from '@react-native-firebase/messaging';
-import deviceInfo from 'react-native-device-info';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import type {StackParamsList} from '@type/stackParamList';
 import {registerPushNotificationToken} from '@apis/push';
+import messaging from '@react-native-firebase/messaging';
+import deviceInfo from 'react-native-device-info';
 
 type Props = NativeStackScreenProps<StackParamsList, 'Main'>;
 

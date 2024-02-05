@@ -66,25 +66,27 @@ export default function App() {
     // Custom function to get the URL which was used to open the app
     async getInitialURL() {
       // check for notification deep linking
-      PushNotification.popInitialNotification(notification => {
+      PushNotification.popInitialNotification(_notification => {
         // <---- 1
-        if (!notification) return;
+        // if (!notification) return;
 
-        const {link = null} = notification?.data || {};
-        link && Linking.openURL(link); // <---- 2
+        // const {link = null} = notification?.data || {};
+        // link && Linking.openURL(link); // <---- 2
+
+        // todo 딥링크 처리
+        Linking.openURL('letterstoapp://notifications');
       });
       // As a fallback, you may want to do the default deep link handling
-      const url = await Linking.getInitialURL();
-
-      return url;
+      // const url = await Linking.getInitialURL();
+      // return url;
+      return 'letterstoapp://notifications';
     },
 
     // Custom function to subscribe to incoming links
     subscribe(listener: any) {
       // Listen to incoming links from deep linking
       const linkingSubscription = Linking.addEventListener('url', ({url}) => {
-        console.log(url);
-        listener(url);
+        listener('letterstoapp://notifications');
       });
 
       return () => {
@@ -94,15 +96,9 @@ export default function App() {
 
     config: {
       screens: {
-        // Profile: {
-        //   path: 'user/:id/:section',
-        //   parse: {
-        //     id: (id) => `user-${id}`,
-        //   },
-        //   stringify: {
-        //     id: (id) => id.replace(/^user-/, ''),
-        //   },
-        // },
+        Notifications: {
+          path: 'notifications',
+        },
         LetterBoxDetail: {
           path: 'letterbox/:id/:fromMemberId/:color',
         },
