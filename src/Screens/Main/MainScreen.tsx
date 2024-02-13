@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {View} from 'react-native';
+import {Platform, View} from 'react-native';
 import {useQueryClient} from 'react-query';
 import {getUserInfo} from '@apis/member';
 import {BottomTab} from '@components/BottomTab/BottomTab';
@@ -30,7 +30,10 @@ export const Main = ({navigation}: Props) => {
     const pushNotificationPermissionResult =
       await requestPushNotificationPermission();
     if (pushNotificationPermissionResult === true) {
-      const token = await messaging().getAPNSToken();
+      const token =
+        Platform.OS === 'ios'
+          ? await messaging().getAPNSToken()
+          : await messaging().getToken();
       const deviceId = await deviceInfo.getUniqueId();
       if (token && deviceId) {
         const result = await registerPushNotificationToken({
@@ -63,7 +66,7 @@ export const Main = ({navigation}: Props) => {
 
   useEffect(() => {
     registerPushToken();
-  }, []);
+  });
 
   return (
     <View style={{flex: 1}}>

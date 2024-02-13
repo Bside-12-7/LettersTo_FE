@@ -66,27 +66,23 @@ export default function App() {
     // Custom function to get the URL which was used to open the app
     async getInitialURL() {
       // check for notification deep linking
-      PushNotification.popInitialNotification(_notification => {
+      PushNotification.popInitialNotification(async notification => {
         // <---- 1
-        // if (!notification) return;
+        if (!notification) return;
 
-        // const {link = null} = notification?.data || {};
-        // link && Linking.openURL(link); // <---- 2
-
-        // todo 딥링크 처리
-        Linking.openURL('letterstoapp://notifications');
+        const {link = null} = notification?.data || {}; // <---- 1
+        if (link && (await Linking.canOpenURL(link))) Linking.openURL(link);
+        else Linking.openURL('letterstoapp://notifications');
       });
       // As a fallback, you may want to do the default deep link handling
-      // const url = await Linking.getInitialURL();
-      // return url;
-      return 'letterstoapp://notifications';
+      return await Linking.getInitialURL();
     },
 
     // Custom function to subscribe to incoming links
     subscribe(listener: any) {
       // Listen to incoming links from deep linking
       const linkingSubscription = Linking.addEventListener('url', ({url}) => {
-        listener('letterstoapp://notifications');
+        listener(url);
       });
 
       return () => {
