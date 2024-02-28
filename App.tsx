@@ -13,6 +13,7 @@ import Toast from '@components/Toast/toast';
 import analytics from '@react-native-firebase/analytics';
 import {Linking} from 'react-native';
 import PushNotification from 'react-native-push-notification';
+import {getRandomColor} from '@utils/deeplink';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -68,11 +69,16 @@ export default function App() {
       // check for notification deep linking
       PushNotification.popInitialNotification(async notification => {
         // <---- 1
-        if (!notification) return;
+        if (!notification) {
+          return;
+        }
 
         const {link = null} = notification?.data || {}; // <---- 1
-        if (link && (await Linking.canOpenURL(link))) Linking.openURL(link);
-        else Linking.openURL('letterstoapp://notifications');
+        if (link) {
+          Linking.openURL(link + getRandomColor());
+        } else {
+          Linking.openURL('letterstoapp://notifications');
+        }
       });
       // As a fallback, you may want to do the default deep link handling
       return await Linking.getInitialURL();
