@@ -15,9 +15,8 @@ import {NotificationItem} from '@components/Notification/NotificationItem';
 import {NotificationSlideSwitch} from '@components/Notification/NotificationSlideSwitch';
 import Toast from '@components/Toast/toast';
 import type {StackParamsList} from '@type/stackParamList';
-import {Feedback, NotificationList} from '@type/types';
+import {Feedback, Notification, NotificationList} from '@type/types';
 import {FeedbackItem} from '@components/Feedback/FeedbackItem';
-import {getRandomColor} from '@utils/deeplink';
 
 type Props = NativeStackScreenProps<StackParamsList, 'Notifications'>;
 
@@ -49,27 +48,35 @@ export const Notifications = ({navigation}: Props) => {
       item => item.id === selectedNotificationId,
     );
 
-    if (notifications[selectedNotificationIndex].read === true) {
-      return;
+    const notification = notifications[selectedNotificationIndex];
+
+    if (!notifications[selectedNotificationIndex].read) {
+      readNotification(notification, selectedNotificationIndex);
     }
 
-    const notificationIntent = JSON.parse(
-      notifications[selectedNotificationIndex].intent,
-    );
+    if (notification.intent) {
+      goToLetterBox(notification.intent);
+    }
+  };
 
+  const goToLetterBox = (intent: string) => {
+    const notificationIntent = JSON.parse(intent);
+
+    if (notificationIntent.fromMemberId && notificationIntent.letterBoxId) {
+      const link = `letterstoapp://letterbox/${notificationIntent.letterBoxId}/${notificationIntent.fromMemberId}`;
+      Linking.openURL(link);
+    }
+  };
+
+  const readNotification = async (
+    notification: Notification,
+    index: number,
+  ) => {
     try {
-      await setNotificationRead(selectedNotificationId);
+      await setNotificationRead(notification.id);
 
-      notifications[selectedNotificationIndex].read = true;
+      notifications[index].read = true;
       setNotifications([...notifications]);
-
-      if (notificationIntent.fromMemberId && notificationIntent.letterBoxId) {
-        const link = `letterstoapp://letterbox/${
-          notificationIntent.letterBoxId
-        }/${notificationIntent.fromMemberId}/${getRandomColor()}`;
-
-        Linking.openURL(link);
-      }
     } catch (error: any) {
       Toast.show('문제가 발생했습니다');
     }

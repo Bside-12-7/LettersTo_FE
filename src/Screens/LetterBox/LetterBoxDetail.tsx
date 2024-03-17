@@ -25,6 +25,7 @@ import {dateFormatter} from '@utils/dateFormatter';
 import {LetterItem} from './LetterItem';
 import {EnvelopeModal} from '@components/Modals/Letter/EnvelopeModal';
 import Toast from '@components/Toast/toast';
+import {getRandomColor} from '@utils/deeplink';
 
 const triangleImg = require('@assets/Icon/tool/bottomTabButtonEdge.png');
 
@@ -64,7 +65,7 @@ export function LetterBoxDetail({route, navigation}: Props) {
 
   useEffect(() => {
     const {id, fromMemberId, color} = route.params;
-    setAvatarColor(color as PaperColor);
+    setAvatarColor((color ?? getRandomColor()) as PaperColor);
 
     // 사서함 정보 조회
     try {

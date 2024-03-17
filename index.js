@@ -16,8 +16,11 @@ PushNotification.configure({
   onNotification: function (notification) {
     // process the notification'
     const {link = null} = notification?.data || {}; // <---- 1
-    if (link) Linking.openURL(link);
-    else Linking.openURL('letterstoapp://notifications'); // <---- 2
+    if (link) {
+      Linking.openURL(link);
+    } else {
+      Linking.openURL('letterstoapp://notifications');
+    } // <---- 2
 
     // (required) Called when a remote is received or opened, or local notification is opened
     notification.finish(PushNotificationIOS.FetchResult.NoData);

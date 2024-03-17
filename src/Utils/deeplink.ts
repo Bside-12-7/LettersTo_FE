@@ -11,5 +11,5 @@ export const getRandomColor = () => {
     'LAVENDER',
   ];
 
-  return '/' + color[Math.floor(Math.random() * color.length)];
+  return color[Math.floor(Math.random() * color.length)];
 };
