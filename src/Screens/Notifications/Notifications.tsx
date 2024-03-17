@@ -1,6 +1,13 @@
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect, useMemo, useState} from 'react';
-import {FlatList, Linking, StatusBar, StyleSheet, Text, View} from 'react-native';
+import {
+  FlatList,
+  Linking,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {getNotifications, setNotificationRead} from '@apis/notification';
 import {Header2} from '@components/Headers/Header2';
@@ -10,7 +17,7 @@ import Toast from '@components/Toast/toast';
 import type {StackParamsList} from '@type/stackParamList';
 import {Feedback, NotificationList} from '@type/types';
 import {FeedbackItem} from '@components/Feedback/FeedbackItem';
-import { getRandomColor } from '@utils/deeplink';
+import {getRandomColor} from '@utils/deeplink';
 
 type Props = NativeStackScreenProps<StackParamsList, 'Notifications'>;
 
