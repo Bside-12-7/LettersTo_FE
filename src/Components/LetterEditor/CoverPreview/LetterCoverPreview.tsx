@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {
   Image,
   ImageBackground,
@@ -15,12 +15,20 @@ import {GRADIENT_COLORS} from '@constants/letter';
 import {SCREEN_WIDTH} from '@constants/screen';
 import {useTopic} from '@hooks/UserInfo/useTopic';
 import {usePersonality} from '@hooks/UserInfo/usePersonality';
+import {getStamps} from '@apis/stamp';
+import {useQuery} from 'react-query';
+import {getImageUrl} from '@utils/image';
 
 const SelectedStampImage = () => {
-  const {cover, stamps} = useStore();
+  const {cover} = useStore();
+  const {data: stampData} = useQuery(['STAMPS'], getStamps);
+  const stampUri = useMemo(
+    () => stampData?.find(stamp => stamp.id === cover.stamp)?.fileId,
+    [cover.stamp, stampData],
+  );
   return (
     <>
-      {cover.stamp ? (
+      {cover.stamp && stampUri ? (
         <Image
           style={{
             width: '85%',
@@ -28,7 +36,7 @@ const SelectedStampImage = () => {
             aspectRatio: 94 / 116,
             backgroundColor: '#0000cc13',
           }}
-          source={stamps.find(stamp => stamp.id === cover.stamp)?.image}
+          source={{uri: getImageUrl(stampUri)}}
         />
       ) : (
         <View

@@ -4,12 +4,19 @@ import {LinearGradient} from 'expo-linear-gradient';
 import useStore, {useLetterEditorStore} from '@stores/store';
 import {GRADIENT_COLORS} from '@constants/letter';
 import {SCREEN_WIDTH} from '@constants/screen';
+import {getStamps} from '@apis/stamp';
+import {useQuery} from 'react-query';
+import {getImageUrl} from '@utils/image';
 
 const SelectedStampImage = ({stampId}: {stampId: number | undefined}) => {
-  const {stamps} = useStore();
+  const {data: stampData} = useQuery(['STAMPS'], getStamps);
+  const stampUri = useMemo(
+    () => stampData?.find(stamp => stamp.id === stampId)?.fileId,
+    [stampData, stampId],
+  );
   return (
     <>
-      {stampId ? (
+      {stampId && stampUri ? (
         <Image
           style={{
             width: '85%',
@@ -17,7 +24,9 @@ const SelectedStampImage = ({stampId}: {stampId: number | undefined}) => {
             aspectRatio: 94 / 116,
             backgroundColor: '#0000cc13',
           }}
-          source={stamps.find(stamp => stamp.id === stampId)?.image}
+          source={{
+            uri: getImageUrl(stampUri),
+          }}
         />
       ) : (
         <View
@@ -66,10 +75,7 @@ export const DeliveryLetterCoverPreview = React.memo(() => {
           <Image source={require('@assets/to.png')} style={styles.To} />
           <Text style={styles.fromText}>{deliveryLetterTo?.toNickname}</Text>
           <Text style={styles.fromText}>{deliveryLetterTo?.toAddress}</Text>
-          <Image
-            source={require('@assets/From..png')}
-            style={styles.From}
-          />
+          <Image source={require('@assets/From..png')} style={styles.From} />
           <Text style={styles.fromText}>{cover.nickname},</Text>
           <Text style={styles.fromText}>
             {[cover.address.region, ' ', cover.address.city].join('')}
