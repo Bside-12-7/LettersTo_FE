@@ -54,6 +54,10 @@ export const Notifications = ({navigation}: Props) => {
       readNotification(notification, selectedNotificationIndex);
     }
 
+    if (notification.type === 'STAMP') {
+      return navigation.push('StampHistory');
+    }
+
     if (notification.intent) {
       goToLetterBox(notification.intent);
     }
