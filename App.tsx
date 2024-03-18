@@ -13,7 +13,6 @@ import Toast from '@components/Toast/toast';
 import analytics from '@react-native-firebase/analytics';
 import {Linking} from 'react-native';
 import PushNotification from 'react-native-push-notification';
-import {getRandomColor} from '@utils/deeplink';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -75,7 +74,7 @@ export default function App() {
 
         const {link = null} = notification?.data || {}; // <---- 1
         if (link) {
-          Linking.openURL(link + getRandomColor());
+          Linking.openURL(link);
         } else {
           Linking.openURL('letterstoapp://notifications');
         }
@@ -102,7 +101,7 @@ export default function App() {
           path: 'notifications',
         },
         LetterBoxDetail: {
-          path: 'letterbox/:id/:fromMemberId/:color',
+          path: 'letterbox/:id/:fromMemberId',
         },
       },
     },
