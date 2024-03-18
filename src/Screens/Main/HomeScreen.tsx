@@ -58,7 +58,7 @@ export function Home({navigation}: Props) {
   }, []);
 
   // 스크롤 시 y 위치 저장
-  const [currentPositionY, setCurrentPositionY] = useState<Number>(0);
+  const [currentPositionY, setCurrentPositionY] = useState<number>(0);
   const handleScroll = (event: any) => {
     const positionY = event.nativeEvent.contentOffset.y;
     setCurrentPositionY(positionY);
