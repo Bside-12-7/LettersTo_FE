@@ -1,6 +1,7 @@
 import React from 'react';
 import {Image, ImageBackground, TouchableOpacity} from 'react-native';
 import {SCREEN_WIDTH} from '@constants/screen';
+import {getImageUrl} from '@utils/image';
 
 export function StampButton({stamp, onPress: selectStamp}: any) {
   return (
@@ -23,7 +24,8 @@ export function StampButton({stamp, onPress: selectStamp}: any) {
           alignItems: 'center',
         }}>
         <Image
-          source={stamp.image}
+          // source={stamp.image}
+          source={{uri: getImageUrl(stamp.fileId)}}
           style={{
             width: '85%',
             height: undefined,

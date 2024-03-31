@@ -70,7 +70,7 @@ export type Texticons = {
 
 export type Stamp = {
   id: number;
-  image: any;
+  fileId: string;
 };
 
 export type Stamps = Stamp[];
