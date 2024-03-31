@@ -7,6 +7,8 @@ import {LetterBoxList} from '../LetterBox/LetterBoxList';
 import {Home} from './HomeScreen';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import type {StackParamsList} from '@type/stackParamList';
+import {useAnalytics} from '@hooks/Analytics/useAnalytics';
+import {useFocusEffect} from '@react-navigation/native';
 import {registerPushNotificationToken} from '@apis/push';
 import messaging from '@react-native-firebase/messaging';
 import deviceInfo from 'react-native-device-info';
@@ -56,6 +58,8 @@ export const Main = ({navigation}: Props) => {
 
   const queryClient = useQueryClient();
 
+  const {logScreenNameWithoutNavigation} = useAnalytics();
+
   useEffect(() => {
     const fetchUserInfo = async () => {
       await queryClient.prefetchQuery('userInfo', getUserInfo);
@@ -63,6 +67,13 @@ export const Main = ({navigation}: Props) => {
 
     fetchUserInfo();
   }, [queryClient]);
+
+  // MainScreen은 Firebase Analytics의 Screen 항목에 [Home/LetterBox]를 따로 기록함
+  useFocusEffect(
+    useCallback(() => {
+      logScreenNameWithoutNavigation(selectedScreen);
+    }, [logScreenNameWithoutNavigation, selectedScreen]),
+  );
 
   useEffect(() => {
     registerPushToken();

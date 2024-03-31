@@ -15,6 +15,7 @@ import {Header2} from '@components/Headers/Header2';
 import {NoticeBalloon} from '@components/UserInfo/Notice/NoticeBalloon';
 import {NoticeButton} from '@components/UserInfo/Notice/NoticeButton';
 import type {StackParamsList} from '@type/stackParamList';
+import {CLICK_BUTTON_EVENT_PARAMS} from '@constants/analytics';
 
 type Props = NativeStackScreenProps<StackParamsList, 'LocationForm'>;
 
@@ -141,7 +142,11 @@ export function LocationForm({navigation}: Props) {
             </View>
           )}
         </View>
-        <SignUpButton disable={disableSignUp} onPress={onPressSignUp} />
+        <SignUpButton
+          clickButtonEvent={CLICK_BUTTON_EVENT_PARAMS.SIGN_UP}
+          disable={disableSignUp}
+          onPress={onPressSignUp}
+        />
       </SafeAreaView>
     </LinearGradient>
   );

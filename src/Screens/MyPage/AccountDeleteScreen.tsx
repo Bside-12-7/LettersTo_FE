@@ -7,10 +7,32 @@ import {Header2} from '@components/Headers/Header2';
 import {ModalBlur} from '@components/Modals/ModalBlur';
 import {AccountDeleteModal} from '@components/Modals/MyPage/AccountDeleteModal';
 import type {StackParamsList} from '@type/stackParamList';
+import {withButtonClickEventLogger} from '@components/Button/withButtonClickEventLogger';
+import {CLICK_BUTTON_EVENT_PARAMS} from '@constants/analytics';
 
 const noticeImg = require('@assets/Icon/notice/notice_red.png');
 
 type Props = NativeStackScreenProps<StackParamsList, 'AccountDelete'>;
+
+const OKButton = ({onPress}: {onPress: () => void}) => (
+  <BottomButton
+    onPress={onPress}
+    style={styles.buttonYes}
+    textStyle={styles.buttonTextYes}>
+    상관없어요
+  </BottomButton>
+);
+
+const CancelButtonWithoutLogger = ({onPress}: {onPress: () => void}) => (
+  <BottomButton
+    onPress={onPress}
+    style={styles.buttonNo}
+    textStyle={styles.buttonTextNo}>
+    한번 더 생각해볼게요
+  </BottomButton>
+);
+
+const CancelButton = withButtonClickEventLogger(CancelButtonWithoutLogger);
 
 export function AccountDelete({navigation}: Props) {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -48,18 +70,11 @@ export function AccountDelete({navigation}: Props) {
         </Text>
       </View>
       <View style={styles.buttonWrap}>
-        <BottomButton
-          onPress={toggleModal}
-          style={styles.buttonYes}
-          textStyle={styles.buttonTextYes}>
-          상관없어요
-        </BottomButton>
-        <BottomButton
+        <OKButton onPress={toggleModal} />
+        <CancelButton
+          clickButtonEvent={CLICK_BUTTON_EVENT_PARAMS.CANCEL_SIGN_OUT}
           onPress={goBack}
-          style={styles.buttonNo}
-          textStyle={styles.buttonTextNo}>
-          한번 더 생각해볼게요
-        </BottomButton>
+        />
       </View>
 
       {isModalVisible && <ModalBlur />}
