@@ -2,8 +2,9 @@ import React, {useCallback} from 'react';
 import {Text, View, StyleSheet, ScrollView, Image} from 'react-native';
 import {SCREEN_HEIGHT} from '@constants/screen';
 import {StampsList} from '@components/Stamp/StampsList';
-import useStore from '@stores/store';
 import {Title} from '@components/UserInfo/TitleText';
+import {getStamps} from '@apis/stamp';
+import {useQuery} from 'react-query';
 
 const stampImg = require('@assets/Icon/stamp/stamps_blue.png');
 
@@ -18,8 +19,6 @@ export function StampSelector({
   selectedStampId,
   selectStamp,
 }: Props) {
-  const {stamps} = useStore();
-
   const onPressStamp = useCallback(
     (id: number) => {
       if (selectedStampId !== id) {
@@ -33,11 +32,13 @@ export function StampSelector({
     [selectedStampId, stampQuantity, selectStamp],
   );
 
+  const {data: stampData} = useQuery(['STAMPS'], getStamps);
+
   return (
     <View style={styles.container}>
       <View style={styles.titleBox}>
         <View style={styles.titleWrap}>
-          <Title title={'나의 관심사를\n모두 선택해주세요'} />
+          <Title title={'우표를\n선택해주세요'} />
         </View>
         <View style={styles.counterWrap}>
           <Text style={styles.counter}>보유 우표</Text>
@@ -47,11 +48,13 @@ export function StampSelector({
       </View>
 
       <ScrollView alwaysBounceVertical={false} style={styles.personalityBox}>
-        <StampsList
-          stamps={stamps}
-          selectedStampId={selectedStampId}
-          onPressStamp={onPressStamp}
-        />
+        {stampData && (
+          <StampsList
+            stamps={stampData}
+            selectedStampId={selectedStampId}
+            onPressStamp={onPressStamp}
+          />
+        )}
       </ScrollView>
     </View>
   );

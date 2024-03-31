@@ -1,6 +1,6 @@
 import create from 'zustand';
 import {
-  Stamps,
+  // Stamps,
   PaperColor,
   PaperStyle,
   DeliveryLetterWriteRequest,
@@ -44,8 +44,8 @@ interface Store {
   setCoverNickname: (nickname: string) => void;
   setCoverAddress: (region: string, city: string) => void;
 
-  stamps: Stamps;
-  setStamps: (value: Stamps) => void;
+  // stamps: Stamps;
+  // setStamps: (value: Stamps) => void;
 }
 
 const useStore = create<Store>(set => ({
@@ -79,18 +79,24 @@ const useStore = create<Store>(set => ({
   setCoverAddress: (region, city) =>
     set(state => ({cover: {...state.cover, address: {region, city}}})),
 
-  stamps: [
-    {id: 1, image: require('@assets/Image/stamp/1.png')},
-    {id: 2, image: require('@assets/Image/stamp/2.png')},
-    {id: 3, image: require('@assets/Image/stamp/3.png')},
-    {id: 4, image: require('@assets/Image/stamp/4.png')},
-    {id: 5, image: require('@assets/Image/stamp/5.png')},
-    {id: 6, image: require('@assets/Image/stamp/6.png')},
-    {id: 7, image: require('@assets/Image/stamp/7.png')},
-    {id: 8, image: require('@assets/Image/stamp/8.png')},
-  ],
+  // stamps: [
+  //   {id: 1, image: require('@assets/Image/stamp/1.png')},
+  //   {id: 2, image: require('@assets/Image/stamp/2.png')},
+  //   {id: 3, image: require('@assets/Image/stamp/3.png')},
+  //   {id: 4, image: require('@assets/Image/stamp/4.png')},
+  //   {id: 5, image: require('@assets/Image/stamp/5.png')},
+  //   // {id: 6, image: require('@assets/Image/stamp/6.png')},
+  //   {id: 7, image: require('@assets/Image/stamp/7.png')},
+  //   // {id: 8, image: require('@assets/Image/stamp/8.png')},
+  //   {id: 9, image: require('@assets/Image/stamp/9.png')},
+  //   {id: 10, image: require('@assets/Image/stamp/10.png')},
+  //   {id: 11, image: require('@assets/Image/stamp/11.png')},
+  //   {id: 12, image: require('@assets/Image/stamp/12.png')},
+  //   {id: 13, image: require('@assets/Image/stamp/13.png')},
+  //   {id: 14, image: require('@assets/Image/stamp/14.png')},
+  // ],
 
-  setStamps: value => set(() => ({stamps: [...value]})),
+  // setStamps: value => set(() => ({stamps: [...value]})),
 }));
 
 export default useStore;

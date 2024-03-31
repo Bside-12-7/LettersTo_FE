@@ -10,7 +10,7 @@ export interface StackParamsList {
   // 편지 관련 스택
   LetterViewer: {id: number; to: 'PUBLIC' | 'DELIVERY'};
   LetterBoxList: undefined;
-  LetterBoxDetail: {id: number; fromMemberId: number; color: string};
+  LetterBoxDetail: {id: number; fromMemberId: number; color?: string};
 
   // 인증 관련 스택
   Auth: undefined;

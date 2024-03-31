@@ -105,6 +105,7 @@ export function Auth({navigation}: Props) {
       await loginWithProvider(providerToken);
     } catch (error: any) {
       console.error(error.message);
+      Toast.show('문제가 발생했습니다.');
     } finally {
       setDisableSignUp(false);
     }

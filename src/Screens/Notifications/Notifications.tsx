@@ -1,6 +1,13 @@
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect, useMemo, useState} from 'react';
-import {FlatList, StatusBar, StyleSheet, Text, View} from 'react-native';
+import {
+  FlatList,
+  Linking,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {getNotifications, setNotificationRead} from '@apis/notification';
 import {Header2} from '@components/Headers/Header2';
@@ -36,13 +43,44 @@ export const Notifications = ({navigation}: Props) => {
 
   const {top: SAFE_AREA_TOP, bottom: SAFE_AREA_BOTTOM} = useSafeAreaInsets();
 
-  const onPressNotification = (notification: Notification) => async () => {
-    if (notification.read) {
-      return;
+  const onPressNotification = (selectedNotificationId: number) => async () => {
+    const selectedNotificationIndex = notifications.findIndex(
+      item => item.id === selectedNotificationId,
+    );
+
+    const notification = notifications[selectedNotificationIndex];
+
+    if (!notifications[selectedNotificationIndex].read) {
+      readNotification(notification, selectedNotificationIndex);
     }
 
+    if (notification.type === 'STAMP') {
+      return navigation.push('StampHistory');
+    }
+
+    if (notification.intent) {
+      goToLetterBox(notification.intent);
+    }
+  };
+
+  const goToLetterBox = (intent: string) => {
+    const notificationIntent = JSON.parse(intent);
+
+    if (notificationIntent.fromMemberId && notificationIntent.letterBoxId) {
+      const link = `letterstoapp://letterbox/${notificationIntent.letterBoxId}/${notificationIntent.fromMemberId}`;
+      Linking.openURL(link);
+    }
+  };
+
+  const readNotification = async (
+    notification: Notification,
+    index: number,
+  ) => {
     try {
       await setNotificationRead(notification.id);
+
+      notifications[index].read = true;
+      setNotifications([...notifications]);
     } catch (error: any) {
       Toast.show('문제가 발생했습니다');
     }

@@ -25,6 +25,7 @@ import {dateFormatter} from '@utils/dateFormatter';
 import {LetterItem} from './LetterItem';
 import {EnvelopeModal} from '@components/Modals/Letter/EnvelopeModal';
 import Toast from '@components/Toast/toast';
+import {getRandomColor} from '@utils/deeplink';
 
 const triangleImg = require('@assets/Icon/tool/bottomTabButtonEdge.png');
 
@@ -64,7 +65,7 @@ export function LetterBoxDetail({route, navigation}: Props) {
 
   useEffect(() => {
     const {id, fromMemberId, color} = route.params;
-    setAvatarColor(color as PaperColor);
+    setAvatarColor((color ?? getRandomColor()) as PaperColor);
 
     // 사서함 정보 조회
     try {
@@ -125,6 +126,7 @@ export function LetterBoxDetail({route, navigation}: Props) {
   // 봉투 열기
   const [selectedItem, setSelectedItem] = useState<DeliveryLetter>();
   const [isEnvelopeModalVisible, setEnvelopeModalVisible] = useState(false);
+
   const onOpenEnvelopeModal = (item: DeliveryLetter) => {
     setSelectedItem(item);
     setEnvelopeModalVisible(true);
@@ -138,17 +140,18 @@ export function LetterBoxDetail({route, navigation}: Props) {
     [navigation],
   );
 
+  const goBack = () => navigation.goBack();
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle={'light-content'} />
-      <View style={{height: SAFE_AREA_TOP, backgroundColor: '#0000cc'}} />
-      {/* <Header
-        navigation={navigation}
-        title={`${info?.fromNickname}와의 사서함`}
-        color="white"
-        style={{backgroundColor: '#0000CC', paddingTop: 0}}
-      /> */}
-      <Header2 title={`${info?.fromNickname}와의 사서함`} color={'blue'} />
+      <View style={{paddingTop: SAFE_AREA_TOP, backgroundColor: '#0000cc'}}>
+        <Header2
+          title={`${info?.fromNickname}와의 사서함`}
+          color={'white'}
+          onPressBack={goBack}
+        />
+      </View>
       <View style={styles.infoArea}>
         <View style={styles.infoHeader}>
           <Text style={styles.infoNickname}>{info?.fromNickname}</Text>
