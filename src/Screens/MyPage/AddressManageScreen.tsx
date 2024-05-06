@@ -2,6 +2,7 @@ import {getUserInfo} from '@apis/member';
 import {Header2} from '@components/Headers/Header2';
 import {ModalBlur} from '@components/Modals/ModalBlur';
 import {SafeNicknameInfoModal} from '@components/Modals/MyPage/AddressManage/SafeNicknameInfoModal';
+import {SafeNicknameModal} from '@components/Modals/MyPage/AddressManage/SafeNicknameModal';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {StackParamsList} from '@type/stackParamList';
 import React, {useCallback, useMemo, useReducer} from 'react';
@@ -140,11 +141,11 @@ export function AddressManage({navigation}: Props) {
         isModalVisible={isModalVisible.SAFE_NICKNAME_INFO}
         onPressClose={() => toggleModal(MODAL_NAME.SAFE_NICKNAME_INFO)}
       />
-      {/* <NicknameModal
+      <SafeNicknameModal
         currentNickname={userInfo.safeNickname}
         isModalVisible={isModalVisible.SAFE_NICKNAME}
         onPressClose={() => toggleModal(MODAL_NAME.SAFE_NICKNAME)}
-      /> */}
+      />
     </View>
   );
 }

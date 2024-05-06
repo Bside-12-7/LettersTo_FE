@@ -32,6 +32,7 @@ export interface RegisterInfo {
 
 export interface PatchUserInfoRequest {
   nickname?: string;
+  safeNickname?: string;
   geolocationId?: number;
   topicIds?: number[];
   personalityIds?: number[];
