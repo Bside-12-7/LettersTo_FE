@@ -120,6 +120,10 @@ export const MyPage = ({navigation}: Props) => {
     navigation.navigate('AccountDelete');
   }, [navigation]);
 
+  const goToAddressManage = useCallback(() => {
+    navigation.navigate('AddressManage');
+  }, [navigation]);
+
   const {data: userInfo, isSuccess} = useQuery('userInfo', getUserInfo);
 
   if (!isSuccess) {
@@ -156,9 +160,9 @@ export const MyPage = ({navigation}: Props) => {
           onPress={toggleModal(MODAL_NAME.PERSONALITY)}
         />
         <EditUserInfoButton
-          text="위치 정보 관리"
-          clickButtonEvent={CLICK_BUTTON_EVENT_PARAMS.EDIT_LOCATION}
-          onPress={toggleModal(MODAL_NAME.LOCATION)}
+          text="주소록 관리"
+          clickButtonEvent={CLICK_BUTTON_EVENT_PARAMS.MANAGE_ADDRESS}
+          onPress={goToAddressManage}
         />
       </View>
 
