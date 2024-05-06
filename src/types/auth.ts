@@ -2,6 +2,7 @@ type ProviderType = 'KAKAO' | 'APPLE';
 
 export interface UserInfo {
   nickname: string;
+  safeNickname: string;
   personalityIds: number[];
   topicIds: number[];
   geolocationId: number;
