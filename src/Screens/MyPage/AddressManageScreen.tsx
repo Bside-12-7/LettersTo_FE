@@ -75,9 +75,7 @@ export function AddressManage({navigation}: Props) {
 
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
 
-  if (!isSuccess) {
-    return <></>;
-  }
+  if (!isSuccess) return;
 
   return (
     <View style={[styles.container, {paddingTop: SAFE_AREA_TOP}]}>
