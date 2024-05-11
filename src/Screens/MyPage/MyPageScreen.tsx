@@ -21,7 +21,6 @@ import {EditUserInfoButton} from '@components/MyPage/EditUserInfoButton';
 import {NicknameModal} from '@components/Modals/MyPage/NicknameModal';
 import {TopicsModal} from '@components/Modals/MyPage/TopicsModal';
 import {PersonalitiesModal} from '@components/Modals/MyPage/PersonalitiesModal';
-import {LocationModal} from '@components/Modals/MyPage/LocationModal';
 import {ModalBlur} from '@components/Modals/ModalBlur';
 import {LogoutModal} from '@components/Modals/MyPage/LogoutModal';
 
@@ -31,13 +30,12 @@ import {CLICK_BUTTON_EVENT_PARAMS} from '@constants/analytics';
 
 type Props = NativeStackScreenProps<StackParamsList, 'MyPage'>;
 
-type ModalName = 'NICKNAME' | 'TOPIC' | 'PERSONALITY' | 'LOCATION' | 'LOGOUT';
+type ModalName = 'NICKNAME' | 'TOPIC' | 'PERSONALITY' | 'LOGOUT';
 
 const MODAL_NAME: {[key in ModalName]: key} = {
   NICKNAME: 'NICKNAME',
   TOPIC: 'TOPIC',
   PERSONALITY: 'PERSONALITY',
-  LOCATION: 'LOCATION',
   LOGOUT: 'LOGOUT',
 };
 
@@ -49,7 +47,6 @@ const INITIAL_MODAL_STATE: ModalState = {
   NICKNAME: false,
   TOPIC: false,
   PERSONALITY: false,
-  LOCATION: false,
   LOGOUT: false,
 };
 
@@ -57,7 +54,6 @@ const MODAL_ACTION = {
   TOGGLE_NICKNAME_MODAL: 'TOGGLE_NICKNAME_MODAL',
   TOGGLE_TOPIC_MODAL: 'TOGGLE_TOPIC_MODAL',
   TOGGLE_PERSONALITY_MODAL: 'TOGGLE_PERSONALITY_MODAL',
-  TOGGLE_LOCATION_MODAL: 'TOGGLE_LOCATION_MODAL',
   TOGGLE_LOGOUT_MODAL: 'TOGGLE_LOGOUT_MODAL',
 } as const;
 
@@ -72,8 +68,6 @@ const modalReducer = (
       return {...state, TOPIC: !state.TOPIC};
     case MODAL_ACTION.TOGGLE_PERSONALITY_MODAL:
       return {...state, PERSONALITY: !state.PERSONALITY};
-    case MODAL_ACTION.TOGGLE_LOCATION_MODAL:
-      return {...state, LOCATION: !state.LOCATION};
     case MODAL_ACTION.TOGGLE_LOGOUT_MODAL:
       return {...state, LOGOUT: !state.LOGOUT};
   }
@@ -90,7 +84,6 @@ export const MyPage = ({navigation}: Props) => {
       isModalVisible.NICKNAME ||
       isModalVisible.TOPIC ||
       isModalVisible.PERSONALITY ||
-      isModalVisible.LOCATION ||
       isModalVisible.LOGOUT,
     [isModalVisible],
   );
@@ -217,14 +210,6 @@ export const MyPage = ({navigation}: Props) => {
         currentPersonalities={userInfo.personalityIds}
         isModalVisible={isModalVisible.PERSONALITY}
         onPressClose={toggleModal(MODAL_NAME.PERSONALITY)}
-      />
-      <LocationModal
-        currentLocation={{
-          geolocationId: userInfo.geolocationId,
-          parentGeolocationId: userInfo.parentGeolocationId,
-        }}
-        isModalVisible={isModalVisible.LOCATION}
-        onPressClose={toggleModal(MODAL_NAME.LOCATION)}
       />
       <LogoutModal
         isVisible={isModalVisible.LOGOUT}

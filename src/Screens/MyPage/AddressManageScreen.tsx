@@ -4,7 +4,7 @@ import {Header2} from '@components/Headers/Header2';
 import {ModalBlur} from '@components/Modals/ModalBlur';
 import {SafeNicknameInfoModal} from '@components/Modals/MyPage/AddressManage/SafeNicknameInfoModal';
 import {SafeNicknameModal} from '@components/Modals/MyPage/AddressManage/SafeNicknameModal';
-import {LocationModal} from '@components/Modals/MyPage/LocationModal';
+import {LocationModal} from '@components/Modals/MyPage/AddressManage/LocationModal';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {StackParamsList} from '@type/stackParamList';
 import React, {useCallback, useMemo, useReducer} from 'react';
@@ -106,31 +106,17 @@ export function AddressManage({navigation}: Props) {
       <StatusBar barStyle={'light-content'} />
       <Header2 title={'주소록 관리'} color={'white'} onPressBack={goBack} />
 
-      <View
-        style={{
-          paddingTop: 17,
-          paddingBottom: 31,
-          paddingHorizontal: 24,
-        }}>
+      <View style={styles.topWrapper}>
         <TouchableOpacity
           activeOpacity={0.9}
           onPress={() => toggleModal(MODAL_NAME.SAFE_NICKNAME)}
           style={[styles.btnEdit, {marginBottom: 18}]}>
-          <Text
-            style={{fontFamily: 'Galmuri11', fontSize: 14, color: '#0000CC'}}>
-            친구들이 보는 이름
-          </Text>
+          <Text style={styles.textEdit}>친구들이 보는 이름</Text>
           <TouchableWithoutFeedback
             onPress={() => toggleModal(MODAL_NAME.SAFE_NICKNAME_INFO)}>
             <Image source={questionsImg} style={{height: 20, width: 20}} />
           </TouchableWithoutFeedback>
-          <Text
-            style={{
-              fontFamily: 'Galmuri11',
-              fontSize: 14,
-              color: '#0000CC',
-              marginLeft: 'auto',
-            }}>
+          <Text style={[styles.textEdit, {marginLeft: 'auto'}]}>
             {userInfo?.safeNickname}
           </Text>
           <Image source={pencilImg} style={{height: 24, width: 24}} />
@@ -139,28 +125,44 @@ export function AddressManage({navigation}: Props) {
           activeOpacity={0.9}
           onPress={() => toggleModal(MODAL_NAME.LOCATION)}
           style={styles.btnEdit}>
-          <Text
-            style={{fontFamily: 'Galmuri11', fontSize: 14, color: '#0000CC'}}>
-            내 주소
-          </Text>
-          <Text
-            style={{
-              fontFamily: 'Galmuri11',
-              fontSize: 14,
-              color: '#0000CC',
-              marginLeft: 'auto',
-            }}>
+          <Text style={styles.textEdit}>내 주소</Text>
+          <Text style={[styles.textEdit, {marginLeft: 'auto'}]}>
             {addressString}
           </Text>
           <Image source={pencilImg} style={{height: 24, width: 24}} />
         </TouchableOpacity>
       </View>
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: 'white',
-        }}>
-        <Text>123</Text>
+      <View style={styles.bottomWrapper}>
+        <View style={styles.invitationWrapper}>
+          <Image source={require('./image.png')} />
+          <Text
+            style={{
+              margin: 8,
+              fontFamily: 'Galmuri11',
+              fontSize: 14,
+              fontWeight: '700',
+              color: '#0000CC',
+            }}>
+            친구 추가하고 편지 주고받기
+          </Text>
+          <TouchableOpacity
+            style={{
+              marginLeft: 'auto',
+              paddingVertical: 6,
+              paddingHorizontal: 11,
+              backgroundColor: '#0000CC',
+              borderRadius: 10,
+            }}>
+            <Text
+              style={{
+                fontFamily: 'Galmuri11',
+                fontSize: 13,
+                color: 'white',
+              }}>
+              초대하기
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
       {isAnyModalVisible && <ModalBlur />}
       <SafeNicknameInfoModal
@@ -193,5 +195,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     backgroundColor: 'white',
     borderRadius: 5,
+  },
+  textEdit: {fontFamily: 'Galmuri11', fontSize: 14, color: '#0000CC'},
+  topWrapper: {
+    paddingTop: 17,
+    paddingBottom: 31,
+    paddingHorizontal: 24,
+  },
+  bottomWrapper: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  invitationWrapper: {
+    height: 100,
+    backgroundColor: '#F2F2FC',
+    borderBottomWidth: 1,
+    borderBottomColor: '#0000CC',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
   },
 });
