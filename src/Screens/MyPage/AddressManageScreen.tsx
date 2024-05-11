@@ -1,8 +1,10 @@
+import {getCities, getRegions} from '@apis/geolocation';
 import {getUserInfo} from '@apis/member';
 import {Header2} from '@components/Headers/Header2';
 import {ModalBlur} from '@components/Modals/ModalBlur';
 import {SafeNicknameInfoModal} from '@components/Modals/MyPage/AddressManage/SafeNicknameInfoModal';
 import {SafeNicknameModal} from '@components/Modals/MyPage/AddressManage/SafeNicknameModal';
+import {LocationModal} from '@components/Modals/MyPage/LocationModal';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {StackParamsList} from '@type/stackParamList';
 import React, {useCallback, useMemo, useReducer} from 'react';
@@ -22,11 +24,12 @@ const pencilImg = require('@assets/Icon/pencil/pencil_blue.png');
 
 type Props = NativeStackScreenProps<StackParamsList, 'AddressManage'>;
 
-type ModalName = 'SAFE_NICKNAME' | 'SAFE_NICKNAME_INFO';
+type ModalName = 'SAFE_NICKNAME' | 'SAFE_NICKNAME_INFO' | 'LOCATION';
 
 const MODAL_NAME: {[key in ModalName]: key} = {
   SAFE_NICKNAME: 'SAFE_NICKNAME',
   SAFE_NICKNAME_INFO: 'SAFE_NICKNAME_INFO',
+  LOCATION: 'LOCATION',
 };
 type ModalState = {
   [key in ModalName]: boolean;
@@ -35,11 +38,13 @@ type ModalState = {
 const INITIAL_MODAL_STATE: ModalState = {
   SAFE_NICKNAME: false,
   SAFE_NICKNAME_INFO: false,
+  LOCATION: false,
 };
 
 const MODAL_ACTION = {
   TOGGLE_SAFE_NICKNAME_MODAL: 'TOGGLE_SAFE_NICKNAME_MODAL',
   TOGGLE_SAFE_NICKNAME_INFO_MODAL: 'TOGGLE_SAFE_NICKNAME_INFO_MODAL',
+  TOGGLE_LOCATION_MODAL: 'TOGGLE_LOCATION_MODAL',
 } as const;
 
 const modalReducer = (
@@ -51,6 +56,8 @@ const modalReducer = (
       return {...state, SAFE_NICKNAME: !state.SAFE_NICKNAME};
     case MODAL_ACTION.TOGGLE_SAFE_NICKNAME_INFO_MODAL:
       return {...state, SAFE_NICKNAME_INFO: !state.SAFE_NICKNAME_INFO};
+    case MODAL_ACTION.TOGGLE_LOCATION_MODAL:
+      return {...state, LOCATION: !state.LOCATION};
   }
 };
 
@@ -68,9 +75,25 @@ export function AddressManage({navigation}: Props) {
     useSafeAreaInsets();
 
   const {data: userInfo, isSuccess} = useQuery('userInfo', getUserInfo);
+  const {data: regions} = useQuery('regions', getRegions);
+  const {data: cities} = useQuery(
+    ['regions', userInfo?.parentGeolocationId, 'cities'],
+    () => userInfo && getCities(userInfo.parentGeolocationId),
+  );
+
+  const addressString = useMemo(() => {
+    if (!userInfo || !regions || !cities) return '';
+    const userRegion = (
+      regions as unknown as {label: string; value: number}[]
+    ).find(region => region.value === userInfo.parentGeolocationId)?.label;
+    const userCity = cities.find(
+      city => city.id === userInfo.geolocationId,
+    )?.name;
+
+    return userRegion + ' ' + userCity;
+  }, [cities, regions, userInfo]);
 
   const toggleModal = (modalName: ModalName) => {
-    console.log(modalName);
     dispatch({type: `TOGGLE_${modalName}_MODAL`});
   };
 
@@ -112,7 +135,10 @@ export function AddressManage({navigation}: Props) {
           </Text>
           <Image source={pencilImg} style={{height: 24, width: 24}} />
         </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.9} style={styles.btnEdit}>
+        <TouchableOpacity
+          activeOpacity={0.9}
+          onPress={() => toggleModal(MODAL_NAME.LOCATION)}
+          style={styles.btnEdit}>
           <Text
             style={{fontFamily: 'Galmuri11', fontSize: 14, color: '#0000CC'}}>
             내 주소
@@ -124,7 +150,7 @@ export function AddressManage({navigation}: Props) {
               color: '#0000CC',
               marginLeft: 'auto',
             }}>
-            진석
+            {addressString}
           </Text>
           <Image source={pencilImg} style={{height: 24, width: 24}} />
         </TouchableOpacity>
@@ -145,6 +171,14 @@ export function AddressManage({navigation}: Props) {
         currentNickname={userInfo.safeNickname}
         isModalVisible={isModalVisible.SAFE_NICKNAME}
         onPressClose={() => toggleModal(MODAL_NAME.SAFE_NICKNAME)}
+      />
+      <LocationModal
+        currentLocation={{
+          geolocationId: userInfo.geolocationId,
+          parentGeolocationId: userInfo.parentGeolocationId,
+        }}
+        isModalVisible={isModalVisible.LOCATION}
+        onPressClose={() => toggleModal(MODAL_NAME.LOCATION)}
       />
     </View>
   );
