@@ -1,15 +1,22 @@
 import {ModalHeader} from '@components/Headers/ModalHeader';
 import {
+  Image,
   InteractionManager,
   Modal,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {InvitationCodeNoticeModal} from './InvitationCodeNoticeModal';
+import {ModalBlur} from '@components/Modals/ModalBlur';
+import {BottomButton} from '@components/Button/Bottom/BottomButton';
+import {InvitationCodeAlertModal} from './InvitationCodeAlertModal';
+const questionsImg = require('@assets/question.png');
 
 const CELL_COUNT = 6;
 
@@ -24,7 +31,8 @@ export const InvitationCodeInputModal = React.memo(
     isModalVisible: boolean;
   }) => {
     const {top: SAFE_AREA_TOP, bottom: SAFE_AREA_BOTTOM} = useSafeAreaInsets();
-
+    const [isNoticeModalVisible, setNoticeModalVisible] = useState(false);
+    const [isAlertModalVisible, setAlertModalVisible] = useState(false);
     const [code, setCode] = useState(receivedCode ?? '');
     const [containerIsFocused, setContainerIsFocused] = useState(false);
 
@@ -59,14 +67,14 @@ export const InvitationCodeInputModal = React.memo(
       );
     };
 
+    const handleChangeCodeInput = (inputCode: string) => {
+      if (inputCode !== '' && !/^[0-9a-z]+$/.test(inputCode)) return;
+      setCode(inputCode);
+    };
+
     const handleOnPress = () => {
       setContainerIsFocused(true);
       ref?.current?.focus();
-    };
-
-    const handleLongPress = () => {
-      console.log('long pressed');
-      setCode('12345');
     };
 
     const handleOnBlur = () => {
@@ -77,10 +85,11 @@ export const InvitationCodeInputModal = React.memo(
 
     useEffect(() => {
       InteractionManager.runAfterInteractions(() => {
+        if (receivedCode) return;
         setContainerIsFocused(true);
         ref?.current?.focus();
       });
-    }, []);
+    }, [receivedCode]);
 
     return (
       <Modal
@@ -99,24 +108,55 @@ export const InvitationCodeInputModal = React.memo(
               },
             ]}>
             <ModalHeader onPressClose={onPressClose} title={'친구 추가하기'} />
-            <Pressable
-              onLongPress={handleLongPress}
-              style={styles.inputsContainer}
-              onPress={handleOnPress}>
-              {codeDigitsArray.map(toDigitInput)}
-            </Pressable>
-            <TextInput
-              ref={ref}
-              value={code}
-              onChangeText={setCode}
-              onEndEditing={handleOnBlur}
-              returnKeyType="done"
-              textContentType="oneTimeCode"
-              maxLength={CELL_COUNT}
-              style={styles.hiddenCodeInput}
+            <View style={{flex: 1, padding: 24}}>
+              <Text
+                style={{
+                  fontFamily: 'Galmuri11',
+                  fontSize: 18,
+                  fontWeight: '400',
+                  color: '#0000CC',
+                  marginBottom: 24,
+                }}>
+                친구의 코드를 입력해주세요
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    setNoticeModalVisible(true);
+                  }}>
+                  <Image
+                    source={questionsImg}
+                    style={{height: 20, width: 20}}
+                  />
+                </TouchableWithoutFeedback>
+              </Text>
+              <Pressable style={styles.inputsContainer} onPress={handleOnPress}>
+                {codeDigitsArray.map(toDigitInput)}
+              </Pressable>
+              <TextInput
+                ref={ref}
+                value={code}
+                onChangeText={handleChangeCodeInput}
+                onEndEditing={handleOnBlur}
+                returnKeyType="done"
+                textContentType="oneTimeCode"
+                maxLength={CELL_COUNT}
+                style={styles.hiddenCodeInput}
+              />
+            </View>
+            <BottomButton
+              buttonText={'등록하기'}
+              onPress={() => setAlertModalVisible(true)}
             />
           </View>
         </View>
+        {(isNoticeModalVisible || isAlertModalVisible) && <ModalBlur />}
+        <InvitationCodeNoticeModal
+          isModalVisible={isNoticeModalVisible}
+          onPressClose={() => setNoticeModalVisible(false)}
+        />
+        <InvitationCodeAlertModal
+          isModalVisible={isAlertModalVisible}
+          onPressClose={() => setAlertModalVisible(false)}
+        />
       </Modal>
     );
   },
@@ -142,7 +182,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   inputsContainer: {
-    width: 328,
+    width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignSelf: 'center',

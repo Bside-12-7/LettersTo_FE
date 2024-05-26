@@ -8,7 +8,7 @@ type Props = {
   onPressClose: () => void;
 };
 
-export const SafeNicknameInfoModal = ({
+export const InvitationCodeNoticeModal = ({
   isModalVisible,
   onPressClose,
 }: Props) => {
@@ -26,11 +26,14 @@ export const SafeNicknameInfoModal = ({
           <ModalHeader title={'안내'} onPressClose={onPressClose} />
           <View style={styles.contentWrap}>
             <Text style={styles.text}>
-              {'- 주소록의 친구들만 볼 수 있는 이름이에요.'}
+              {'- 친구에게 받은 친구코드를 등록해보세요.'}
+            </Text>
+            <Text style={styles.text}>
+              {'- 코드는 ‘주소록 관리 - 초대하기’에서도 확인할 수 있어요.'}
             </Text>
             <Text style={styles.text}>
               {
-                '- 익명성을 지켜드리기 위해 친구들과 사용하는 이름과 익명의 닉네임을 분리했어요.'
+                '- ‘주소록 관리 - 초대하기’를 통해 내가 먼저 친구를 초대할수도 있어요.'
               }
             </Text>
           </View>

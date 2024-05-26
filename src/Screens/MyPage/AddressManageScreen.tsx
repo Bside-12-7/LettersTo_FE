@@ -2,7 +2,7 @@ import {getCities, getRegions} from '@apis/geolocation';
 import {getUserInfo} from '@apis/member';
 import {Header2} from '@components/Headers/Header2';
 import {ModalBlur} from '@components/Modals/ModalBlur';
-import {SafeNicknameInfoModal} from '@components/Modals/MyPage/AddressManage/SafeNicknameInfoModal';
+import {SafeNicknameNoticeModal} from '@components/Modals/MyPage/AddressManage/SafeNicknameNoticeModal';
 import {SafeNicknameModal} from '@components/Modals/MyPage/AddressManage/SafeNicknameModal';
 import {LocationModal} from '@components/Modals/MyPage/AddressManage/LocationModal';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -186,7 +186,7 @@ export function AddressManage({navigation, route: {params}}: Props) {
         </View>
       </View>
       {isAnyModalVisible && <ModalBlur />}
-      <SafeNicknameInfoModal
+      <SafeNicknameNoticeModal
         isModalVisible={isModalVisible.SAFE_NICKNAME_INFO}
         onPressClose={() => toggleModal(MODAL_NAME.SAFE_NICKNAME_INFO)}
       />
