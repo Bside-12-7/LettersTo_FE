@@ -33,9 +33,8 @@ export const InvitationModal = ({
   const [isCodeModalVisible, setCodeModalVisible] = useState(!!receivedCode);
 
   const {mutate} = useMutation(generateInvitationCode);
-  const {data: codeData, refetch} = useQuery(
-    'INVITATION_CODE',
-    getInvitationCode,
+  const {data: codeData, refetch} = useQuery('INVITATION_CODE', () =>
+    getInvitationCode(),
   );
 
   const resetCode = () => {

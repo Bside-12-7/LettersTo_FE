@@ -16,6 +16,8 @@ import {InvitationCodeNoticeModal} from './InvitationCodeNoticeModal';
 import {ModalBlur} from '@components/Modals/ModalBlur';
 import {BottomButton} from '@components/Button/Bottom/BottomButton';
 import {InvitationCodeAlertModal} from './InvitationCodeAlertModal';
+import {useMutation} from 'react-query';
+import {applyInvitationCode} from '@apis/invitation';
 const questionsImg = require('@assets/question.png');
 
 const CELL_COUNT = 6;
@@ -67,6 +69,10 @@ export const InvitationCodeInputModal = React.memo(
       );
     };
 
+    const {mutate} = useMutation((invitationCode: string) =>
+      applyInvitationCode(invitationCode),
+    );
+
     const handleChangeCodeInput = (inputCode: string) => {
       if (inputCode !== '' && !/^[0-9a-z]+$/.test(inputCode)) return;
       setCode(inputCode);
@@ -81,7 +87,18 @@ export const InvitationCodeInputModal = React.memo(
       setContainerIsFocused(false);
     };
 
-    // Effects
+    const handleSubmit = () => {
+      if (code.length !== 6 || !/^[0-9a-z]+$/.test(code))
+        setAlertModalVisible(true);
+
+      mutate(code, {
+        onSuccess: () => {
+          // Todo 친구 리스트 query 초기화
+          onPressClose();
+        },
+        onError: () => setAlertModalVisible(true),
+      });
+    };
 
     useEffect(() => {
       InteractionManager.runAfterInteractions(() => {
@@ -142,10 +159,7 @@ export const InvitationCodeInputModal = React.memo(
                 style={styles.hiddenCodeInput}
               />
             </View>
-            <BottomButton
-              buttonText={'등록하기'}
-              onPress={() => setAlertModalVisible(true)}
-            />
+            <BottomButton buttonText={'등록하기'} onPress={handleSubmit} />
           </View>
         </View>
         {(isNoticeModalVisible || isAlertModalVisible) && <ModalBlur />}

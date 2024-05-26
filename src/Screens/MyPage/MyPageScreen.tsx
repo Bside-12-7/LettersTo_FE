@@ -1,7 +1,7 @@
 import React, {useCallback, useMemo, useReducer} from 'react';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {View, StyleSheet, StatusBar} from 'react-native';
-import {useQuery} from 'react-query';
+import {useQuery, useQueryClient} from 'react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
@@ -79,6 +79,8 @@ export const MyPage = ({navigation}: Props) => {
     INITIAL_MODAL_STATE,
   );
 
+  const queryClient = useQueryClient();
+
   const isAnyModalVisible = useMemo(
     () =>
       isModalVisible.NICKNAME ||
@@ -95,8 +97,9 @@ export const MyPage = ({navigation}: Props) => {
   const onPressLogout = useCallback(() => {
     AsyncStorage.removeItem('accessToken');
     AsyncStorage.removeItem('refreshToken');
+    queryClient.clear();
     logout();
-  }, [logout]);
+  }, [logout, queryClient]);
 
   const toggleModal = (modalName: ModalName) => () =>
     dispatch({type: `TOGGLE_${modalName}_MODAL`});
