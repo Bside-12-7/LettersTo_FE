@@ -26,7 +26,7 @@ export interface StackParamsList {
   // 회원 정보 수정 스택
   MyPage: undefined;
   AccountDelete: undefined;
-  AddressManage: undefined;
+  AddressManage: {code: string} | undefined;
 
   // 편지 작성
   LetterEditor: {reply: number; to: 'PUBLIC' | 'DELIVERY'} | undefined;

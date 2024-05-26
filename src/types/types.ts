@@ -236,3 +236,9 @@ export interface DeliveryDate {
   deliveryDate: Date;
   deliveryType: DeliveryType;
 }
+
+export interface InvitationCode {
+  invitationCode: string;
+  expirationDate: string;
+  expired: boolean;
+}

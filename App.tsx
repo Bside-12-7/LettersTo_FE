@@ -82,6 +82,9 @@ export default function App() {
         LetterBoxDetail: {
           path: 'letterbox/:id/:fromMemberId',
         },
+        AddressManage: {
+          path: 'address_manage',
+        },
       },
     },
   };
