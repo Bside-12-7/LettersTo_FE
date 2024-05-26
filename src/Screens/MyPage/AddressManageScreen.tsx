@@ -7,7 +7,13 @@ import {SafeNicknameModal} from '@components/Modals/MyPage/AddressManage/SafeNic
 import {LocationModal} from '@components/Modals/MyPage/AddressManage/LocationModal';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {StackParamsList} from '@type/stackParamList';
-import React, {useCallback, useMemo, useReducer} from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
+} from 'react';
 import {
   Image,
   StatusBar,
@@ -19,17 +25,23 @@ import {
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useQuery} from 'react-query';
+import {InvitationModal} from '@components/Modals/MyPage/AddressManage/InvitationModal';
 const questionsImg = require('@assets/question.png');
 const pencilImg = require('@assets/Icon/pencil/pencil_blue.png');
 
 type Props = NativeStackScreenProps<StackParamsList, 'AddressManage'>;
 
-type ModalName = 'SAFE_NICKNAME' | 'SAFE_NICKNAME_INFO' | 'LOCATION';
+type ModalName =
+  | 'SAFE_NICKNAME'
+  | 'SAFE_NICKNAME_INFO'
+  | 'LOCATION'
+  | 'INVITATION';
 
 const MODAL_NAME: {[key in ModalName]: key} = {
   SAFE_NICKNAME: 'SAFE_NICKNAME',
   SAFE_NICKNAME_INFO: 'SAFE_NICKNAME_INFO',
   LOCATION: 'LOCATION',
+  INVITATION: 'INVITATION',
 };
 type ModalState = {
   [key in ModalName]: boolean;
@@ -39,12 +51,14 @@ const INITIAL_MODAL_STATE: ModalState = {
   SAFE_NICKNAME: false,
   SAFE_NICKNAME_INFO: false,
   LOCATION: false,
+  INVITATION: false,
 };
 
 const MODAL_ACTION = {
   TOGGLE_SAFE_NICKNAME_MODAL: 'TOGGLE_SAFE_NICKNAME_MODAL',
   TOGGLE_SAFE_NICKNAME_INFO_MODAL: 'TOGGLE_SAFE_NICKNAME_INFO_MODAL',
   TOGGLE_LOCATION_MODAL: 'TOGGLE_LOCATION_MODAL',
+  TOGGLE_INVITATION_MODAL: 'TOGGLE_INVITATION_MODAL',
 } as const;
 
 const modalReducer = (
@@ -58,10 +72,12 @@ const modalReducer = (
       return {...state, SAFE_NICKNAME_INFO: !state.SAFE_NICKNAME_INFO};
     case MODAL_ACTION.TOGGLE_LOCATION_MODAL:
       return {...state, LOCATION: !state.LOCATION};
+    case MODAL_ACTION.TOGGLE_INVITATION_MODAL:
+      return {...state, INVITATION: !state.INVITATION};
   }
 };
 
-export function AddressManage({navigation}: Props) {
+export function AddressManage({navigation, route: {params}}: Props) {
   const [isModalVisible, dispatch] = useReducer(
     modalReducer,
     INITIAL_MODAL_STATE,
@@ -70,9 +86,9 @@ export function AddressManage({navigation}: Props) {
     () => isModalVisible.SAFE_NICKNAME || isModalVisible.SAFE_NICKNAME_INFO,
     [isModalVisible],
   );
+  const [receivedCode, setReceivedCode] = useState(params?.code);
 
-  const {top: SAFE_AREA_TOP /*, bottom: SAFE_AREA_BOTTOM*/} =
-    useSafeAreaInsets();
+  const {top: SAFE_AREA_TOP} = useSafeAreaInsets();
 
   const {data: userInfo, isSuccess} = useQuery('userInfo', getUserInfo);
   const {data: regions} = useQuery('regions', getRegions);
@@ -98,6 +114,10 @@ export function AddressManage({navigation}: Props) {
   };
 
   const goBack = useCallback(() => navigation.goBack(), [navigation]);
+
+  useEffect(() => {
+    if (receivedCode) toggleModal(MODAL_NAME.INVITATION);
+  }, [receivedCode]);
 
   if (!isSuccess) return;
 
@@ -146,6 +166,7 @@ export function AddressManage({navigation}: Props) {
             친구 추가하고 편지 주고받기
           </Text>
           <TouchableOpacity
+            onPress={() => toggleModal(MODAL_NAME.INVITATION)}
             style={{
               marginLeft: 'auto',
               paddingVertical: 6,
@@ -181,6 +202,16 @@ export function AddressManage({navigation}: Props) {
         }}
         isModalVisible={isModalVisible.LOCATION}
         onPressClose={() => toggleModal(MODAL_NAME.LOCATION)}
+      />
+      <InvitationModal
+        receivedCode={receivedCode}
+        deleteReceivedCode={
+          receivedCode ? () => setReceivedCode(undefined) : undefined
+        }
+        isModalVisible={isModalVisible.INVITATION}
+        onPressClose={() => {
+          toggleModal(MODAL_NAME.INVITATION);
+        }}
       />
     </View>
   );
