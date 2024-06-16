@@ -20,9 +20,11 @@ import {ImagePicker} from '@components/LetterEditor/ImagePicker';
 import {ImageModal} from '@components/Modals/Image/ImageModal';
 import {ModalBlur} from '@components/Modals/ModalBlur';
 import {Header2} from '@components/Headers/Header2';
-import useStore, {useLetterEditorStore} from '@stores/store';
+import {useLetterEditorStore} from '@stores/store';
 import {ReportModal} from '@components/Modals/Report/ReportModal';
 import Toast from '@components/Toast/toast';
+import {getUserInfo} from '@apis/member';
+import {useQuery} from 'react-query';
 
 const TEXT_ALIGN = {
   LEFT: 'left',
@@ -39,8 +41,8 @@ export function LetterViewer({route, navigation}: Props) {
   const [isImageModalVisible, setImageModalVisible] = useState(false);
   const [isReportModalVisible, setReportModalVisible] = useState(false);
 
+  const {data: userInfo} = useQuery('userInfo', getUserInfo);
   const {setDeliverLetterTo} = useLetterEditorStore();
-  const nickname = useStore(state => state.userInfo?.nickname);
 
   const paperColor = useMemo(
     () => letterContent?.paperColor ?? 'PINK',
@@ -95,7 +97,6 @@ export function LetterViewer({route, navigation}: Props) {
     const getDeliveryLetter = async (id: number) => {
       try {
         const data = await getDeliveryLetterContent(id);
-        // console.log('DeliveryLetterContent:', data);
         setLetterContent(data);
       } catch (error: any) {
         console.error(error.message);
@@ -124,7 +125,7 @@ export function LetterViewer({route, navigation}: Props) {
 
   const onPressReply = useCallback(() => {
     if (letterContent) {
-      if (letterContent.fromNickname === nickname) {
+      if (userInfo && letterContent.fromNickname === userInfo.nickname) {
         return Alert.alert(
           '내가 작성한 편지에요. 다른 편지에 답장해 보세요.',
           undefined,
@@ -157,10 +158,10 @@ export function LetterViewer({route, navigation}: Props) {
     alertButtonOK,
     letterContent,
     navigation,
-    nickname,
     route.params.id,
     route.params.to,
     setDeliverLetterTo,
+    userInfo,
   ]);
 
   return (

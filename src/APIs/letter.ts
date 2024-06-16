@@ -1,4 +1,5 @@
 import {
+  DeliveryLetterContent,
   DeliveryLetterWriteRequest,
   PublicLetterContent,
   PublicLetters,
@@ -44,7 +45,9 @@ export async function postDeliveryLetter(
 }
 
 export async function getDeliveryLetterContent(id: number) {
-  return await axiosInstance.post(`/delivery-letters/${id}/open`);
+  return await axiosInstance.post<DeliveryLetterContent>(
+    `/delivery-letters/${id}/open`,
+  );
 }
 
 export async function getDeliveryDate(id: number) {
