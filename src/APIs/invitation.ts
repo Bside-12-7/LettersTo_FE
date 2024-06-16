@@ -1,4 +1,4 @@
-import {InvitationCode} from '@type/types';
+import {Friend, InvitationCode} from '@type/types';
 import {axiosInstance} from '@utils/http';
 
 export async function generateInvitationCode() {
@@ -15,4 +15,8 @@ export async function applyInvitationCode(invitationCode: string) {
   return await axiosInstance.post<InvitationCode>(
     `/friend/apply-invitation-code?invitationCode=${invitationCode}`,
   );
+}
+
+export async function getFriends() {
+  return await axiosInstance.get<Friend[]>('/friend');
 }

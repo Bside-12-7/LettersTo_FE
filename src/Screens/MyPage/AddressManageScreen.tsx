@@ -12,10 +12,12 @@ import React, {
   useEffect,
   useMemo,
   useReducer,
+  useRef,
   useState,
 } from 'react';
 import {
   Image,
+  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
@@ -26,6 +28,10 @@ import {
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useQuery} from 'react-query';
 import {InvitationModal} from '@components/Modals/MyPage/AddressManage/InvitationModal';
+import {ListItemWithSwipeAction} from '@components/ListItem/ListItemWithSwipeAction';
+import {getFriends} from '@apis/invitation';
+import {GRADIENT_COLORS} from '@constants/letter';
+import {LinearGradient} from 'expo-linear-gradient';
 const questionsImg = require('@assets/question.png');
 const pencilImg = require('@assets/Icon/pencil/pencil_blue.png');
 
@@ -78,6 +84,7 @@ const modalReducer = (
 };
 
 export function AddressManage({navigation, route: {params}}: Props) {
+  const scrollViewRef = useRef<ScrollView>(null);
   const [isModalVisible, dispatch] = useReducer(
     modalReducer,
     INITIAL_MODAL_STATE,
@@ -96,6 +103,7 @@ export function AddressManage({navigation, route: {params}}: Props) {
     ['regions', userInfo?.parentGeolocationId, 'cities'],
     () => userInfo && getCities(userInfo.parentGeolocationId),
   );
+  const {data: friends} = useQuery('friends', getFriends);
 
   const addressString = useMemo(() => {
     if (!userInfo || !regions || !cities) return '';
@@ -184,6 +192,49 @@ export function AddressManage({navigation, route: {params}}: Props) {
             </Text>
           </TouchableOpacity>
         </View>
+        {friends && (
+          <ScrollView
+            style={{flex: 1}}
+            contentInsetAdjustmentBehavior="automatic"
+            ref={scrollViewRef}>
+            <ListItemWithSwipeAction scrollViewRef={scrollViewRef}>
+              <View
+                style={[
+                  styles.listItemIcon,
+                  {backgroundColor: GRADIENT_COLORS.BLUE},
+                ]}>
+                <Text style={styles.listItemIconText}>
+                  {friends[0].nickname[0]}
+                </Text>
+              </View>
+              <Text style={styles.listItemTitle}>{friends[0].nickname}</Text>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                style={{
+                  marginLeft: 'auto',
+                }}>
+                <LinearGradient
+                  colors={['#FF6ECE', '#FF3DBD']}
+                  style={{
+                    width: 73,
+                    height: 28,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 10,
+                  }}>
+                  <Text
+                    style={{
+                      fontFamily: 'Galmuri11',
+                      fontSize: 13,
+                      color: 'white',
+                    }}>
+                    편지 쓰기
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </ListItemWithSwipeAction>
+          </ScrollView>
+        )}
       </View>
       {isAnyModalVisible && <ModalBlur />}
       <SafeNicknameNoticeModal
@@ -245,5 +296,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
+  },
+  listItemIcon: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 36,
+    height: 36,
+    marginRight: 12,
+    borderWidth: 1,
+    borderColor: '#0000CC',
+    borderRadius: 18,
+  },
+  listItemIconText: {
+    fontFamily: 'Galmuri11-Bold',
+    fontSize: 13,
+    color: '#0000CC',
+  },
+  listItemTitle: {
+    width: '50%',
+    fontFamily: 'Galmuri11',
+    fontSize: 14,
+    lineHeight: 24,
+    color: '#0000CC',
   },
 });
