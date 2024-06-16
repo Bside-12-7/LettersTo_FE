@@ -18,9 +18,13 @@ import {BottomButton} from '@components/Button/Bottom/BottomButton';
 import {InvitationCodeAlertModal} from './InvitationCodeAlertModal';
 import {useMutation} from 'react-query';
 import {applyInvitationCode} from '@apis/invitation';
+import {AxiosError} from 'axios';
 const questionsImg = require('@assets/question.png');
 
 const CELL_COUNT = 6;
+const INVALID_CODE_TEXT = '유효한 코드를 입력해주세요.';
+const CODE_TIMEOUT_TEXT =
+  '유효 기간이 지났어요 (´•̥ ᵔ •̥`)\n친구에게 새로운 코드를 요청해 주세요';
 
 export const InvitationCodeInputModal = React.memo(
   ({
@@ -34,7 +38,7 @@ export const InvitationCodeInputModal = React.memo(
   }) => {
     const {top: SAFE_AREA_TOP, bottom: SAFE_AREA_BOTTOM} = useSafeAreaInsets();
     const [isNoticeModalVisible, setNoticeModalVisible] = useState(false);
-    const [isAlertModalVisible, setAlertModalVisible] = useState(false);
+    const [alert, setAlert] = useState<string | null>(null);
     const [code, setCode] = useState(receivedCode ?? '');
     const [containerIsFocused, setContainerIsFocused] = useState(false);
 
@@ -89,14 +93,21 @@ export const InvitationCodeInputModal = React.memo(
 
     const handleSubmit = () => {
       if (code.length !== 6 || !/^[0-9a-z]+$/.test(code))
-        setAlertModalVisible(true);
+        return setAlert(INVALID_CODE_TEXT);
 
       mutate(code, {
         onSuccess: () => {
           // Todo 친구 리스트 query 초기화
           onPressClose();
         },
-        onError: () => setAlertModalVisible(true),
+        onError: error => {
+          const axiosError = error as AxiosError<{message: string}>;
+          setAlert(
+            axiosError.response?.data?.message.includes('유효기간')
+              ? CODE_TIMEOUT_TEXT
+              : INVALID_CODE_TEXT,
+          );
+        },
       });
     };
 
@@ -162,14 +173,15 @@ export const InvitationCodeInputModal = React.memo(
             <BottomButton buttonText={'등록하기'} onPress={handleSubmit} />
           </View>
         </View>
-        {(isNoticeModalVisible || isAlertModalVisible) && <ModalBlur />}
+        {(isNoticeModalVisible || !!alert) && <ModalBlur />}
         <InvitationCodeNoticeModal
           isModalVisible={isNoticeModalVisible}
           onPressClose={() => setNoticeModalVisible(false)}
         />
         <InvitationCodeAlertModal
-          isModalVisible={isAlertModalVisible}
-          onPressClose={() => setAlertModalVisible(false)}
+          isModalVisible={!!alert}
+          text={alert}
+          onPressClose={() => setAlert(null)}
         />
       </Modal>
     );

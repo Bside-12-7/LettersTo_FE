@@ -6,11 +6,13 @@ import {BottomButton} from '@components/Button/Bottom/BottomButton';
 
 type Props = {
   isModalVisible: boolean;
+  text: string | null;
   onPressClose: () => void;
 };
 
 export const InvitationCodeAlertModal = ({
   isModalVisible,
+  text,
   onPressClose,
 }: Props) => {
   const {bottom: SAFE_AREA_BOTTOM} = useSafeAreaInsets();
@@ -26,7 +28,7 @@ export const InvitationCodeAlertModal = ({
         <View style={[styles.modalView, {paddingBottom: SAFE_AREA_BOTTOM}]}>
           <ModalHeader title={''} onPressClose={onPressClose} />
           <View style={styles.contentWrap}>
-            <Text style={styles.text}>{'유효한 코드를 입력해주세요.'}</Text>
+            <Text style={styles.text}>{text}</Text>
           </View>
           <BottomButton blue buttonText={'확인'} onPress={onPressClose} />
         </View>
@@ -61,6 +63,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontFamily: 'Galmuri11',
+    textAlign: 'center',
     color: '#0000cc',
     fontSize: 15,
     lineHeight: 30,
