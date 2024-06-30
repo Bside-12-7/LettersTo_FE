@@ -1,6 +1,7 @@
 import {
   DeliveryLetterContent,
   DeliveryLetterWriteRequest,
+  DeliveryLetterWriteRequestV2,
   PublicLetterContent,
   PublicLetters,
   PublicLetterWriteRequest,
@@ -42,6 +43,12 @@ export async function postDeliveryLetter(
   deliveryLetterData: DeliveryLetterWriteRequest,
 ) {
   return await axiosInstance.post('/delivery-letters', deliveryLetterData);
+}
+
+export async function postDeliveryLetterV2(
+  deliveryLetterData: DeliveryLetterWriteRequestV2,
+) {
+  return await axiosInstance.post('/delivery-letters/v2', deliveryLetterData);
 }
 
 export async function getDeliveryLetterContent(id: number) {

@@ -162,6 +162,20 @@ export interface DeliveryLetterWriteRequest {
   deliveryType?: 'NONE' | 'STANDARD' | 'EXPRESS';
 }
 
+export interface DeliveryLetterWriteRequestV2 {
+  letterId?: number;
+  letterBoxType: 'ANONYMOUS_DIRECT_MESSAGE' | 'DIRECT_MESSAGE';
+  opponentMemberId: number;
+  title: string;
+  content: string;
+  paperType: PaperStyle;
+  paperColor: PaperColor;
+  alignType: AlignType;
+  stampId: number;
+  files: string[];
+  deliveryType: 'NONE' | 'STANDARD' | 'EXPRESS';
+}
+
 export interface LetterBox {
   id: number;
   fromMemberId: number;

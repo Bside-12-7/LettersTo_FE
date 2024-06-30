@@ -22,3 +22,12 @@ export async function getDeliveryLetters(data: {
     params: data,
   });
 }
+
+export async function getDeliveryLettersV2(data: {
+  cursor?: number;
+  letterBoxId: number;
+}): Promise<DeliveryLetterData> {
+  return await axiosInstance.get<DeliveryLetterData>('/delivery-letters/v2', {
+    params: data,
+  });
+}
