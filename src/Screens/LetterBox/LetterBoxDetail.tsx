@@ -19,11 +19,7 @@ import {
   DeliveryLetters,
   PaperColor,
 } from '@type/types';
-import {
-  getLetterBoxInfo,
-  getDeliveryLetters,
-  // getDeliveryLettersV2,
-} from '@apis/letterBox';
+import {getLetterBoxInfo, getDeliveryLettersV2} from '@apis/letterBox';
 import {Header2} from '@components/Headers/Header2';
 import {dateFormatter} from '@utils/dateFormatter';
 import {LetterItem} from './LetterItem';
@@ -51,12 +47,11 @@ export function LetterBoxDetail({route, navigation}: Props) {
     [],
   );
   const [currentCursor, setCurrentCursor] = useState<number>();
-  // const [fromMemberId, setFromMemberId] = useState<number>();
   const [avatarColor, setAvatarColor] = useState<PaperColor>();
 
-  const getPublicLettersInit = useCallback((id: number) => {
+  const getPublicLettersInitV2 = useCallback((id: number) => {
     try {
-      getDeliveryLetters({fromMemberId: id}).then(data => {
+      getDeliveryLettersV2({letterBoxId: id}).then(data => {
         const {content, cursor} = data;
         setDeliveryLetters(content);
         setCurrentCursor(cursor);
@@ -67,21 +62,8 @@ export function LetterBoxDetail({route, navigation}: Props) {
     }
   }, []);
 
-  // const getPublicLettersInitV2 = useCallback((id: number) => {
-  //   try {
-  //     getDeliveryLettersV2({letterBoxId: id}).then(data => {
-  //       const {content, cursor} = data;
-  //       setDeliveryLetters(content);
-  //       setCurrentCursor(cursor);
-  //     });
-  //   } catch (error: any) {
-  //     console.error(error.message);
-  //     Toast.show('문제가 발생했습니다');
-  //   }
-  // }, []);
-
   useEffect(() => {
-    const {id, fromMemberId, color} = route.params;
+    const {id, color} = route.params;
     setAvatarColor((color ?? getRandomColor()) as PaperColor);
 
     // 사서함 정보 조회
@@ -95,17 +77,16 @@ export function LetterBoxDetail({route, navigation}: Props) {
     }
 
     // 주고받은 편지 목록 조회
-    getPublicLettersInit(fromMemberId);
-    // getPublicLettersInitV2(id);
-  }, [getPublicLettersInit, /*getPublicLettersInitV2,*/ route]);
+    getPublicLettersInitV2(id);
+  }, [getPublicLettersInitV2, route]);
 
   // 무한 스크롤
   const handleEndReached = useCallback(() => {
-    if (currentCursor && route.params.fromMemberId) {
+    if (currentCursor && route.params.id) {
       try {
-        getDeliveryLetters({
+        getDeliveryLettersV2({
           cursor: currentCursor,
-          fromMemberId: route.params.fromMemberId,
+          letterBoxId: route.params.id,
         }).then(data => {
           const {content, cursor} = data;
           if (content.length === 0) return setCurrentCursor(undefined); // 임시
@@ -118,7 +99,7 @@ export function LetterBoxDetail({route, navigation}: Props) {
         Toast.show('문제가 발생했습니다');
       }
     }
-  }, [currentCursor, deliveryLetters, route.params.fromMemberId]);
+  }, [currentCursor, deliveryLetters, route.params.id]);
 
   // n일째 인연
   const fromPeriod = useMemo(() => {
