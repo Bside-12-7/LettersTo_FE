@@ -135,9 +135,13 @@ export function LetterBoxDetail({route, navigation}: Props) {
   // 편지 조회
   const goToLetterViewer = useCallback(
     (id: number) => {
-      navigation.navigate('LetterViewer', {id, to: 'DELIVERY'});
+      navigation.navigate('LetterViewer', {
+        id,
+        to: 'DELIVERY',
+        type: route.params.type,
+      });
     },
-    [navigation],
+    [navigation, route.params.type],
   );
 
   const goBack = () => navigation.goBack();
@@ -227,7 +231,11 @@ export function LetterBoxDetail({route, navigation}: Props) {
             <LetterItem
               data={item}
               color={avatarColor}
-              onOpenLetter={() => onOpenEnvelopeModal(item)}
+              onOpenLetter={() =>
+                item.read
+                  ? goToLetterViewer(item.id)
+                  : onOpenEnvelopeModal(item)
+              }
               style={[
                 {marginTop: isFirst ? 24 : 16},
                 isLast && {marginBottom: 80},

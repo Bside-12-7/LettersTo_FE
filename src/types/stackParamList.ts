@@ -8,9 +8,20 @@ export interface StackParamsList {
   Main: undefined;
 
   // 편지 관련 스택
-  LetterViewer: {id: number; to: 'PUBLIC' | 'DELIVERY'};
+  LetterViewer:
+    | {id: number; to: 'PUBLIC'}
+    | {
+        id: number;
+        to: 'DELIVERY';
+        type: 'ANONYMOUS_DIRECT_MESSAGE' | 'DIRECT_MESSAGE';
+      };
   LetterBoxList: undefined;
-  LetterBoxDetail: {id: number; fromMemberId: number; color?: string};
+  LetterBoxDetail: {
+    id: number;
+    fromMemberId: number;
+    color?: string;
+    type: 'ANONYMOUS_DIRECT_MESSAGE' | 'DIRECT_MESSAGE';
+  };
 
   // 인증 관련 스택
   Auth: undefined;

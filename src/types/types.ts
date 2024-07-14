@@ -178,6 +178,7 @@ export interface DeliveryLetterWriteRequestV2 {
 
 export interface LetterBox {
   id: number;
+  type: 'ANONYMOUS_DIRECT_MESSAGE' | 'DIRECT_MESSAGE';
   fromMemberId: number;
   fromMemberNickname: string;
   new: boolean;

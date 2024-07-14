@@ -59,8 +59,13 @@ export function LetterBoxList({navigation, onPressHome}: Props) {
   const {data: userInfo} = useQuery('userInfo', getUserInfo);
 
   // 내 사서함 상세
-  const goToDetail = (id: number, fromMemberId: number, color: PaperColor) => {
-    navigation.push('LetterBoxDetail', {id, fromMemberId, color});
+  const goToDetail = (
+    id: number,
+    fromMemberId: number,
+    color: PaperColor,
+    type: 'ANONYMOUS_DIRECT_MESSAGE' | 'DIRECT_MESSAGE',
+  ) => {
+    navigation.push('LetterBoxDetail', {id, fromMemberId, color, type});
   };
 
   const goToNotification = () => {
@@ -183,7 +188,12 @@ export function LetterBoxList({navigation, onPressHome}: Props) {
                 isLast && {marginBottom: 100},
               ]}
               onPress={() =>
-                goToDetail(item.id, item.fromMemberId, color[index % 9])
+                goToDetail(
+                  item.id,
+                  item.fromMemberId,
+                  color[index % 9],
+                  item.type,
+                )
               }>
               <View
                 style={[
