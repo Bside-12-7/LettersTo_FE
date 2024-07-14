@@ -88,7 +88,7 @@ export const LetterComplete = ({navigation, route}: Props) => {
         <View style={styles.contentContainer}>
           <Text style={styles.completeText}>Complete!</Text>
           <Text style={styles.descText}>편지 작성을 완료했어요!</Text>
-          {!route.params?.reply ? (
+          {!route.params ? (
             <View style={styles.cover}>
               <LetterCoverPreview />
             </View>
@@ -115,7 +115,7 @@ export const LetterComplete = ({navigation, route}: Props) => {
           )}
         </View>
 
-        <SendLetterButton reply={!!route.params?.reply} onPress={sendLetter} />
+        <SendLetterButton reply={!!route.params} onPress={sendLetter} />
       </SafeAreaView>
     </View>
   );

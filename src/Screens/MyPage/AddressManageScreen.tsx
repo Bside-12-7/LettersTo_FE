@@ -32,6 +32,7 @@ import {ListItemWithSwipeAction} from '@components/ListItem/ListItemWithSwipeAct
 import {getFriends} from '@apis/invitation';
 import {GRADIENT_COLORS} from '@constants/letter';
 import {LinearGradient} from 'expo-linear-gradient';
+import {useLetterEditorStore} from '@stores/store';
 const questionsImg = require('@assets/question.png');
 const pencilImg = require('@assets/Icon/pencil/pencil_blue.png');
 
@@ -94,6 +95,8 @@ export function AddressManage({navigation, route: {params}}: Props) {
     [isModalVisible],
   );
   const [receivedCode, setReceivedCode] = useState(params?.code);
+
+  const {setDeliverLetterTo} = useLetterEditorStore();
 
   const {top: SAFE_AREA_TOP} = useSafeAreaInsets();
 
@@ -210,6 +213,17 @@ export function AddressManage({navigation, route: {params}}: Props) {
               <Text style={styles.listItemTitle}>{friends[0].nickname}</Text>
               <TouchableOpacity
                 activeOpacity={0.7}
+                onPress={() => {
+                  setDeliverLetterTo({
+                    toNickname: friends[0].nickname,
+                    toAddress: '추가 필요',
+                  });
+                  navigation.navigate('LetterEditor', {
+                    to: 'DELIVERY',
+                    type: 'DIRECT_MESSAGE',
+                    fromMemberId: friends[0].memberId,
+                  });
+                }}
                 style={{
                   marginLeft: 'auto',
                 }}>

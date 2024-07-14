@@ -236,7 +236,7 @@ export function CoverDeliverySelector({navigation, route}: Props) {
                     fontSize: 15,
                     color: '#0000cc',
                   }}>
-                  {standardDeliveryDate}후에 도착해요
+                  {standardDeliveryDate || '추가 필요'}후에 도착해요
                 </Text>
               </View>
             </TouchableOpacity>

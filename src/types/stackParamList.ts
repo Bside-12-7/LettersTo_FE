@@ -45,19 +45,19 @@ export interface StackParamsList {
   // 편지 작성
   LetterEditor:
     | {
-        reply: number;
+        reply?: number;
         to: 'PUBLIC' | 'DELIVERY';
         type: LetterBoxType;
         fromMemberId?: number;
       }
     | undefined;
-  CoverDeliverySelector: {reply: number; to: 'PUBLIC' | 'DELIVERY'};
-  CoverTopicEditor: {reply: number; to: 'PUBLIC' | 'DELIVERY'} | undefined;
+  CoverDeliverySelector: {reply?: number; to: 'PUBLIC' | 'DELIVERY'};
+  CoverTopicEditor: {reply?: number; to: 'PUBLIC' | 'DELIVERY'} | undefined;
   CoverPersonalityEditor:
-    | {reply: number; to: 'PUBLIC' | 'DELIVERY'}
+    | {reply?: number; to: 'PUBLIC' | 'DELIVERY'}
     | undefined;
-  CoverStampSelector: {reply: number; to: 'PUBLIC' | 'DELIVERY'} | undefined;
-  LetterComplete: {reply: number; to: 'PUBLIC' | 'DELIVERY'} | undefined;
+  CoverStampSelector: {reply?: number; to: 'PUBLIC' | 'DELIVERY'} | undefined;
+  LetterComplete: {reply?: number; to: 'PUBLIC' | 'DELIVERY'} | undefined;
 
   // 알림
   Notifications: undefined;
