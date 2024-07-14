@@ -139,9 +139,10 @@ export function LetterBoxDetail({route, navigation}: Props) {
         id,
         to: 'DELIVERY',
         type: route.params.type,
+        fromMemberId: route.params.fromMemberId,
       });
     },
-    [navigation, route.params.type],
+    [navigation, route.params],
   );
 
   const goBack = () => navigation.goBack();

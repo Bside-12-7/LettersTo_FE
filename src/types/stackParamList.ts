@@ -16,6 +16,7 @@ export interface StackParamsList {
         id: number;
         to: 'DELIVERY';
         type: LetterBoxType;
+        fromMemberId: number;
       };
   LetterBoxList: undefined;
   LetterBoxDetail: {
@@ -42,7 +43,14 @@ export interface StackParamsList {
   AddressManage: {code: string} | undefined;
 
   // 편지 작성
-  LetterEditor: {reply: number; to: 'PUBLIC' | 'DELIVERY'} | undefined;
+  LetterEditor:
+    | {
+        reply: number;
+        to: 'PUBLIC' | 'DELIVERY';
+        type: LetterBoxType;
+        fromMemberId?: number;
+      }
+    | undefined;
   CoverDeliverySelector: {reply: number; to: 'PUBLIC' | 'DELIVERY'};
   CoverTopicEditor: {reply: number; to: 'PUBLIC' | 'DELIVERY'} | undefined;
   CoverPersonalityEditor:

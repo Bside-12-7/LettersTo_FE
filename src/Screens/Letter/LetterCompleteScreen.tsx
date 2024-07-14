@@ -3,7 +3,7 @@ import React, {useCallback} from 'react';
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {
-  postDeliveryLetter,
+  postDeliveryLetterV2,
   postPublicLetter,
   replyPublicLetter,
 } from '@apis/letter';
@@ -61,7 +61,7 @@ export const LetterComplete = ({navigation, route}: Props) => {
       if (route.params?.to === 'PUBLIC') {
         await replyPublicLetter(letterData);
       } else if (route.params?.to === 'DELIVERY') {
-        await postDeliveryLetter(letterData);
+        await postDeliveryLetterV2(letterData);
       }
       Toast.show('편지 작성이 완료되었습니다!');
       navigation.navigate('Main');

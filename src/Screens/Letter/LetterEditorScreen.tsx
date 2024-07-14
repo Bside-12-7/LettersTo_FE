@@ -32,6 +32,8 @@ import type {
   PaperStyle as _PaperStyle,
   Selector,
   TexticonCategory,
+  DeliveryLetterWriteRequest,
+  DeliveryLetterWriteRequestV2,
 } from '@type/types';
 import {getImageUploadUrl} from '@apis/file';
 import {ImageModal} from '@components/Modals/Image/ImageModal';
@@ -61,6 +63,8 @@ export function LetterEditor({navigation, route}: Props) {
   const [images, setImages] = useState<string[]>([]);
   const [isLoadingImage, setLoadingImage] = useState(false);
   const [isImageModalVisible, setImageModalVisible] = useState(false);
+
+  console.log(route.params);
 
   const [disableNext, setDisableNext] = useState<boolean>(false);
 
@@ -122,24 +126,42 @@ export function LetterEditor({navigation, route}: Props) {
 
   const setDeliveryLetterDataOnStore = useCallback(
     (id: number) => {
-      const deliveryLetterData = {
-        id,
-        title: title.replace(/(⌜|⌟︎)/g, ''),
-        content: text,
-        paperType: paperStyle,
-        paperColor,
-        alignType,
-        files: images,
-        stampId: undefined,
-      };
+      if (route.params?.to === 'PUBLIC') {
+        const deliveryLetterData: DeliveryLetterWriteRequest = {
+          id,
+          title: title.replace(/(⌜|⌟︎)/g, ''),
+          content: text,
+          paperType: paperStyle,
+          paperColor,
+          alignType,
+          files: images,
+          stampId: undefined,
+        };
 
-      setDeliveryLetterData(deliveryLetterData);
+        setDeliveryLetterData(deliveryLetterData);
+      } else if (route.params?.to === 'DELIVERY') {
+        const deliveryLetterData: DeliveryLetterWriteRequestV2 = {
+          letterId: id,
+          letterBoxType: route.params.type,
+          opponentMemberId: route.params.fromMemberId,
+          title: title.replace(/(⌜|⌟︎)/g, ''),
+          content: text,
+          paperType: paperStyle,
+          paperColor,
+          alignType,
+          files: images,
+          stampId: undefined,
+        };
+
+        setDeliveryLetterData(deliveryLetterData);
+      }
     },
     [
       alignType,
       images,
       paperColor,
       paperStyle,
+      route.params,
       setDeliveryLetterData,
       text,
       title,

@@ -149,6 +149,7 @@ export interface DeliveryLetterContent {
   canReply: boolean;
   files: string[];
   createdDate: Date;
+  letterBoxType: LetterBoxType;
 }
 
 export interface DeliveryLetterWriteRequest {
@@ -167,16 +168,16 @@ export type LetterBoxType = 'ANONYMOUS_DIRECT_MESSAGE' | 'DIRECT_MESSAGE';
 
 export interface DeliveryLetterWriteRequestV2 {
   letterId?: number;
-  letterBoxType: LetterBoxType;
-  opponentMemberId: number;
-  title: string;
-  content: string;
-  paperType: PaperStyle;
-  paperColor: PaperColor;
-  alignType: AlignType;
-  stampId: number;
-  files: string[];
-  deliveryType: 'NONE' | 'STANDARD' | 'EXPRESS';
+  letterBoxType?: LetterBoxType;
+  opponentMemberId?: number;
+  title?: string;
+  content?: string;
+  paperType?: PaperStyle;
+  paperColor?: PaperColor;
+  alignType?: AlignType;
+  stampId?: number;
+  files?: string[];
+  deliveryType?: 'NONE' | 'STANDARD' | 'EXPRESS';
 }
 
 export interface LetterBox {

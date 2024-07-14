@@ -96,7 +96,6 @@ export function LetterViewer({route, navigation}: Props) {
     const getDeliveryLetter = async (id: number) => {
       try {
         const data = await getDeliveryLetterContent(id);
-        console.log(data);
         setLetterContent(data);
       } catch (error: any) {
         console.error(error.message);
@@ -152,14 +151,18 @@ export function LetterViewer({route, navigation}: Props) {
       navigation.navigate('LetterEditor', {
         reply: route.params.id,
         to: route.params.to,
+        type: letterContent.letterBoxType,
+        fromMemberId:
+          route.params.to === 'DELIVERY'
+            ? route.params.fromMemberId
+            : undefined,
       });
     }
   }, [
     alertButtonOK,
     letterContent,
     navigation,
-    route.params.id,
-    route.params.to,
+    route.params,
     setDeliverLetterTo,
     userInfo,
   ]);
