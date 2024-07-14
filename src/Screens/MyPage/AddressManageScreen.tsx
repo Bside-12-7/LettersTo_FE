@@ -201,7 +201,9 @@ export function AddressManage({navigation, route: {params}}: Props) {
             contentInsetAdjustmentBehavior="automatic"
             ref={scrollViewRef}>
             {friends.map(friend => (
-              <ListItemWithSwipeAction scrollViewRef={scrollViewRef}>
+              <ListItemWithSwipeAction
+                key={friend.id}
+                scrollViewRef={scrollViewRef}>
                 <View
                   style={[
                     styles.listItemIcon,
@@ -211,7 +213,13 @@ export function AddressManage({navigation, route: {params}}: Props) {
                     {friend.nickname[0]}
                   </Text>
                 </View>
-                <Text style={styles.listItemTitle}>{friend.nickname}</Text>
+                <View
+                  style={{
+                    width: '100%',
+                  }}>
+                  <Text style={styles.listItemTitle}>{friend.nickname}</Text>
+                  <Text style={styles.listItemTitle}>주소 추가 필요</Text>
+                </View>
                 <TouchableOpacity
                   activeOpacity={0.7}
                   onPress={() => {
