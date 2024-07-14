@@ -132,6 +132,7 @@ export interface PublicLetterContent {
   canReply: boolean;
   files: string[];
   createdDate: Date;
+  letterBoxType: LetterBoxType;
 }
 
 export interface DeliveryLetterContent {
@@ -162,9 +163,11 @@ export interface DeliveryLetterWriteRequest {
   deliveryType?: 'NONE' | 'STANDARD' | 'EXPRESS';
 }
 
+export type LetterBoxType = 'ANONYMOUS_DIRECT_MESSAGE' | 'DIRECT_MESSAGE';
+
 export interface DeliveryLetterWriteRequestV2 {
   letterId?: number;
-  letterBoxType: 'ANONYMOUS_DIRECT_MESSAGE' | 'DIRECT_MESSAGE';
+  letterBoxType: LetterBoxType;
   opponentMemberId: number;
   title: string;
   content: string;
@@ -178,7 +181,7 @@ export interface DeliveryLetterWriteRequestV2 {
 
 export interface LetterBox {
   id: number;
-  type: 'ANONYMOUS_DIRECT_MESSAGE' | 'DIRECT_MESSAGE';
+  type: LetterBoxType;
   fromMemberId: number;
   fromMemberNickname: string;
   new: boolean;

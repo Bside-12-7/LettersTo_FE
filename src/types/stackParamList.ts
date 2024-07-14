@@ -1,3 +1,5 @@
+import {LetterBoxType} from './types';
+
 export interface StackParamsList {
   [keys: string]: any;
 
@@ -13,14 +15,14 @@ export interface StackParamsList {
     | {
         id: number;
         to: 'DELIVERY';
-        type: 'ANONYMOUS_DIRECT_MESSAGE' | 'DIRECT_MESSAGE';
+        type: LetterBoxType;
       };
   LetterBoxList: undefined;
   LetterBoxDetail: {
     id: number;
     fromMemberId: number;
     color?: string;
-    type: 'ANONYMOUS_DIRECT_MESSAGE' | 'DIRECT_MESSAGE';
+    type: LetterBoxType;
   };
 
   // 인증 관련 스택

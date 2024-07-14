@@ -96,6 +96,7 @@ export function LetterViewer({route, navigation}: Props) {
     const getDeliveryLetter = async (id: number) => {
       try {
         const data = await getDeliveryLetterContent(id);
+        console.log(data);
         setLetterContent(data);
       } catch (error: any) {
         console.error(error.message);

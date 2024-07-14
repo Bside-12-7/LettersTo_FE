@@ -15,7 +15,7 @@ import {
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {LinearGradient} from 'expo-linear-gradient';
 import {SCREEN_HEIGHT} from '@constants/screen';
-import {LetterBoxes, PaperColor} from '@type/types';
+import {LetterBoxType, LetterBoxes, PaperColor} from '@type/types';
 import {getLetterBoxes} from '@apis/letterBox';
 import {GRADIENT_COLORS} from '@constants/letter';
 import Toast from '@components/Toast/toast';
@@ -63,7 +63,7 @@ export function LetterBoxList({navigation, onPressHome}: Props) {
     id: number,
     fromMemberId: number,
     color: PaperColor,
-    type: 'ANONYMOUS_DIRECT_MESSAGE' | 'DIRECT_MESSAGE',
+    type: LetterBoxType,
   ) => {
     navigation.push('LetterBoxDetail', {id, fromMemberId, color, type});
   };
