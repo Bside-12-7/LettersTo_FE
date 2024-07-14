@@ -130,7 +130,7 @@ export function AddressManage({navigation, route: {params}}: Props) {
     if (receivedCode) toggleModal(MODAL_NAME.INVITATION);
   }, [receivedCode]);
 
-  if (!isSuccess) return;
+  if (!isSuccess) return <></>;
 
   return (
     <View style={[styles.container, {paddingTop: SAFE_AREA_TOP}]}>
@@ -200,53 +200,55 @@ export function AddressManage({navigation, route: {params}}: Props) {
             style={{flex: 1}}
             contentInsetAdjustmentBehavior="automatic"
             ref={scrollViewRef}>
-            <ListItemWithSwipeAction scrollViewRef={scrollViewRef}>
-              <View
-                style={[
-                  styles.listItemIcon,
-                  {backgroundColor: GRADIENT_COLORS.BLUE},
-                ]}>
-                <Text style={styles.listItemIconText}>
-                  {friends[0].nickname[0]}
-                </Text>
-              </View>
-              <Text style={styles.listItemTitle}>{friends[0].nickname}</Text>
-              <TouchableOpacity
-                activeOpacity={0.7}
-                onPress={() => {
-                  setDeliverLetterTo({
-                    toNickname: friends[0].nickname,
-                    toAddress: '추가 필요',
-                  });
-                  navigation.navigate('LetterEditor', {
-                    to: 'DELIVERY',
-                    type: 'DIRECT_MESSAGE',
-                    fromMemberId: friends[0].memberId,
-                  });
-                }}
-                style={{
-                  marginLeft: 'auto',
-                }}>
-                <LinearGradient
-                  colors={['#FF6ECE', '#FF3DBD']}
-                  style={{
-                    width: 73,
-                    height: 28,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: 10,
-                  }}>
-                  <Text
-                    style={{
-                      fontFamily: 'Galmuri11',
-                      fontSize: 13,
-                      color: 'white',
-                    }}>
-                    편지 쓰기
+            {friends.map(friend => (
+              <ListItemWithSwipeAction scrollViewRef={scrollViewRef}>
+                <View
+                  style={[
+                    styles.listItemIcon,
+                    {backgroundColor: GRADIENT_COLORS.BLUE},
+                  ]}>
+                  <Text style={styles.listItemIconText}>
+                    {friend.nickname[0]}
                   </Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            </ListItemWithSwipeAction>
+                </View>
+                <Text style={styles.listItemTitle}>{friend.nickname}</Text>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    setDeliverLetterTo({
+                      toNickname: friend.nickname,
+                      toAddress: '추가 필요',
+                    });
+                    navigation.navigate('LetterEditor', {
+                      to: 'DELIVERY',
+                      type: 'DIRECT_MESSAGE',
+                      fromMemberId: friend.memberId,
+                    });
+                  }}
+                  style={{
+                    marginLeft: 'auto',
+                  }}>
+                  <LinearGradient
+                    colors={['#FF6ECE', '#FF3DBD']}
+                    style={{
+                      width: 73,
+                      height: 28,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: 10,
+                    }}>
+                    <Text
+                      style={{
+                        fontFamily: 'Galmuri11',
+                        fontSize: 13,
+                        color: 'white',
+                      }}>
+                      편지 쓰기
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </ListItemWithSwipeAction>
+            ))}
           </ScrollView>
         )}
       </View>
