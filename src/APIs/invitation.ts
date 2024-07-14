@@ -20,3 +20,7 @@ export async function applyInvitationCode(invitationCode: string) {
 export async function getFriends() {
   return await axiosInstance.get<Friend[]>('/friend');
 }
+
+export async function deleteFriends(id: number) {
+  return await axiosInstance.delete<null>(`/friend/${id}`);
+}

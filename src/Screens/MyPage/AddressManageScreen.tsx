@@ -26,13 +26,14 @@ import {
   View,
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useQuery} from 'react-query';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {InvitationModal} from '@components/Modals/MyPage/AddressManage/InvitationModal';
 import {ListItemWithSwipeAction} from '@components/ListItem/ListItemWithSwipeAction';
-import {getFriends} from '@apis/invitation';
+import {deleteFriends, getFriends} from '@apis/invitation';
 import {GRADIENT_COLORS} from '@constants/letter';
 import {LinearGradient} from 'expo-linear-gradient';
 import {useLetterEditorStore} from '@stores/store';
+import {AxiosError} from 'axios';
 const questionsImg = require('@assets/question.png');
 const pencilImg = require('@assets/Icon/pencil/pencil_blue.png');
 
@@ -95,6 +96,7 @@ export function AddressManage({navigation, route: {params}}: Props) {
     [isModalVisible],
   );
   const [receivedCode, setReceivedCode] = useState(params?.code);
+  const queryClient = useQueryClient();
 
   const {setDeliverLetterTo} = useLetterEditorStore();
 
@@ -107,6 +109,12 @@ export function AddressManage({navigation, route: {params}}: Props) {
     () => userInfo && getCities(userInfo.parentGeolocationId),
   );
   const {data: friends} = useQuery('friends', getFriends);
+  const {mutate} = useMutation<null, AxiosError, number>({
+    mutationFn: id => deleteFriends(id),
+    onSuccess() {
+      queryClient.refetchQueries('friends');
+    },
+  });
 
   const addressString = useMemo(() => {
     if (!userInfo || !regions || !cities) return '';
@@ -203,7 +211,8 @@ export function AddressManage({navigation, route: {params}}: Props) {
             {friends.map(friend => (
               <ListItemWithSwipeAction
                 key={friend.id}
-                scrollViewRef={scrollViewRef}>
+                scrollViewRef={scrollViewRef}
+                onPressDelete={() => mutate(friend.id)}>
                 <View
                   style={[
                     styles.listItemIcon,

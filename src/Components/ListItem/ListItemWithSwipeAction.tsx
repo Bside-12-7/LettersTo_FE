@@ -13,6 +13,7 @@ import {
 type Props = {
   scrollViewRef: React.RefObject<ScrollView>;
   children?: React.ReactNode;
+  onPressDelete: () => void;
 };
 
 const THRESHOLD = 100;
