@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useRef} from 'react';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import type {StackParamsList} from '@type/stackParamList';
 import {
@@ -15,14 +15,14 @@ import {
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {LinearGradient} from 'expo-linear-gradient';
 import {SCREEN_HEIGHT} from '@constants/screen';
-import {LetterBoxType, LetterBoxes, PaperColor} from '@type/types';
+import {LetterBox, LetterBoxType, PaperColor} from '@type/types';
 import {getLetterBoxes} from '@apis/letterBox';
 import {GRADIENT_COLORS} from '@constants/letter';
-import Toast from '@components/Toast/toast';
 import {getUserInfo} from '@apis/member';
 import {useQuery} from 'react-query';
 import {useFeedbackStore} from '@stores/feedback';
 import {FeedbackButton} from '@components/Feedback/FeedbackButton';
+import {ListItemWithSwipeAction} from '@components/ListItem/ListItemWithSwipeAction';
 
 type Props = {
   navigation: NativeStackNavigationProp<StackParamsList, 'Main', undefined>;
@@ -30,31 +30,12 @@ type Props = {
 };
 
 export function LetterBoxList({navigation, onPressHome}: Props) {
+  const flatListRef = useRef<FlatList<LetterBox>>(null);
   const {top: SAFE_AREA_TOP} = useSafeAreaInsets();
-  // const {userInfo} = useStore();
-
-  // 내 사서함 목록
-  const [letterBoxes, setLetterBoxes] = useState<LetterBoxes>([]);
-  const [loading, setLoading] = useState<boolean>(false);
 
   const {isFeedbackButtonShown} = useFeedbackStore();
 
-  const getLetterBoxesInit = () => {
-    try {
-      getLetterBoxes().then(data => {
-        setLetterBoxes(data);
-        setLoading(false);
-      });
-    } catch (error: any) {
-      console.error(error.message);
-      Toast.show('문제가 발생했습니다');
-    }
-  };
-
-  useEffect(() => {
-    setLoading(true);
-    getLetterBoxesInit();
-  }, []);
+  const {data: letterBoxes, isLoading} = useQuery('letterBox', getLetterBoxes);
 
   const {data: userInfo} = useQuery('userInfo', getUserInfo);
 
@@ -161,73 +142,82 @@ export function LetterBoxList({navigation, onPressHome}: Props) {
           <FeedbackButton screenName={'LETTERBOX'} />
         </View>
       )}
-      <FlatList
-        ListEmptyComponent={loading ? Loading : Empty}
-        contentContainerStyle={{marginTop: SAFE_AREA_TOP}}
-        data={letterBoxes}
-        renderItem={({item, index}) => {
-          const isFirst: boolean = index === 0;
-          const isLast: boolean = index === letterBoxes.length - 1;
-          const color = [
-            'PINK',
-            'ORANGE',
-            'YELLOW',
-            'GREEN',
-            'MINT',
-            'SKY_BLUE',
-            'BLUE',
-            'PURPLE',
-            'LAVENDER',
-          ] as const;
-          return (
-            <TouchableOpacity
-              activeOpacity={1}
-              style={[
-                styles.listItem,
-                isFirst && {marginTop: 50},
-                isLast && {marginBottom: 100},
-              ]}
-              onPress={() =>
-                goToDetail(
-                  item.id,
-                  item.fromMemberId,
-                  color[index % 9],
-                  item.type,
-                )
-              }>
-              <View
-                style={[
-                  styles.listItemIcon,
-                  {backgroundColor: GRADIENT_COLORS[color[index % 9]]},
-                ]}>
-                <Text style={styles.listItemIconText}>
-                  {item.fromMemberNickname[0]}
-                </Text>
-              </View>
-              <Text style={styles.listItemTitle}>
-                {item.fromMemberNickname}와(과)의 사서함
-              </Text>
-              <View style={styles.letterArea}>
-                <Image
-                  source={require('@assets/letter_blank.png')}
-                  resizeMode="contain"
-                  style={[styles.letterBlank]}
-                />
-                {item.new && (
-                  <>
-                    <View style={styles.dot} />
+      {letterBoxes && (
+        <FlatList
+          ListEmptyComponent={isLoading ? Loading : Empty}
+          contentContainerStyle={{
+            marginTop: SAFE_AREA_TOP,
+            paddingTop: 50,
+            paddingBottom: 100,
+          }}
+          data={letterBoxes}
+          ref={flatListRef}
+          renderItem={({item, index}) => {
+            const color = [
+              'PINK',
+              'ORANGE',
+              'YELLOW',
+              'GREEN',
+              'MINT',
+              'SKY_BLUE',
+              'BLUE',
+              'PURPLE',
+              'LAVENDER',
+            ] as const;
+            return (
+              <ListItemWithSwipeAction
+                key={item.id}
+                scrollViewRef={flatListRef}
+                onPressDelete={function (): void {
+                  throw new Error('Function not implemented.');
+                }}>
+                <TouchableOpacity
+                  activeOpacity={1}
+                  style={styles.listItem}
+                  disabled
+                  onPress={() =>
+                    goToDetail(
+                      item.id,
+                      item.fromMemberId,
+                      color[index % 9],
+                      item.type,
+                    )
+                  }>
+                  <View
+                    style={[
+                      styles.listItemIcon,
+                      {backgroundColor: GRADIENT_COLORS[color[index % 9]]},
+                    ]}>
+                    <Text style={styles.listItemIconText}>
+                      {item.fromMemberNickname[0]}
+                    </Text>
+                  </View>
+                  <Text style={styles.listItemTitle}>
+                    {item.fromMemberNickname}와(과)의 사서함
+                  </Text>
+                  <View style={styles.letterArea}>
                     <Image
-                      source={require('@assets/letter_new.png')}
+                      source={require('@assets/letter_blank.png')}
                       resizeMode="contain"
-                      style={[styles.letterNew]}
+                      style={[styles.letterBlank]}
                     />
-                  </>
-                )}
-              </View>
-            </TouchableOpacity>
-          );
-        }}
-      />
+                    {item.new && (
+                      <>
+                        <View style={styles.dot} />
+                        <Image
+                          source={require('@assets/letter_new.png')}
+                          resizeMode="contain"
+                          style={[styles.letterNew]}
+                        />
+                      </>
+                    )}
+                  </View>
+                </TouchableOpacity>
+              </ListItemWithSwipeAction>
+            );
+          }}
+        />
+      )}
     </LinearGradient>
   );
 }

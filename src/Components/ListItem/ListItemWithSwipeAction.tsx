@@ -7,18 +7,24 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  Alert,
+  FlatList,
+  ViewProps,
 } from 'react-native';
 
-type Props = {
-  scrollViewRef: React.RefObject<ScrollView>;
+interface Props extends ViewProps {
+  scrollViewRef: React.RefObject<ScrollView | FlatList<any>>;
   children?: React.ReactNode;
   onPressDelete: () => void;
-};
+}
 
 const THRESHOLD = 100;
 
-export const ListItemWithSwipeAction = ({scrollViewRef, children}: Props) => {
+export const ListItemWithSwipeAction = ({
+  scrollViewRef,
+  children,
+  style,
+  onPressDelete,
+}: Props) => {
   const release = (distance: number) => {
     Animated.spring(pan, {
       toValue: {x: distance, y: 0},
@@ -65,7 +71,7 @@ export const ListItemWithSwipeAction = ({scrollViewRef, children}: Props) => {
       <TouchableOpacity
         activeOpacity={0.7}
         style={{backgroundColor: '#FF5500'}}
-        onPress={() => Alert.alert('Archive')}>
+        onPress={onPressDelete}>
         <View style={[styles.iconContainer, styles.iconContainerRight]}>
           <Text style={styles.actionText}>삭제</Text>
         </View>
@@ -73,6 +79,7 @@ export const ListItemWithSwipeAction = ({scrollViewRef, children}: Props) => {
       <Animated.View
         style={[
           styles.item,
+          style,
           {transform: [{translateX: pan.x}, {translateY: pan.y}]},
         ]}
         {...panResponder.panHandlers}>
@@ -93,14 +100,14 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   item: {
-    height: 100,
-    alignItems: 'center',
-    width: '100%',
+    // height: 100,
+    // alignItems: 'center',
+    // width: '100%',
     backgroundColor: '#ffffff',
-    padding: 16,
-    flexDirection: 'row',
-    borderBottomColor: '#0000CC40',
-    borderBottomWidth: 1,
+    // padding: 16,
+    // flexDirection: 'row',
+    // borderBottomColor: '#0000CC40',
+    // borderBottomWidth: 1,
   },
   actionText: {
     fontFamily: 'Galmuri11',
