@@ -159,6 +159,23 @@ export function LetterBoxDetail({route, navigation}: Props) {
       </View>
       <View style={styles.infoArea}>
         <View style={styles.infoHeader}>
+          {info?.type === 'DIRECT_MESSAGE' && (
+            <Text
+              style={{
+                fontFamily: 'Galmuri11',
+                fontSize: 11,
+                marginRight: 8,
+                lineHeight: 18,
+                color: '#0000CC',
+                borderColor: '#0000CC',
+                borderWidth: 1,
+                width: 31,
+                height: 20,
+                textAlign: 'center',
+              }}>
+              찐친
+            </Text>
+          )}
           <Text style={styles.infoNickname}>{info?.fromNickname}</Text>
           <Text style={styles.infoAddress}>{info?.fromAddress}</Text>
           {fromPeriod && (

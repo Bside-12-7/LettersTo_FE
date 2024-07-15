@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import type {StackParamsList} from '@type/stackParamList';
 import {
@@ -16,13 +16,15 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {LinearGradient} from 'expo-linear-gradient';
 import {SCREEN_HEIGHT} from '@constants/screen';
 import {LetterBox, LetterBoxType, PaperColor} from '@type/types';
-import {getLetterBoxes} from '@apis/letterBox';
+import {deleteLetterBox, getLetterBoxes} from '@apis/letterBox';
 import {GRADIENT_COLORS} from '@constants/letter';
 import {getUserInfo} from '@apis/member';
-import {useQuery} from 'react-query';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {useFeedbackStore} from '@stores/feedback';
 import {FeedbackButton} from '@components/Feedback/FeedbackButton';
 import {ListItemWithSwipeAction} from '@components/ListItem/ListItemWithSwipeAction';
+import {DeleteFriendModal} from '@components/Modals/MyPage/AddressManage/DeleteFriendModal';
+import {ModalBlur} from '@components/Modals/ModalBlur';
 
 type Props = {
   navigation: NativeStackNavigationProp<StackParamsList, 'Main', undefined>;
@@ -30,12 +32,21 @@ type Props = {
 };
 
 export function LetterBoxList({navigation, onPressHome}: Props) {
+  const queryClient = useQueryClient();
   const flatListRef = useRef<FlatList<LetterBox>>(null);
   const {top: SAFE_AREA_TOP} = useSafeAreaInsets();
+  const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
 
   const {isFeedbackButtonShown} = useFeedbackStore();
 
   const {data: letterBoxes, isLoading} = useQuery('letterBox', getLetterBoxes);
+  const {mutate} = useMutation({
+    mutationFn: (id: number) => deleteLetterBox(id),
+    onSettled() {
+      setDeleteModalVisible(false);
+      queryClient.refetchQueries('letterBox');
+    },
+  });
 
   const {data: userInfo} = useQuery('userInfo', getUserInfo);
 
@@ -165,58 +176,86 @@ export function LetterBoxList({navigation, onPressHome}: Props) {
               'LAVENDER',
             ] as const;
             return (
-              <ListItemWithSwipeAction
-                key={item.id}
-                scrollViewRef={flatListRef}
-                onPressDelete={function (): void {
-                  throw new Error('Function not implemented.');
-                }}>
-                <TouchableOpacity
-                  activeOpacity={1}
-                  style={styles.listItem}
-                  onPress={() =>
-                    goToDetail(
-                      item.id,
-                      item.fromMemberId,
-                      color[index % 9],
-                      item.type,
-                    )
-                  }>
-                  <View
-                    style={[
-                      styles.listItemIcon,
-                      {backgroundColor: GRADIENT_COLORS[color[index % 9]]},
-                    ]}>
-                    <Text style={styles.listItemIconText}>
-                      {item.fromMemberNickname[0]}
-                    </Text>
-                  </View>
-                  <Text style={styles.listItemTitle}>
-                    {item.fromMemberNickname}와(과)의 사서함
-                  </Text>
-                  <View style={styles.letterArea}>
-                    <Image
-                      source={require('@assets/letter_blank.png')}
-                      resizeMode="contain"
-                      style={[styles.letterBlank]}
-                    />
-                    {item.new && (
-                      <>
-                        <View style={styles.dot} />
-                        <Image
-                          source={require('@assets/letter_new.png')}
-                          resizeMode="contain"
-                          style={[styles.letterNew]}
-                        />
-                      </>
-                    )}
-                  </View>
-                </TouchableOpacity>
-              </ListItemWithSwipeAction>
+              <>
+                <ListItemWithSwipeAction
+                  key={item.id}
+                  scrollViewRef={flatListRef}
+                  onPressDelete={() => setDeleteModalVisible(true)}>
+                  <TouchableOpacity
+                    activeOpacity={1}
+                    style={styles.listItem}
+                    onPress={() =>
+                      goToDetail(
+                        item.id,
+                        item.fromMemberId,
+                        color[index % 9],
+                        item.type,
+                      )
+                    }>
+                    <View
+                      style={[
+                        styles.listItemIcon,
+                        {backgroundColor: GRADIENT_COLORS[color[index % 9]]},
+                      ]}>
+                      <Text style={styles.listItemIconText}>
+                        {item.fromMemberNickname[0]}
+                      </Text>
+                    </View>
+
+                    <View
+                      style={{
+                        width: '50%',
+                      }}>
+                      {item.type === 'DIRECT_MESSAGE' && (
+                        <Text
+                          style={{
+                            fontFamily: 'Galmuri11',
+                            fontSize: 11,
+                            lineHeight: 18,
+                            color: '#0000CC',
+                            borderColor: '#0000CC',
+                            borderWidth: 1,
+                            width: 31,
+                            height: 20,
+                            textAlign: 'center',
+                          }}>
+                          찐친
+                        </Text>
+                      )}
+                      <Text style={styles.listItemTitle}>
+                        {item.fromMemberNickname}와(과)의 사서함
+                      </Text>
+                    </View>
+                    <View style={styles.letterArea}>
+                      <Image
+                        source={require('@assets/letter_blank.png')}
+                        resizeMode="contain"
+                        style={[styles.letterBlank]}
+                      />
+                      {item.new && (
+                        <>
+                          <View style={styles.dot} />
+                          <Image
+                            source={require('@assets/letter_new.png')}
+                            resizeMode="contain"
+                            style={[styles.letterNew]}
+                          />
+                        </>
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                </ListItemWithSwipeAction>
+                <DeleteFriendModal
+                  isModalVisible={isDeleteModalVisible}
+                  onPressClose={() => setDeleteModalVisible(false)}
+                  onPressDelete={() => mutate(item.id)}
+                />
+              </>
             );
           }}
         />
       )}
+      {isDeleteModalVisible && <ModalBlur />}
     </LinearGradient>
   );
 }
@@ -279,7 +318,6 @@ const styles = StyleSheet.create({
     color: '#0000CC',
   },
   listItemTitle: {
-    width: '50%',
     fontFamily: 'Galmuri11',
     fontSize: 14,
     lineHeight: 24,
