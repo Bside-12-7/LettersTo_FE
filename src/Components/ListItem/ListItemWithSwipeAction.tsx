@@ -33,9 +33,14 @@ export const ListItemWithSwipeAction = ({
   };
 
   const pan = useRef(new Animated.ValueXY()).current;
+  const activeRef = useRef<boolean | null>(null);
+
   const panResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: () => {
+        activeRef.current = true;
+      },
       onPanResponderMove: (_event, gestureState) => {
         if (Math.abs(gestureState.dx) > Math.abs(gestureState.dy)) {
           scrollViewRef.current?.setNativeProps({scrollEnabled: false});
@@ -48,6 +53,10 @@ export const ListItemWithSwipeAction = ({
         }
       },
       onPanResponderRelease: (_event, gestureState) => {
+        setTimeout(() => {
+          activeRef.current = false;
+        }, 250);
+
         if (gestureState.dx < -THRESHOLD / 2) {
           release(-THRESHOLD);
         } else {
@@ -82,7 +91,13 @@ export const ListItemWithSwipeAction = ({
           style,
           {transform: [{translateX: pan.x}, {translateY: pan.y}]},
         ]}
-        {...panResponder.panHandlers}>
+        {...panResponder.panHandlers}
+        onTouchStart={event => {
+          if (activeRef.current) {
+            event.stopPropagation();
+            event.preventDefault();
+          }
+        }}>
         {children}
       </Animated.View>
     </View>

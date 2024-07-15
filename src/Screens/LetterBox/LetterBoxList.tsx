@@ -174,7 +174,6 @@ export function LetterBoxList({navigation, onPressHome}: Props) {
                 <TouchableOpacity
                   activeOpacity={1}
                   style={styles.listItem}
-                  disabled
                   onPress={() =>
                     goToDetail(
                       item.id,
