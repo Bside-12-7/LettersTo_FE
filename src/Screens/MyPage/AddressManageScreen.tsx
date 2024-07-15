@@ -34,6 +34,7 @@ import {GRADIENT_COLORS} from '@constants/letter';
 import {LinearGradient} from 'expo-linear-gradient';
 import {useLetterEditorStore} from '@stores/store';
 import {AxiosError} from 'axios';
+import {DeleteFriendModal} from '@components/Modals/MyPage/AddressManage/DeleteFriendModal';
 const questionsImg = require('@assets/question.png');
 const pencilImg = require('@assets/Icon/pencil/pencil_blue.png');
 
@@ -43,13 +44,15 @@ type ModalName =
   | 'SAFE_NICKNAME'
   | 'SAFE_NICKNAME_INFO'
   | 'LOCATION'
-  | 'INVITATION';
+  | 'INVITATION'
+  | 'DELETE_FRIEND';
 
 const MODAL_NAME: {[key in ModalName]: key} = {
   SAFE_NICKNAME: 'SAFE_NICKNAME',
   SAFE_NICKNAME_INFO: 'SAFE_NICKNAME_INFO',
   LOCATION: 'LOCATION',
   INVITATION: 'INVITATION',
+  DELETE_FRIEND: 'DELETE_FRIEND',
 };
 type ModalState = {
   [key in ModalName]: boolean;
@@ -60,6 +63,7 @@ const INITIAL_MODAL_STATE: ModalState = {
   SAFE_NICKNAME_INFO: false,
   LOCATION: false,
   INVITATION: false,
+  DELETE_FRIEND: false,
 };
 
 const MODAL_ACTION = {
@@ -67,6 +71,7 @@ const MODAL_ACTION = {
   TOGGLE_SAFE_NICKNAME_INFO_MODAL: 'TOGGLE_SAFE_NICKNAME_INFO_MODAL',
   TOGGLE_LOCATION_MODAL: 'TOGGLE_LOCATION_MODAL',
   TOGGLE_INVITATION_MODAL: 'TOGGLE_INVITATION_MODAL',
+  TOGGLE_DELETE_FRIEND_MODAL: 'TOGGLE_DELETE_FRIEND_MODAL',
 } as const;
 
 const modalReducer = (
@@ -82,6 +87,8 @@ const modalReducer = (
       return {...state, LOCATION: !state.LOCATION};
     case MODAL_ACTION.TOGGLE_INVITATION_MODAL:
       return {...state, INVITATION: !state.INVITATION};
+    case MODAL_ACTION.TOGGLE_DELETE_FRIEND_MODAL:
+      return {...state, DELETE_FRIEND: !state.DELETE_FRIEND};
   }
 };
 
@@ -92,7 +99,12 @@ export function AddressManage({navigation, route: {params}}: Props) {
     INITIAL_MODAL_STATE,
   );
   const isAnyModalVisible = useMemo(
-    () => isModalVisible.SAFE_NICKNAME || isModalVisible.SAFE_NICKNAME_INFO,
+    () =>
+      isModalVisible.SAFE_NICKNAME ||
+      isModalVisible.SAFE_NICKNAME_INFO ||
+      isModalVisible.INVITATION ||
+      isModalVisible.LOCATION ||
+      isModalVisible.DELETE_FRIEND,
     [isModalVisible],
   );
   const [receivedCode, setReceivedCode] = useState(params?.code);
@@ -111,7 +123,8 @@ export function AddressManage({navigation, route: {params}}: Props) {
   const {data: friends} = useQuery('friends', getFriends);
   const {mutate} = useMutation<null, AxiosError, number>({
     mutationFn: id => deleteFriends(id),
-    onSuccess() {
+    onSettled() {
+      toggleModal(MODAL_NAME.DELETE_FRIEND);
       queryClient.refetchQueries('friends');
     },
   });
@@ -209,62 +222,78 @@ export function AddressManage({navigation, route: {params}}: Props) {
             contentInsetAdjustmentBehavior="automatic"
             ref={scrollViewRef}>
             {friends.map(friend => (
-              <ListItemWithSwipeAction
-                key={friend.id}
-                scrollViewRef={scrollViewRef}
-                onPressDelete={() => mutate(friend.id)}>
-                <View
-                  style={[
-                    styles.listItemIcon,
-                    {backgroundColor: GRADIENT_COLORS.BLUE},
-                  ]}>
-                  <Text style={styles.listItemIconText}>
-                    {friend.nickname[0]}
-                  </Text>
-                </View>
-                <View
+              <>
+                <ListItemWithSwipeAction
                   style={{
+                    height: 100,
+                    alignItems: 'center',
                     width: '100%',
-                  }}>
-                  <Text style={styles.listItemTitle}>{friend.nickname}</Text>
-                  <Text style={styles.listItemTitle}>주소 추가 필요</Text>
-                </View>
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  onPress={() => {
-                    setDeliverLetterTo({
-                      toNickname: friend.nickname,
-                      toAddress: '추가 필요',
-                    });
-                    navigation.navigate('LetterEditor', {
-                      to: 'DELIVERY',
-                      type: 'DIRECT_MESSAGE',
-                      fromMemberId: friend.memberId,
-                    });
+                    padding: 16,
+                    flexDirection: 'row',
+                    borderBottomColor: '#0000CC40',
+                    borderBottomWidth: 1,
                   }}
-                  style={{
-                    marginLeft: 'auto',
-                  }}>
-                  <LinearGradient
-                    colors={['#FF6ECE', '#FF3DBD']}
-                    style={{
-                      width: 73,
-                      height: 28,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderRadius: 10,
-                    }}>
-                    <Text
-                      style={{
-                        fontFamily: 'Galmuri11',
-                        fontSize: 13,
-                        color: 'white',
-                      }}>
-                      편지 쓰기
+                  key={friend.id}
+                  scrollViewRef={scrollViewRef}
+                  onPressDelete={() => toggleModal(MODAL_NAME.DELETE_FRIEND)}>
+                  <View
+                    style={[
+                      styles.listItemIcon,
+                      {backgroundColor: GRADIENT_COLORS.BLUE},
+                    ]}>
+                    <Text style={styles.listItemIconText}>
+                      {friend.nickname[0]}
                     </Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-              </ListItemWithSwipeAction>
+                  </View>
+                  <View
+                    style={{
+                      width: '100%',
+                    }}>
+                    <Text style={styles.listItemTitle}>{friend.nickname}</Text>
+                    <Text style={styles.listItemTitle}>주소 추가 필요</Text>
+                  </View>
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => {
+                      setDeliverLetterTo({
+                        toNickname: friend.nickname,
+                        toAddress: '추가 필요',
+                      });
+                      navigation.navigate('LetterEditor', {
+                        to: 'DELIVERY',
+                        type: 'DIRECT_MESSAGE',
+                        fromMemberId: friend.memberId,
+                      });
+                    }}
+                    style={{
+                      marginLeft: 'auto',
+                    }}>
+                    <LinearGradient
+                      colors={['#FF6ECE', '#FF3DBD']}
+                      style={{
+                        width: 73,
+                        height: 28,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: 10,
+                      }}>
+                      <Text
+                        style={{
+                          fontFamily: 'Galmuri11',
+                          fontSize: 13,
+                          color: 'white',
+                        }}>
+                        편지 쓰기
+                      </Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                </ListItemWithSwipeAction>
+                <DeleteFriendModal
+                  isModalVisible={isModalVisible.DELETE_FRIEND}
+                  onPressClose={() => toggleModal(MODAL_NAME.DELETE_FRIEND)}
+                  onPressDelete={() => mutate(friend.id)}
+                />
+              </>
             ))}
           </ScrollView>
         )}

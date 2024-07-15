@@ -10,6 +10,10 @@ export async function getLetterBoxes() {
   return await axiosInstance.get<LetterBoxes>('/letter-boxes');
 }
 
+export async function deleteLetterBox(id: number) {
+  return await axiosInstance.delete<null>(`letter-boxes/${id}`);
+}
+
 export async function getLetterBoxInfo(id: number) {
   return await axiosInstance.get<LetterBoxInfo>(`/letter-boxes/${id}`);
 }

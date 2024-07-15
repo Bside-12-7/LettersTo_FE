@@ -16,7 +16,7 @@ import {InvitationCodeNoticeModal} from './InvitationCodeNoticeModal';
 import {ModalBlur} from '@components/Modals/ModalBlur';
 import {BottomButton} from '@components/Button/Bottom/BottomButton';
 import {InvitationCodeAlertModal} from './InvitationCodeAlertModal';
-import {useMutation} from 'react-query';
+import {useMutation, useQueryClient} from 'react-query';
 import {applyInvitationCode} from '@apis/invitation';
 import {AxiosError} from 'axios';
 const questionsImg = require('@assets/question.png');
@@ -41,6 +41,8 @@ export const InvitationCodeInputModal = React.memo(
     const [alert, setAlert] = useState<string | null>(null);
     const [code, setCode] = useState(receivedCode ?? '');
     const [containerIsFocused, setContainerIsFocused] = useState(false);
+
+    const queryClient = useQueryClient();
 
     const codeDigitsArray = new Array(CELL_COUNT).fill(0);
     const ref = useRef<TextInput>(null);
@@ -73,9 +75,13 @@ export const InvitationCodeInputModal = React.memo(
       );
     };
 
-    const {mutate} = useMutation((invitationCode: string) =>
-      applyInvitationCode(invitationCode),
-    );
+    const {mutate} = useMutation({
+      mutationFn: (invitationCode: string) =>
+        applyInvitationCode(invitationCode),
+      onSettled() {
+        queryClient.refetchQueries('friends');
+      },
+    });
 
     const handleChangeCodeInput = (inputCode: string) => {
       if (inputCode !== '' && !/^[0-9a-z]+$/.test(inputCode)) return;
