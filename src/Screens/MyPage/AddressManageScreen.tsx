@@ -250,14 +250,14 @@ export function AddressManage({navigation, route: {params}}: Props) {
                       width: '100%',
                     }}>
                     <Text style={styles.listItemTitle}>{friend.nickname}</Text>
-                    <Text style={styles.listItemTitle}>주소 추가 필요</Text>
+                    <Text style={styles.listItemTitle}>{friend.address}</Text>
                   </View>
                   <TouchableOpacity
                     activeOpacity={0.7}
                     onPress={() => {
                       setDeliverLetterTo({
                         toNickname: friend.nickname,
-                        toAddress: '추가 필요',
+                        toAddress: friend.address,
                       });
                       navigation.navigate('LetterEditor', {
                         to: 'DELIVERY',
