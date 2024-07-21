@@ -159,7 +159,7 @@ export function LetterBoxDetail({route, navigation}: Props) {
       </View>
       <View style={styles.infoArea}>
         <View style={styles.infoHeader}>
-          {info?.type === 'DIRECT_MESSAGE' && (
+          {route.params.type === 'DIRECT_MESSAGE' && (
             <Text
               style={{
                 fontFamily: 'Galmuri11',

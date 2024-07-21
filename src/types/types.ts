@@ -195,7 +195,6 @@ export interface LetterBoxInfo {
   fromAddress: string;
   startDate: Date;
   topics: string[];
-  type: LetterBoxType;
   personalities: string[];
   [key: string]: any;
 }
