@@ -20,12 +20,14 @@ import {
   PublicLetterWriteRequest,
 } from '@type/types';
 import Toast from '@components/Toast/toast';
+import {useQueryClient} from 'react-query';
 
 type Props = NativeStackScreenProps<StackParamsList, 'LetterComplete'>;
 
 export const LetterComplete = ({navigation, route}: Props) => {
   const {cover, letter} = useStore();
   const {deliveryLetter} = useLetterEditorStore();
+  const queryClient = useQueryClient();
 
   const sendPublicLetter = useCallback(async () => {
     if (cover.stamp && letter) {
@@ -44,13 +46,21 @@ export const LetterComplete = ({navigation, route}: Props) => {
 
         await postPublicLetter(letterData);
         Toast.show('편지 작성이 완료되었습니다!');
+        queryClient.invalidateQueries('letterBox');
         navigation.navigate('Main');
       } catch (error: any) {
         console.error(error.message);
         Toast.show('문제가 발생했습니다');
       }
     }
-  }, [cover.personalityIds, cover.stamp, cover.topicIds, letter, navigation]);
+  }, [
+    cover.personalityIds,
+    cover.stamp,
+    cover.topicIds,
+    letter,
+    navigation,
+    queryClient,
+  ]);
 
   const sendDeliveryLetter = useCallback(async () => {
     try {
