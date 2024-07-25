@@ -120,7 +120,9 @@ export function AddressManage({navigation, route: {params}}: Props) {
     ['regions', userInfo?.parentGeolocationId, 'cities'],
     () => userInfo && getCities(userInfo.parentGeolocationId),
   );
-  const {data: friends} = useQuery('friends', getFriends);
+  const {data: friends, isFetchedAfterMount} = useQuery('friends', getFriends, {
+    refetchOnMount: true,
+  });
   const {mutate} = useMutation<null, AxiosError, number>({
     mutationFn: id => deleteFriends(id),
     onSettled() {
@@ -150,6 +152,14 @@ export function AddressManage({navigation, route: {params}}: Props) {
   useEffect(() => {
     if (receivedCode) toggleModal(MODAL_NAME.INVITATION);
   }, [receivedCode]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (isFetchedAfterMount && (!friends || friends?.length === 0)) {
+        toggleModal('INVITATION');
+      }
+    }, 500);
+  }, [friends, isFetchedAfterMount]);
 
   if (!isSuccess) return <></>;
 
