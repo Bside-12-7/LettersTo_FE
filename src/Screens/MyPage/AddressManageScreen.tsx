@@ -268,6 +268,7 @@ export function AddressManage({navigation, route: {params}}: Props) {
                       setDeliverLetterTo({
                         toNickname: friend.nickname,
                         toAddress: friend.address,
+                        addressId: friend.addressId,
                       });
                       navigation.navigate('LetterEditor', {
                         to: 'DELIVERY',

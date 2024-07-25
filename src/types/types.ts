@@ -267,4 +267,5 @@ export interface Friend {
   memberId: number;
   nickname: string;
   address: string;
+  addressId: number;
 }

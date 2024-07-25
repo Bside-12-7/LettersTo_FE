@@ -57,6 +57,7 @@ export async function getDeliveryLetterContent(id: number) {
   );
 }
 
+// deprecated
 export async function getDeliveryDate(id: number) {
   return await axiosInstance.get<{deliveryDate: string}>(
     `/letters/${id}/delivery-date`,
@@ -66,4 +67,14 @@ export async function getDeliveryDate(id: number) {
       },
     },
   );
+}
+
+export async function getEstimatedDeliveryTime(
+  deliveryType: 'NONE' | 'STANDARD' | 'EXPRESS',
+  addressId: number,
+) {
+  return await axiosInstance.get<{
+    deliveryType: 'NONE' | 'STANDARD' | 'EXPRESS';
+    deliveryTime: string;
+  }>(`/estimated-delivery-time/${deliveryType}/${addressId}`);
 }

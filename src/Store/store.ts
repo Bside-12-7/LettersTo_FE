@@ -109,6 +109,7 @@ interface LetterEditorStore {
     | {
         toNickname: string;
         toAddress: string;
+        addressId?: number;
       }
     | undefined;
 
@@ -118,7 +119,11 @@ interface LetterEditorStore {
     value: DeliveryLetterWriteRequest | DeliveryLetterWriteRequestV2,
   ) => void;
 
-  setDeliverLetterTo: (value: {toNickname: string; toAddress: string}) => void;
+  setDeliverLetterTo: (value: {
+    toNickname: string;
+    toAddress: string;
+    addressId?: number;
+  }) => void;
 
   setStandardDeliveryDate: (value: string) => void;
 
