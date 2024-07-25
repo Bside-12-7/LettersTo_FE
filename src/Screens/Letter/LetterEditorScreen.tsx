@@ -64,8 +64,6 @@ export function LetterEditor({navigation, route}: Props) {
   const [isLoadingImage, setLoadingImage] = useState(false);
   const [isImageModalVisible, setImageModalVisible] = useState(false);
 
-  console.log(route.params);
-
   const [disableNext, setDisableNext] = useState<boolean>(false);
 
   const selection = useRef<Selector>({start: 0, end: 0});
