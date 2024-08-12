@@ -73,13 +73,14 @@ export const LetterComplete = ({navigation, route}: Props) => {
       } else if (route.params?.to === 'DELIVERY') {
         await postDeliveryLetterV2(letterData);
       }
+      queryClient.invalidateQueries('letterBox');
       Toast.show('편지 작성이 완료되었습니다!');
       navigation.navigate('Main');
     } catch (error: any) {
       console.error(error.message);
       Toast.show('문제가 발생했습니다');
     }
-  }, [deliveryLetter, navigation, route.params?.to]);
+  }, [deliveryLetter, navigation, route.params?.to, queryClient]);
 
   const sendLetter = useCallback(() => {
     if (route.params) {
