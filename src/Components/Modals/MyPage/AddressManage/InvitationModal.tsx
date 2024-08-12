@@ -112,7 +112,8 @@ export const InvitationModal = ({
               onPress={() => {
                 Share.share({
                   title: '[Letters to] 우리 편지 주고받아요!',
-                  message: `링크를 누르거나 앱에서 친구코드[${codeData?.invitationCode}]를 입력해주세요.
+                  message: `[Letters to] 우리 편지 주고받아요! 
+                    \n링크를 누르거나 앱에서 친구코드[${codeData?.invitationCode}]를 입력해주세요.
                     \nhttps://lettersto.onelink.me/DSlL/ilxarcdy?code=${codeData?.invitationCode}`,
                 });
               }}>
