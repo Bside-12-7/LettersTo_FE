@@ -10,7 +10,7 @@ import React, {useEffect, useState} from 'react';
 import {ModalHeader} from '@components/Headers/ModalHeader';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useInterval} from '@hooks/useInterval';
-import {useMutation, useQuery} from 'react-query';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {generateInvitationCode, getInvitationCode} from '@apis/invitation';
 import {Share} from 'react-native';
 import {InvitationCodeInputModal} from './InvitationCodeInputModal';
@@ -28,22 +28,24 @@ export const InvitationModal = ({
   isModalVisible,
   onPressClose,
 }: Props) => {
+  const queryClient = useQueryClient();
   const {top: SAFE_AREA_TOP, bottom: SAFE_AREA_BOTTOM} = useSafeAreaInsets();
   const [remainingTime, setRemainingTime] = useState(1000 * 60 * 30);
   const [isCodeModalVisible, setCodeModalVisible] = useState(!!receivedCode);
 
-  const {mutate} = useMutation(generateInvitationCode);
-  const {data: codeData, refetch} = useQuery('INVITATION_CODE', () =>
-    getInvitationCode(),
+  const {mutate: resetCode} = useMutation(generateInvitationCode, {
+    onSuccess() {
+      queryClient.refetchQueries('INVITATION_CODE');
+    },
+  });
+  const {data: codeData} = useQuery(
+    'INVITATION_CODE',
+    () => getInvitationCode(),
+    {
+      cacheTime: 0,
+      enabled: isModalVisible,
+    },
   );
-
-  const resetCode = () => {
-    mutate(undefined, {
-      onSuccess() {
-        refetch();
-      },
-    });
-  };
 
   const hideModal = () => {
     deleteReceivedCode && deleteReceivedCode();
@@ -63,8 +65,9 @@ export const InvitationModal = ({
     if (codeData) {
       const expirationDate = new Date(codeData.expirationDate).getTime();
       setRemainingTime(expirationDate - new Date().getTime());
+      if (expirationDate - new Date().getTime() < 0) resetCode();
     }
-  }, [codeData]);
+  }, [codeData, resetCode]);
 
   return (
     <Modal
@@ -95,7 +98,7 @@ export const InvitationModal = ({
                 : '만료된 코드입니다, 재생성 해주세요!'}
             </Text>
             <TouchableOpacity
-              onPress={resetCode}
+              onPress={() => resetCode()}
               activeOpacity={0.7}
               style={styles.resetButton}>
               <Text style={styles.resetButtonText}>재생성</Text>
