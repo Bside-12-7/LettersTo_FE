@@ -35,6 +35,7 @@ import {LinearGradient} from 'expo-linear-gradient';
 import {useLetterEditorStore} from '@stores/store';
 import {AxiosError} from 'axios';
 import {DeleteFriendModal} from '@components/Modals/MyPage/AddressManage/DeleteFriendModal';
+import {EmptyFriendsModal} from '@components/Modals/MyPage/AddressManage/EmptyFriendsModal';
 const questionsImg = require('@assets/question.png');
 const pencilImg = require('@assets/Icon/pencil/pencil_blue.png');
 
@@ -45,6 +46,7 @@ type ModalName =
   | 'SAFE_NICKNAME_INFO'
   | 'LOCATION'
   | 'INVITATION'
+  | 'EMPTY_FRIENDS'
   | 'DELETE_FRIEND';
 
 const MODAL_NAME: {[key in ModalName]: key} = {
@@ -52,6 +54,7 @@ const MODAL_NAME: {[key in ModalName]: key} = {
   SAFE_NICKNAME_INFO: 'SAFE_NICKNAME_INFO',
   LOCATION: 'LOCATION',
   INVITATION: 'INVITATION',
+  EMPTY_FRIENDS: 'EMPTY_FRIENDS',
   DELETE_FRIEND: 'DELETE_FRIEND',
 };
 type ModalState = {
@@ -63,6 +66,7 @@ const INITIAL_MODAL_STATE: ModalState = {
   SAFE_NICKNAME_INFO: false,
   LOCATION: false,
   INVITATION: false,
+  EMPTY_FRIENDS: false,
   DELETE_FRIEND: false,
 };
 
@@ -71,6 +75,7 @@ const MODAL_ACTION = {
   TOGGLE_SAFE_NICKNAME_INFO_MODAL: 'TOGGLE_SAFE_NICKNAME_INFO_MODAL',
   TOGGLE_LOCATION_MODAL: 'TOGGLE_LOCATION_MODAL',
   TOGGLE_INVITATION_MODAL: 'TOGGLE_INVITATION_MODAL',
+  TOGGLE_EMPTY_FRIENDS_MODAL: 'TOGGLE_EMPTY_FRIENDS_MODAL',
   TOGGLE_DELETE_FRIEND_MODAL: 'TOGGLE_DELETE_FRIEND_MODAL',
 } as const;
 
@@ -87,6 +92,8 @@ const modalReducer = (
       return {...state, LOCATION: !state.LOCATION};
     case MODAL_ACTION.TOGGLE_INVITATION_MODAL:
       return {...state, INVITATION: !state.INVITATION};
+    case MODAL_ACTION.TOGGLE_EMPTY_FRIENDS_MODAL:
+      return {...state, EMPTY_FRIENDS: !state.EMPTY_FRIENDS};
     case MODAL_ACTION.TOGGLE_DELETE_FRIEND_MODAL:
       return {...state, DELETE_FRIEND: !state.DELETE_FRIEND};
   }
@@ -102,7 +109,7 @@ export function AddressManage({navigation, route: {params}}: Props) {
     () =>
       isModalVisible.SAFE_NICKNAME ||
       isModalVisible.SAFE_NICKNAME_INFO ||
-      isModalVisible.INVITATION ||
+      isModalVisible.EMPTY_FRIENDS ||
       isModalVisible.LOCATION ||
       isModalVisible.DELETE_FRIEND,
     [isModalVisible],
@@ -156,7 +163,7 @@ export function AddressManage({navigation, route: {params}}: Props) {
   useEffect(() => {
     setTimeout(() => {
       if (isFetchedAfterMount && (!friends || friends?.length === 0)) {
-        toggleModal('INVITATION');
+        toggleModal('EMPTY_FRIENDS');
       }
     }, 500);
   }, [friends, isFetchedAfterMount]);
@@ -313,6 +320,14 @@ export function AddressManage({navigation, route: {params}}: Props) {
       <SafeNicknameNoticeModal
         isModalVisible={isModalVisible.SAFE_NICKNAME_INFO}
         onPressClose={() => toggleModal(MODAL_NAME.SAFE_NICKNAME_INFO)}
+      />
+      <EmptyFriendsModal
+        isModalVisible={isModalVisible.EMPTY_FRIENDS}
+        onPressConfirm={() => {
+          toggleModal(MODAL_NAME.EMPTY_FRIENDS);
+          toggleModal(MODAL_NAME.INVITATION);
+        }}
+        onPressClose={() => toggleModal(MODAL_NAME.EMPTY_FRIENDS)}
       />
       <SafeNicknameModal
         currentNickname={userInfo.safeNickname}
