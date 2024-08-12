@@ -82,7 +82,7 @@ export const InvitationModal = ({
               paddingBottom: SAFE_AREA_BOTTOM,
             },
           ]}>
-          <ModalHeader title={'위치 정보 관리'} onPressClose={hideModal} />
+          <ModalHeader title={'친구 초대하기'} onPressClose={hideModal} />
           <View style={styles.topWrapper}>
             <Text style={styles.invitationCodeText}>
               {codeData?.invitationCode}
