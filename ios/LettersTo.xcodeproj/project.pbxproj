@@ -608,7 +608,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2403311;
+				CURRENT_PROJECT_VERSION = 240819;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = UWL8SJ2YMP;
 				ENABLE_BITCODE = NO;
@@ -703,7 +703,7 @@
 					"$(inherited)",
 					/usr/lib/swift,
 				);
-				MARKETING_VERSION = 2.1.5;
+				MARKETING_VERSION = 2.1.7;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -739,7 +739,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2403311;
+				CURRENT_PROJECT_VERSION = 240819;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = UWL8SJ2YMP;
 				HEADER_SEARCH_PATHS = (
@@ -833,7 +833,7 @@
 					"$(inherited)",
 					/usr/lib/swift,
 				);
-				MARKETING_VERSION = 2.1.5;
+				MARKETING_VERSION = 2.1.7;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
