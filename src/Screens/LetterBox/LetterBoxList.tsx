@@ -35,7 +35,9 @@ export function LetterBoxList({navigation, onPressHome}: Props) {
   const queryClient = useQueryClient();
   const flatListRef = useRef<FlatList<LetterBox>>(null);
   const {top: SAFE_AREA_TOP} = useSafeAreaInsets();
-  const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [deletingLetterBoxId, setDeletingLetterBoxId] = useState<number | null>(
+    null,
+  );
 
   const {isFeedbackButtonShown} = useFeedbackStore();
 
@@ -43,7 +45,7 @@ export function LetterBoxList({navigation, onPressHome}: Props) {
   const {mutate} = useMutation({
     mutationFn: (id: number) => deleteLetterBox(id),
     onSettled() {
-      setDeleteModalVisible(false);
+      setDeletingLetterBoxId(null);
       queryClient.refetchQueries('letterBox');
     },
   });
@@ -180,7 +182,7 @@ export function LetterBoxList({navigation, onPressHome}: Props) {
                 <ListItemWithSwipeAction
                   key={item.id}
                   scrollViewRef={flatListRef}
-                  onPressDelete={() => setDeleteModalVisible(true)}>
+                  onPressDelete={() => setDeletingLetterBoxId(item.id)}>
                   <TouchableOpacity
                     activeOpacity={1}
                     style={styles.listItem}
@@ -245,17 +247,17 @@ export function LetterBoxList({navigation, onPressHome}: Props) {
                     </View>
                   </TouchableOpacity>
                 </ListItemWithSwipeAction>
-                <DeleteFriendModal
-                  isModalVisible={isDeleteModalVisible}
-                  onPressClose={() => setDeleteModalVisible(false)}
-                  onPressDelete={() => mutate(item.id)}
-                />
               </>
             );
           }}
         />
       )}
-      {isDeleteModalVisible && <ModalBlur />}
+      {deletingLetterBoxId !== null && <ModalBlur />}
+      <DeleteFriendModal
+        isModalVisible={!!deletingLetterBoxId}
+        onPressClose={() => setDeletingLetterBoxId(null)}
+        onPressDelete={() => deletingLetterBoxId && mutate(deletingLetterBoxId)}
+      />
     </LinearGradient>
   );
 }

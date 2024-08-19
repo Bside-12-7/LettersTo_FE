@@ -45,17 +45,13 @@ type ModalName =
   | 'SAFE_NICKNAME'
   | 'SAFE_NICKNAME_INFO'
   | 'LOCATION'
-  | 'INVITATION'
-  | 'EMPTY_FRIENDS'
-  | 'DELETE_FRIEND';
+  | 'INVITATION';
 
 const MODAL_NAME: {[key in ModalName]: key} = {
   SAFE_NICKNAME: 'SAFE_NICKNAME',
   SAFE_NICKNAME_INFO: 'SAFE_NICKNAME_INFO',
   LOCATION: 'LOCATION',
   INVITATION: 'INVITATION',
-  EMPTY_FRIENDS: 'EMPTY_FRIENDS',
-  DELETE_FRIEND: 'DELETE_FRIEND',
 };
 type ModalState = {
   [key in ModalName]: boolean;
@@ -66,8 +62,6 @@ const INITIAL_MODAL_STATE: ModalState = {
   SAFE_NICKNAME_INFO: false,
   LOCATION: false,
   INVITATION: false,
-  EMPTY_FRIENDS: false,
-  DELETE_FRIEND: false,
 };
 
 const MODAL_ACTION = {
@@ -75,8 +69,6 @@ const MODAL_ACTION = {
   TOGGLE_SAFE_NICKNAME_INFO_MODAL: 'TOGGLE_SAFE_NICKNAME_INFO_MODAL',
   TOGGLE_LOCATION_MODAL: 'TOGGLE_LOCATION_MODAL',
   TOGGLE_INVITATION_MODAL: 'TOGGLE_INVITATION_MODAL',
-  TOGGLE_EMPTY_FRIENDS_MODAL: 'TOGGLE_EMPTY_FRIENDS_MODAL',
-  TOGGLE_DELETE_FRIEND_MODAL: 'TOGGLE_DELETE_FRIEND_MODAL',
 } as const;
 
 const modalReducer = (
@@ -92,15 +84,12 @@ const modalReducer = (
       return {...state, LOCATION: !state.LOCATION};
     case MODAL_ACTION.TOGGLE_INVITATION_MODAL:
       return {...state, INVITATION: !state.INVITATION};
-    case MODAL_ACTION.TOGGLE_EMPTY_FRIENDS_MODAL:
-      return {...state, EMPTY_FRIENDS: !state.EMPTY_FRIENDS};
-    case MODAL_ACTION.TOGGLE_DELETE_FRIEND_MODAL:
-      return {...state, DELETE_FRIEND: !state.DELETE_FRIEND};
   }
 };
 
 export function AddressManage({navigation, route: {params}}: Props) {
   const scrollViewRef = useRef<ScrollView>(null);
+  const fetchCountRef = useRef(0);
   const [isModalVisible, dispatch] = useReducer(
     modalReducer,
     INITIAL_MODAL_STATE,
@@ -109,9 +98,7 @@ export function AddressManage({navigation, route: {params}}: Props) {
     () =>
       isModalVisible.SAFE_NICKNAME ||
       isModalVisible.SAFE_NICKNAME_INFO ||
-      isModalVisible.EMPTY_FRIENDS ||
-      isModalVisible.LOCATION ||
-      isModalVisible.DELETE_FRIEND,
+      isModalVisible.LOCATION,
     [isModalVisible],
   );
   const [receivedCode, setReceivedCode] = useState(params?.code);
@@ -127,13 +114,23 @@ export function AddressManage({navigation, route: {params}}: Props) {
     ['regions', userInfo?.parentGeolocationId, 'cities'],
     () => userInfo && getCities(userInfo.parentGeolocationId),
   );
-  const {data: friends, isFetchedAfterMount} = useQuery('friends', getFriends, {
-    refetchOnMount: true,
-  });
+  const {data: friends} = useQuery(
+    'friends',
+    () =>
+      getFriends().then(res => {
+        fetchCountRef.current++;
+        return res;
+      }),
+    {
+      refetchOnMount: true,
+      staleTime: 0,
+      cacheTime: 0,
+    },
+  );
   const {mutate} = useMutation<null, AxiosError, number>({
     mutationFn: id => deleteFriends(id),
     onSettled() {
-      toggleModal(MODAL_NAME.DELETE_FRIEND);
+      setDeletingFriendId(null);
       queryClient.refetchQueries('friends');
     },
   });
@@ -160,13 +157,15 @@ export function AddressManage({navigation, route: {params}}: Props) {
     if (receivedCode) toggleModal(MODAL_NAME.INVITATION);
   }, [receivedCode]);
 
+  const [deletingFriendId, setDeletingFriendId] = useState<number | null>(null);
+  const [emptyModalOpen, setEmptyModalOpen] = useState(false);
+
   useEffect(() => {
-    setTimeout(() => {
-      if (isFetchedAfterMount && (!friends || friends?.length === 0)) {
-        toggleModal('EMPTY_FRIENDS');
-      }
-    }, 500);
-  }, [friends, isFetchedAfterMount]);
+    console.log(fetchCountRef.current);
+    if (friends && fetchCountRef.current === 1 && friends.length === 0)
+      setEmptyModalOpen(true);
+    if (friends && friends.length > 0) setEmptyModalOpen(false);
+  }, [friends]);
 
   if (!isSuccess) return <></>;
 
@@ -238,96 +237,97 @@ export function AddressManage({navigation, route: {params}}: Props) {
             style={{flex: 1}}
             contentInsetAdjustmentBehavior="automatic"
             ref={scrollViewRef}>
-            {friends.map(friend => (
-              <>
-                <ListItemWithSwipeAction
-                  style={{
-                    height: 100,
-                    alignItems: 'center',
-                    width: '100%',
-                    padding: 16,
-                    flexDirection: 'row',
-                    borderBottomColor: '#0000CC40',
-                    borderBottomWidth: 1,
-                  }}
-                  key={friend.id}
-                  scrollViewRef={scrollViewRef}
-                  onPressDelete={() => toggleModal(MODAL_NAME.DELETE_FRIEND)}>
-                  <View
-                    style={[
-                      styles.listItemIcon,
-                      {backgroundColor: GRADIENT_COLORS.BLUE},
-                    ]}>
-                    <Text style={styles.listItemIconText}>
-                      {friend.nickname[0]}
-                    </Text>
-                  </View>
-                  <View
+            {friends.map(friend => {
+              return (
+                <>
+                  <ListItemWithSwipeAction
                     style={{
+                      height: 100,
+                      alignItems: 'center',
                       width: '100%',
-                    }}>
-                    <Text style={styles.listItemTitle}>{friend.nickname}</Text>
-                    <Text style={styles.listItemTitle}>{friend.address}</Text>
-                  </View>
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    onPress={() => {
-                      setDeliverLetterTo({
-                        toNickname: friend.nickname,
-                        toAddress: friend.address,
-                        addressId: friend.addressId,
-                      });
-                      navigation.navigate('LetterEditor', {
-                        to: 'DELIVERY',
-                        type: 'DIRECT_MESSAGE',
-                        fromMemberId: friend.memberId,
-                      });
+                      padding: 16,
+                      flexDirection: 'row',
+                      borderBottomColor: '#0000CC40',
+                      borderBottomWidth: 1,
                     }}
-                    style={{
-                      marginLeft: 'auto',
-                    }}>
-                    <LinearGradient
-                      colors={['#FF6ECE', '#FF3DBD']}
-                      style={{
-                        width: 73,
-                        height: 28,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: 10,
-                      }}>
-                      <Text
-                        style={{
-                          fontFamily: 'Galmuri11',
-                          fontSize: 13,
-                          color: 'white',
-                        }}>
-                        편지 쓰기
+                    key={friend.id}
+                    scrollViewRef={scrollViewRef}
+                    onPressDelete={() => setDeletingFriendId(friend.id)}>
+                    <View
+                      style={[
+                        styles.listItemIcon,
+                        {backgroundColor: GRADIENT_COLORS.BLUE},
+                      ]}>
+                      <Text style={styles.listItemIconText}>
+                        {friend.nickname[0]}
                       </Text>
-                    </LinearGradient>
-                  </TouchableOpacity>
-                </ListItemWithSwipeAction>
-                <DeleteFriendModal
-                  isModalVisible={isModalVisible.DELETE_FRIEND}
-                  onPressClose={() => toggleModal(MODAL_NAME.DELETE_FRIEND)}
-                  onPressDelete={() => mutate(friend.id)}
-                />
-              </>
-            ))}
+                    </View>
+                    <View
+                      style={{
+                        width: '100%',
+                      }}>
+                      <Text style={styles.listItemTitle}>
+                        {friend.nickname}
+                      </Text>
+                      <Text style={styles.listItemTitle}>{friend.address}</Text>
+                    </View>
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() => {
+                        setDeliverLetterTo({
+                          toNickname: friend.nickname,
+                          toAddress: friend.address,
+                          addressId: friend.addressId,
+                        });
+                        navigation.navigate('LetterEditor', {
+                          to: 'DELIVERY',
+                          type: 'DIRECT_MESSAGE',
+                          fromMemberId: friend.memberId,
+                        });
+                      }}
+                      style={{
+                        marginLeft: 'auto',
+                      }}>
+                      <LinearGradient
+                        colors={['#FF6ECE', '#FF3DBD']}
+                        style={{
+                          width: 73,
+                          height: 28,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: 10,
+                        }}>
+                        <Text
+                          style={{
+                            fontFamily: 'Galmuri11',
+                            fontSize: 13,
+                            color: 'white',
+                          }}>
+                          편지 쓰기
+                        </Text>
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  </ListItemWithSwipeAction>
+                </>
+              );
+            })}
           </ScrollView>
         )}
       </View>
-      {isAnyModalVisible && <ModalBlur />}
+      {(isAnyModalVisible || deletingFriendId !== null || emptyModalOpen) && (
+        <ModalBlur />
+      )}
       <SafeNicknameNoticeModal
         isModalVisible={isModalVisible.SAFE_NICKNAME_INFO}
         onPressClose={() => toggleModal(MODAL_NAME.SAFE_NICKNAME_INFO)}
       />
       <EmptyFriendsModal
-        isModalVisible={isModalVisible.EMPTY_FRIENDS}
+        isModalVisible={emptyModalOpen}
         onPressConfirm={() => {
-          toggleModal(MODAL_NAME.EMPTY_FRIENDS);
+          setEmptyModalOpen(false);
           toggleModal(MODAL_NAME.INVITATION);
         }}
-        onPressClose={() => toggleModal(MODAL_NAME.EMPTY_FRIENDS)}
+        onPressClose={() => setEmptyModalOpen(false)}
       />
       <SafeNicknameModal
         currentNickname={userInfo.safeNickname}
@@ -351,6 +351,11 @@ export function AddressManage({navigation, route: {params}}: Props) {
         onPressClose={() => {
           toggleModal(MODAL_NAME.INVITATION);
         }}
+      />
+      <DeleteFriendModal
+        isModalVisible={deletingFriendId !== null}
+        onPressClose={() => setDeletingFriendId(null)}
+        onPressDelete={() => deletingFriendId && mutate(deletingFriendId)}
       />
     </View>
   );
