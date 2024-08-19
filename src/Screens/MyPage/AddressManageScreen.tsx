@@ -239,7 +239,7 @@ export function AddressManage({navigation, route: {params}}: Props) {
             ref={scrollViewRef}>
             {friends.map(friend => {
               return (
-                <>
+                <React.Fragment key={friend.id}>
                   <ListItemWithSwipeAction
                     style={{
                       height: 100,
@@ -308,7 +308,7 @@ export function AddressManage({navigation, route: {params}}: Props) {
                       </LinearGradient>
                     </TouchableOpacity>
                   </ListItemWithSwipeAction>
-                </>
+                </React.Fragment>
               );
             })}
           </ScrollView>
