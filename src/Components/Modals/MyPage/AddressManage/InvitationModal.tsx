@@ -58,7 +58,11 @@ export const InvitationModal = ({
   };
 
   useInterval(() => {
-    setRemainingTime(prev => prev - 1000);
+    if (codeData) {
+      const expirationDate = new Date(codeData.expirationDate).getTime();
+      setRemainingTime(expirationDate - new Date().getTime());
+    }
+    if (remainingTime < 0) resetCode();
   }, 1000);
 
   useEffect(() => {
@@ -66,6 +70,10 @@ export const InvitationModal = ({
       const expirationDate = new Date(codeData.expirationDate).getTime();
       setRemainingTime(expirationDate - new Date().getTime());
       if (expirationDate - new Date().getTime() < 0) resetCode();
+    }
+
+    if (!codeData?.invitationCode) {
+      resetCode();
     }
   }, [codeData, resetCode]);
 
