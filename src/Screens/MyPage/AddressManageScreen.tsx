@@ -98,7 +98,8 @@ export function AddressManage({navigation, route: {params}}: Props) {
     () =>
       isModalVisible.SAFE_NICKNAME ||
       isModalVisible.SAFE_NICKNAME_INFO ||
-      isModalVisible.LOCATION,
+      isModalVisible.LOCATION ||
+      isModalVisible.INVITATION,
     [isModalVisible],
   );
   const [receivedCode, setReceivedCode] = useState(params?.code);
@@ -161,10 +162,15 @@ export function AddressManage({navigation, route: {params}}: Props) {
   const [emptyModalOpen, setEmptyModalOpen] = useState(false);
 
   useEffect(() => {
-    console.log(fetchCountRef.current);
-    if (friends && fetchCountRef.current === 1 && friends.length === 0)
+    if (
+      friends &&
+      fetchCountRef.current === 1 &&
+      friends.length === 0 &&
+      !isAnyModalVisible
+    )
       setEmptyModalOpen(true);
     if (friends && friends.length > 0) setEmptyModalOpen(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [friends]);
 
   if (!isSuccess) return <></>;
