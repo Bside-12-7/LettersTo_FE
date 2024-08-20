@@ -92,7 +92,15 @@ export const Main = ({navigation}: Props) => {
 
   // 친구에게 편지쓰기 프로모션
   const {bottom: SAFE_AREA_BOTTOM} = useSafeAreaInsets();
-  const [isModalVisible, setModalVisible] = useState(true);
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => {
+      const {routes, index} = navigation.getState();
+      const currentRoute = routes[index].name;
+      if (currentRoute === 'Main') setModalVisible(true);
+    }, 1000);
+  }, [navigation]);
 
   return (
     <View style={{flex: 1}}>
