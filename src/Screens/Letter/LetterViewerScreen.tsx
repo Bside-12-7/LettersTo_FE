@@ -147,6 +147,7 @@ export function LetterViewer({route, navigation}: Props) {
       setDeliverLetterTo({
         toNickname: letterContent.fromNickname,
         toAddress: letterContent.fromAddress,
+        addressId: letterContent.fromAddressId,
       });
       navigation.navigate('LetterEditor', {
         reply: route.params.id,

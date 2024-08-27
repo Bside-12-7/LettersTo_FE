@@ -46,7 +46,8 @@ export const LetterComplete = ({navigation, route}: Props) => {
 
         await postPublicLetter(letterData);
         Toast.show('편지 작성이 완료되었습니다!');
-        queryClient.invalidateQueries('letterBox');
+        queryClient.refetchQueries('letterBox');
+        queryClient.refetchQueries('userInfo');
         navigation.navigate('Main');
       } catch (error: any) {
         console.error(error.message);
@@ -73,7 +74,8 @@ export const LetterComplete = ({navigation, route}: Props) => {
       } else if (route.params?.to === 'DELIVERY') {
         await postDeliveryLetterV2(letterData);
       }
-      queryClient.invalidateQueries('letterBox');
+      queryClient.refetchQueries('letterBox');
+      queryClient.refetchQueries('userInfo');
       Toast.show('편지 작성이 완료되었습니다!');
       navigation.navigate('Main');
     } catch (error: any) {

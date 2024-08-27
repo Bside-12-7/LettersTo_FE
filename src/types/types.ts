@@ -123,6 +123,7 @@ export interface PublicLetterContent {
   title: string;
   content: string;
   fromAddress: string;
+  fromAddressId: number;
   fromNickname: string;
   paperColor: PaperColor;
   paperType: PaperStyle | 'LINE';

@@ -38,7 +38,7 @@ export const InvitationModal = ({
       queryClient.refetchQueries('INVITATION_CODE');
     },
   });
-  const {data: codeData} = useQuery(
+  const {data: codeData, isError} = useQuery(
     'INVITATION_CODE',
     () => getInvitationCode(),
     {
@@ -71,11 +71,11 @@ export const InvitationModal = ({
       setRemainingTime(expirationDate - new Date().getTime());
       if (expirationDate - new Date().getTime() < 0) resetCode();
     }
-
-    if (!codeData?.invitationCode) {
-      resetCode();
-    }
   }, [codeData, resetCode]);
+
+  useEffect(() => {
+    if (isError) resetCode();
+  }, [isError, resetCode]);
 
   return (
     <Modal
@@ -120,6 +120,7 @@ export const InvitationModal = ({
             <TouchableOpacity
               activeOpacity={0.5}
               style={[styles.invitationButton, {marginBottom: 16}]}
+              disabled={!codeData?.invitationCode}
               onPress={() => {
                 Share.share({
                   title: '[Letters to] 우리 편지 주고받아요!',
