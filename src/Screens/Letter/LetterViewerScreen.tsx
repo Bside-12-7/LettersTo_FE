@@ -124,7 +124,7 @@ export function LetterViewer({route, navigation}: Props) {
 
   const onPressReply = useCallback(() => {
     if (letterContent) {
-      if (userInfo && letterContent.fromNickname === userInfo.nickname) {
+      if (userInfo && letterContent.fromMemberId === userInfo.id) {
         return Alert.alert(
           '내가 작성한 편지에요. 다른 편지에 답장해 보세요.',
           undefined,

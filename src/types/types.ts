@@ -124,6 +124,7 @@ export interface PublicLetterContent {
   content: string;
   fromAddress: string;
   fromAddressId: number;
+  fromMemberId: number;
   fromNickname: string;
   paperColor: PaperColor;
   paperType: PaperStyle | 'LINE';
@@ -141,6 +142,7 @@ export interface DeliveryLetterContent {
   title: string;
   content: string;
   fromAddress: string;
+  fromMemberId: number;
   fromNickname: string;
   paperColor: PaperColor;
   paperType: PaperStyle | 'LINE';
