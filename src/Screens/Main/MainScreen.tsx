@@ -23,6 +23,7 @@ import deviceInfo from 'react-native-device-info';
 import {ModalHeader} from '@components/Headers/ModalHeader';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ModalBlur} from '@components/Modals/ModalBlur';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Props = NativeStackScreenProps<StackParamsList, 'Main'>;
 
@@ -94,8 +95,14 @@ export const Main = ({navigation}: Props) => {
   const {bottom: SAFE_AREA_BOTTOM} = useSafeAreaInsets();
   const [isModalVisible, setModalVisible] = useState(false);
 
+  const closePromotionModal = () => {
+    AsyncStorage.setItem('promotion_opened', 'true');
+    setModalVisible(false);
+  };
+
   useEffect(() => {
-    setTimeout(() => {
+    setTimeout(async () => {
+      if ((await AsyncStorage.getItem('promotion_opened')) === 'true') return;
       const {routes, index} = navigation.getState();
       const currentRoute = routes[index].name;
       if (currentRoute === 'Main') setModalVisible(true);
@@ -120,14 +127,11 @@ export const Main = ({navigation}: Props) => {
         statusBarTranslucent={true} // android
         animationType="slide"
         transparent={true}
-        onRequestClose={() => setModalVisible(false)}
+        onRequestClose={closePromotionModal}
         visible={isModalVisible}>
         <View style={styles.container}>
           <View style={[styles.modalView, {paddingBottom: SAFE_AREA_BOTTOM}]}>
-            <ModalHeader
-              title={''}
-              onPressClose={() => setModalVisible(false)}
-            />
+            <ModalHeader title={''} onPressClose={closePromotionModal} />
             <View
               style={{
                 paddingTop: 12,
@@ -185,7 +189,7 @@ export const Main = ({navigation}: Props) => {
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}
-                onPress={() => setModalVisible(false)}>
+                onPress={closePromotionModal}>
                 <Text
                   style={{
                     fontFamily: 'Galmuri11',
@@ -193,7 +197,7 @@ export const Main = ({navigation}: Props) => {
                     lineHeight: 23,
                     color: '#0000CC',
                   }}>
-                  안 할께요
+                  안 할게요
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
