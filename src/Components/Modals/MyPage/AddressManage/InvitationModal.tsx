@@ -126,7 +126,8 @@ export const InvitationModal = ({
                   title: '[Letters to] 우리 편지 주고받아요!',
                   message: `[Letters to] 우리 편지 주고받아요! 
                     \n링크를 누르거나 앱에서 친구코드[${codeData?.invitationCode}]를 입력해주세요.
-                    \nhttps://lettersto.onelink.me/DSlL/ilxarcdy?code=${codeData?.invitationCode}`,
+                    \nhttps://lettersto.onelink.me/DSlL/ilxarcdy?code=${codeData?.invitationCode}
+                    \n※코드 입력창이 보이지 않을 시 앱 종료 후 다시 시도해주세요.`,
                 });
               }}>
               <Text style={styles.invitationButtonText}>
