@@ -108,7 +108,9 @@ export function CoverDeliverySelector({navigation, route}: Props) {
     };
 
     if (userInfo) {
-      setCoverNickname(userInfo.nickname);
+      if (deliveryLetter.letterBoxType === 'DIRECT_MESSAGE')
+        setCoverNickname(userInfo.safeNickname);
+      else setCoverNickname(userInfo.nickname);
       try {
         getFromAddress(userInfo.geolocationId, userInfo.parentGeolocationId);
       } catch (error: any) {
