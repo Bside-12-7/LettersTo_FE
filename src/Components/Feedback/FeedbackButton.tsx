@@ -4,15 +4,16 @@ import React, {useEffect, useRef} from 'react';
 import {
   Animated,
   Image,
+  Pressable,
   StyleSheet,
   Text,
   TouchableWithoutFeedback,
 } from 'react-native';
 
-const nextImg = require('@assets/Icon/next/next_white.png');
+const closeImg = require('@assets/close_white.png');
 
 const FEEDBACK_BUTTON_TEXT = {
-  HOME: '‘Letters to’ 의 어떤 부분이 개선되면 좋을까요? 의견을 남겨주세요!',
+  HOME: '‘Letters to’ 의 어떤 부분이 개선되면\n좋을까요? 의견을 남겨주세요!',
   SIMPLE: '‘Letters to’에게 피드백을 남겨주세요!',
 };
 
@@ -69,10 +70,17 @@ export const FeedbackButton = React.memo(({screenName}: Props) => {
             ? FEEDBACK_BUTTON_TEXT.HOME
             : FEEDBACK_BUTTON_TEXT.SIMPLE}
         </Text>
-        <Image
-          source={nextImg}
-          style={screenName === 'HOME' ? styles.next_24 : styles.next_20}
-        />
+        <Pressable
+          onPress={() => {
+            if (screenName === 'HOME') return clearFeedbackButtonOnHome();
+            if (screenName === 'LETTERBOX')
+              return clearFeedbackButtonOnLetterBox();
+          }}>
+          <Image
+            source={closeImg}
+            style={screenName === 'HOME' ? styles.next_24 : styles.next_20}
+          />
+        </Pressable>
       </Animated.View>
     </TouchableWithoutFeedback>
   );
@@ -97,6 +105,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Galmuri11',
     fontSize: 14,
     flexShrink: 1,
+    lineHeight: 23,
   },
   next_20: {height: 20, width: 20},
   next_24: {height: 24, width: 24},
