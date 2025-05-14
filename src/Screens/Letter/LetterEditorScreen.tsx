@@ -443,6 +443,7 @@ export function LetterEditor({navigation, route}: Props) {
                 onSelectionChange={onChangeSelection}
                 showSoftInputOnFocus={!texticonSelectorVisible}
                 placeholderTextColor="#0000CC66"
+                maxLength={MAX_TEXT_LIMIT}
                 style={[
                   styles.textInput,
                   {
