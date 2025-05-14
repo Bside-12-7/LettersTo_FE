@@ -8,6 +8,7 @@ import React, {
   useState,
 } from 'react';
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   StatusBar,
@@ -206,10 +207,10 @@ export function LetterEditor({navigation, route}: Props) {
   }, [dismissKeyboard, paperSelectorVisible, texticonSelectorVisible]);
 
   const getSelectedFunc = () => {
-    if(paperSelectorVisible) return "PAPER";
-    if(texticonSelectorVisible) return "TEXTICON";
+    if (paperSelectorVisible) return 'PAPER';
+    if (texticonSelectorVisible) return 'TEXTICON';
     return;
-  }
+  };
 
   const onToggleTextAlign = useCallback(() => {
     switch (align) {
@@ -331,7 +332,10 @@ export function LetterEditor({navigation, route}: Props) {
   }, [setImageModalVisible]);
 
   const goBack = useCallback(() => {
-    navigation.pop();
+    Alert.alert('알림', '편지 작성을 중단하고 나갈까요?', [
+      {text: '네', onPress: () => navigation.pop()},
+      {text: '아니오'},
+    ]);
   }, [navigation]);
 
   const goNext = useCallback(() => {

@@ -78,6 +78,9 @@ export default function StackNavigator() {
           <Stack.Screen
             name={SCREEN_NAMES.LETTER_EDITOR}
             component={LetterEditor}
+            options={{
+              gestureEnabled: false,
+            }}
           />
           <Stack.Screen
             name={SCREEN_NAMES.COVER_DELIVERY_SELECTOR}
