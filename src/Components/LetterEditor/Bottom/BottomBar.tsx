@@ -1,5 +1,5 @@
 import React from 'react';
-import {Image, Pressable, StyleSheet, View} from 'react-native';
+import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useKeyboard} from '@hooks/Hardware/useKeyboard';
 
@@ -17,6 +17,7 @@ const textAlign = {
 type Props = {
   paddingOn: boolean;
   align: 'left' | 'center' | 'right';
+  selectedFunc?: 'PAPER' | 'TEXTICON';
   onToggleTextAlign: () => void;
   onShowPaper: () => void;
   onShowTexticon: () => void;
@@ -27,6 +28,7 @@ export const BottomBar = React.memo(
   ({
     paddingOn,
     align,
+    selectedFunc,
     onToggleTextAlign,
     onShowPaper,
     onShowTexticon,
@@ -65,6 +67,15 @@ export const BottomBar = React.memo(
             <Image source={keyboardButton} style={styles.buttonImage} />
           </Pressable>
         )}
+        {selectedFunc && (
+          <Pressable
+            onPress={() => {
+              if (selectedFunc === 'PAPER') onShowPaper();
+              else if (selectedFunc === 'TEXTICON') onShowTexticon();
+            }}>
+            <Text style={styles.completeFuncButtonText}>선택완료</Text>
+          </Pressable>
+        )}
       </View>
     );
   },
@@ -84,4 +95,9 @@ const styles = StyleSheet.create({
   bottomBarButton: {marginRight: 16},
   buttonImage: {height: 24, width: 24},
   texticonButtonImage: {height: 24, width: 60},
+  completeFuncButtonText: {
+    color: 'white',
+    fontSize: 15,
+    fontFamily: 'Galmuri11',
+  },
 });

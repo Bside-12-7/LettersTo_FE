@@ -188,6 +188,12 @@ export function LetterEditor({navigation, route}: Props) {
   const onShowPaper = useCallback(() => {
     if (paperSelectorVisible) {
       setPaperSelectorVisible(false);
+      if (lastestFocus) {
+        lastestFocus.ref.current.blur();
+        setTimeout(() => {
+          lastestFocus.ref.current.focus();
+        }, 1);
+      }
     } else {
       dismissKeyboard();
       if (texticonSelectorVisible) {
@@ -198,6 +204,12 @@ export function LetterEditor({navigation, route}: Props) {
       }, 300);
     }
   }, [dismissKeyboard, paperSelectorVisible, texticonSelectorVisible]);
+
+  const getSelectedFunc = () => {
+    if(paperSelectorVisible) return "PAPER";
+    if(texticonSelectorVisible) return "TEXTICON";
+    return;
+  }
 
   const onToggleTextAlign = useCallback(() => {
     switch (align) {
@@ -475,6 +487,7 @@ export function LetterEditor({navigation, route}: Props) {
               )}
               <BottomBar
                 paddingOn={paddingOn}
+                selectedFunc={getSelectedFunc()}
                 align={align}
                 onToggleTextAlign={onToggleTextAlign}
                 onShowPaper={onShowPaper}
