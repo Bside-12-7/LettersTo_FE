@@ -1,6 +1,6 @@
 import {Texticons, PaperColor} from '@type/types';
 
-export const MAX_TEXT_LIMIT = 1000;
+export const MAX_TEXT_LIMIT = 3000;
 export const MIN_TEXT_LIMIT = 100;
 
 export const MAX_TITLE_LIMIT = 30;

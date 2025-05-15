@@ -8,6 +8,7 @@ import React, {
   useState,
 } from 'react';
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   StatusBar,
@@ -205,6 +206,12 @@ export function LetterEditor({navigation, route}: Props) {
   const onShowPaper = useCallback(() => {
     if (paperSelectorVisible) {
       setPaperSelectorVisible(false);
+      if (lastestFocus) {
+        lastestFocus.ref.current.blur();
+        setTimeout(() => {
+          lastestFocus.ref.current.focus();
+        }, 1);
+      }
     } else {
       dismissKeyboard();
       if (texticonSelectorVisible) {
@@ -215,6 +222,12 @@ export function LetterEditor({navigation, route}: Props) {
       }, 300);
     }
   }, [dismissKeyboard, paperSelectorVisible, texticonSelectorVisible]);
+
+  const getSelectedFunc = () => {
+    if (paperSelectorVisible) return 'PAPER';
+    if (texticonSelectorVisible) return 'TEXTICON';
+    return;
+  };
 
   const onToggleTextAlign = useCallback(() => {
     switch (align) {
@@ -336,7 +349,10 @@ export function LetterEditor({navigation, route}: Props) {
   }, [setImageModalVisible]);
 
   const goBack = useCallback(() => {
-    navigation.pop();
+    Alert.alert('알림', '편지 작성을 중단하고 나갈까요?', [
+      {text: '네', onPress: () => navigation.pop()},
+      {text: '아니오'},
+    ]);
   }, [navigation]);
 
   const goNext = useCallback(() => {
@@ -460,6 +476,7 @@ export function LetterEditor({navigation, route}: Props) {
                 onSelectionChange={onChangeSelection}
                 showSoftInputOnFocus={!texticonSelectorVisible}
                 placeholderTextColor="#0000CC66"
+                maxLength={MAX_TEXT_LIMIT}
                 style={[
                   styles.textInput,
                   {
@@ -491,6 +508,7 @@ export function LetterEditor({navigation, route}: Props) {
               )}
               <BottomBar
                 paddingOn={paddingOn}
+                selectedFunc={getSelectedFunc()}
                 align={align}
                 onToggleTextAlign={onToggleTextAlign}
                 onShowPaper={onShowPaper}

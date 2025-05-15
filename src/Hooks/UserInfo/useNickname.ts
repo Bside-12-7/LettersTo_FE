@@ -28,7 +28,8 @@ const NICKNAME_VALIDATION_RESULT_MAP: NicknameValidationResultMap = {
   },
   FORM_INCORRECT: {
     valid: false,
-    message: '3-10자 이내의 별명을 입력해주세요.',
+    message:
+      '닉네임은 한글 1자 이상, 영문 2자 이상, 숫자 2자 이상 또는 영문과 숫자를 합쳐 2자 이상이어야 하며, 15자 이내여야 합니다. 사용할 수 있는 문자는 한글(완성형), 영문, 숫자만 가능하고, 공백, 특수문자, 이모지, 단독 자음·모음(예: ㄱ, ㅏ 등)은 사용할 수 없습니다.',
   },
   PASS: {
     valid: true,
@@ -79,7 +80,11 @@ export const useNickname = (curruntNickname?: string) => {
         setNicknameValidationResult(
           NICKNAME_VALIDATION_RESULT_MAP.CURRENT_NICKNAME,
         );
-      } else if (!/^[가-힣A-Za-z0-9]{3,10}$/.test(nickname)) {
+      } else if (
+        !/^(?=.{1,15}$)(?!.*[^가-힣A-Za-z0-9])(?:(?=.*[가-힣])|(?=(?:.*[A-Za-z]){2,})|(?=(?:.*\d){2,})|(?=(?=.*[A-Za-z])(?=.*\d))).+$/.test(
+          nickname,
+        )
+      ) {
         setNicknameValidationResult(
           NICKNAME_VALIDATION_RESULT_MAP.FORM_INCORRECT,
         );

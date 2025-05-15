@@ -113,14 +113,14 @@ export const EnvelopeModal = ({
             />
           </Pressable>
           {/* 뜯어서 편지 열어보기 */}
-          <Pressable style={styles.openArea} onPress={openLetter}>
+          <View style={styles.openArea}>
             <Text style={styles.openText}>뜯어서 편지 열어보기</Text>
             <Image
               source={require('@assets/arrow_long.png')}
               style={styles.openArrow}
               resizeMode="contain"
             />
-          </Pressable>
+          </View>
           <View style={styles.envelope}>
             <Animated.View
               style={[styles.cardTop, {transform: [{translateY: moveAnim.y}]}]}>
@@ -260,24 +260,26 @@ export const EnvelopeModal = ({
                 )}
               </LinearGradient>
             </View>
-            <View
+            <Pressable
               style={styles.swipeArea}
-              onStartShouldSetResponder={() => true}
-              onResponderStart={event => {
-                onSwipeXStart(
-                  event.nativeEvent.locationX,
-                  event.nativeEvent.timestamp,
-                );
-              }}
-              onResponderEnd={event => {
-                onSwipteXEnd(
-                  event.nativeEvent.locationX,
-                  event.nativeEvent.timestamp,
-                  150,
-                  1000,
-                  openLetter,
-                );
-              }}
+              // onStartShouldSetResponder={() => true}
+              // onResponderStart={event => {
+              //   onSwipeXStart(
+              //     event.nativeEvent.locationX,
+              //     event.nativeEvent.timestamp,
+              //   );
+              // }}
+              // onResponderEnd={event => {
+              //   onSwipteXEnd(
+              //     event.nativeEvent.locationX,
+              //     event.nativeEvent.timestamp,
+              //     0,
+              //     1000,
+              //     openLetter,
+              //   );
+              // }}
+              // 편지 뜯기 제스처 제거
+              onPress={openLetter}
             />
           </View>
         </LinearGradient>
