@@ -40,6 +40,7 @@ import {StampHistory} from '@screens/Stamp/StampHistory';
 
 import {useAuthStore} from '@stores/auth';
 import {SCREEN_NAMES} from '@constants/navigation';
+import {AddressManage} from '@screens/MyPage/AddressManageScreen';
 
 const Stack = createNativeStackNavigator<StackParamsList>();
 
@@ -72,6 +73,10 @@ export default function StackNavigator() {
           <Stack.Screen
             name={SCREEN_NAMES.ACCOUNT_DELETE}
             component={AccountDelete}
+          />
+          <Stack.Screen
+            name={SCREEN_NAMES.ADDRESS_MANAGE}
+            component={AddressManage}
           />
 
           {/* 편지 작성 */}

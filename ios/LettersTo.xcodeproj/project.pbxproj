@@ -17,6 +17,7 @@
 		EE0CF416293CA7DF00B67905 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = EE0CF415293CA7DF00B67905 /* LaunchScreen.storyboard */; };
 		EE0EC79028EF183900F700DF /* font in Resources */ = {isa = PBXBuildFile; fileRef = EE0EC78F28EF183900F700DF /* font */; };
 		EE683A1929240BCB0053A12A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = EE683A1829240BCB0053A12A /* GoogleService-Info.plist */; };
+		EE9A98722BB9616500925F1F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = EE9A98712BB9616500925F1F /* PrivacyInfo.xcprivacy */; };
 		EEF9D172297906EF006AF3DC /* image 3.png in Resources */ = {isa = PBXBuildFile; fileRef = EEF9D170297906EF006AF3DC /* image 3.png */; };
 		EEF9D17729790F61006AF3DC /* Letters to . . ..png in Resources */ = {isa = PBXBuildFile; fileRef = EEF9D17429790F60006AF3DC /* Letters to . . ..png */; };
 		EEF9D17829790F61006AF3DC /* 진짜 나와 너로 만나는 우편 사서함.png in Resources */ = {isa = PBXBuildFile; fileRef = EEF9D17629790F61006AF3DC /* 진짜 나와 너로 만나는 우편 사서함.png */; };
@@ -65,6 +66,7 @@
 		EE0EC78F28EF183900F700DF /* font */ = {isa = PBXFileReference; lastKnownFileType = folder; path = font; sourceTree = "<group>"; };
 		EE683A1829240BCB0053A12A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		EE8129702938A7CB00495330 /* LettersToDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = LettersToDebug.entitlements; path = LettersTo/LettersToDebug.entitlements; sourceTree = "<group>"; };
+		EE9A98712BB9616500925F1F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		EED391152938F0E3001A3FFF /* LettersToRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = LettersToRelease.entitlements; path = LettersTo/LettersToRelease.entitlements; sourceTree = "<group>"; };
 		EEF9D170297906EF006AF3DC /* image 3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "image 3.png"; sourceTree = "<group>"; };
 		EEF9D17429790F60006AF3DC /* Letters to . . ..png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Letters to . . ..png"; sourceTree = "<group>"; };
@@ -156,6 +158,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				EE9A98712BB9616500925F1F /* PrivacyInfo.xcprivacy */,
 				EE0EC78F28EF183900F700DF /* font */,
 				13B07FAE1A68108700A75B9A /* LettersTo */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -335,6 +338,7 @@
 				EEF9D17829790F61006AF3DC /* 진짜 나와 너로 만나는 우편 사서함.png in Resources */,
 				EEF9D172297906EF006AF3DC /* image 3.png in Resources */,
 				EE0CF416293CA7DF00B67905 /* LaunchScreen.storyboard in Resources */,
+				EE9A98722BB9616500925F1F /* PrivacyInfo.xcprivacy in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -697,7 +701,7 @@
 					"$(inherited)",
 					/usr/lib/swift,
 				);
-				MARKETING_VERSION = 2.1.5;
+				MARKETING_VERSION = 2.1.7;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -824,7 +828,7 @@
 					"$(inherited)",
 					/usr/lib/swift,
 				);
-				MARKETING_VERSION = 2.1.5;
+				MARKETING_VERSION = 2.1.7;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

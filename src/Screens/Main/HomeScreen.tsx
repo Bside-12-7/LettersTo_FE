@@ -25,6 +25,7 @@ import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import type {StackParamsList} from '@type/stackParamList';
 import {useFeedbackStore} from '@stores/feedback';
 import {FeedbackButton} from '@components/Feedback/FeedbackButton';
+import {SelectLetterToWriteModal} from '@components/Modals/Letter/SelectLetterToWriteModal';
 
 type Props = {
   navigation: NativeStackNavigationProp<StackParamsList, 'Main', undefined>;
@@ -113,6 +114,13 @@ export function Home({navigation}: Props) {
     setEnvelopeModalVisible(true);
   };
 
+  // 편지 쓰기 버튼
+  const [isSelectModalVisible, setSelectModalVisible] = useState(false);
+
+  const handlePressWriteLetterButton = () => {
+    setSelectModalVisible(true);
+  };
+
   // 편지 조회
   const goToLetterViewer = (id: number) => {
     navigation.navigate('LetterViewer', {id, to: 'PUBLIC'});
@@ -123,7 +131,13 @@ export function Home({navigation}: Props) {
   };
 
   const goToLetterEditor = () => {
+    setSelectModalVisible(false);
     navigation.navigate('LetterEditor');
+  };
+
+  const goToFriendList = () => {
+    setSelectModalVisible(false);
+    navigation.navigate('AddressManage');
   };
 
   const goToNotification = () => {
@@ -307,7 +321,7 @@ export function Home({navigation}: Props) {
         <TouchableOpacity
           activeOpacity={0.7}
           style={[styles.btn, styles.btnSecondary]}
-          onPress={goToLetterEditor}>
+          onPress={handlePressWriteLetterButton}>
           <Image source={require('@assets/write.png')} style={styles.icon} />
         </TouchableOpacity>
       </View>
@@ -320,6 +334,12 @@ export function Home({navigation}: Props) {
           onOpenLetter={() => goToLetterViewer(selectedItem.id)}
         />
       )}
+      <SelectLetterToWriteModal
+        isModalVisible={isSelectModalVisible}
+        hideModal={() => setSelectModalVisible(false)}
+        onPressPublicLetter={goToLetterEditor}
+        onPressFriendLetter={goToFriendList}
+      />
     </LinearGradient>
   );
 }

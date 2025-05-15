@@ -33,6 +33,8 @@ import type {
   PaperStyle as _PaperStyle,
   Selector,
   TexticonCategory,
+  DeliveryLetterWriteRequest,
+  DeliveryLetterWriteRequestV2,
 } from '@type/types';
 import {getImageUploadUrl} from '@apis/file';
 import {ImageModal} from '@components/Modals/Image/ImageModal';
@@ -121,10 +123,10 @@ export function LetterEditor({navigation, route}: Props) {
     });
   }, [setLetter, title, text, paperColor, paperStyle, alignType, images]);
 
-  const setDeliveryLetterDataOnStore = useCallback(
-    (id: number) => {
-      const deliveryLetterData = {
-        id,
+  const setDeliveryLetterDataOnStore = useCallback(() => {
+    if (route.params?.to === 'PUBLIC') {
+      const deliveryLetterData: DeliveryLetterWriteRequest = {
+        id: route.params.reply,
         title: title.replace(/(⌜|⌟︎)/g, ''),
         content: text,
         paperType: paperStyle,
@@ -135,17 +137,32 @@ export function LetterEditor({navigation, route}: Props) {
       };
 
       setDeliveryLetterData(deliveryLetterData);
-    },
-    [
-      alignType,
-      images,
-      paperColor,
-      paperStyle,
-      setDeliveryLetterData,
-      text,
-      title,
-    ],
-  );
+    } else if (route.params?.to === 'DELIVERY') {
+      const deliveryLetterData: DeliveryLetterWriteRequestV2 = {
+        letterId: route.params.reply,
+        letterBoxType: route.params.type,
+        opponentMemberId: route.params.fromMemberId,
+        title: title.replace(/(⌜|⌟︎)/g, ''),
+        content: text,
+        paperType: paperStyle,
+        paperColor,
+        alignType,
+        files: images,
+        stampId: undefined,
+      };
+
+      setDeliveryLetterData(deliveryLetterData);
+    }
+  }, [
+    alignType,
+    images,
+    paperColor,
+    paperStyle,
+    route.params,
+    setDeliveryLetterData,
+    text,
+    title,
+  ]);
 
   const onFocusTitle = () => {
     setLastestFocus({name: 'title', ref: titleRef});
@@ -343,7 +360,7 @@ export function LetterEditor({navigation, route}: Props) {
       setLetterData();
       navigation.navigate('CoverTopicEditor');
     } else {
-      setDeliveryLetterDataOnStore(route.params.reply);
+      setDeliveryLetterDataOnStore();
       navigation.navigate('CoverDeliverySelector', {
         reply: route.params.reply,
         to: route.params.to,

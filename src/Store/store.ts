@@ -4,6 +4,7 @@ import {
   PaperColor,
   PaperStyle,
   DeliveryLetterWriteRequest,
+  DeliveryLetterWriteRequestV2,
 } from '@type/types';
 import {subDate} from '@utils/dateFormatter';
 
@@ -102,20 +103,27 @@ const useStore = create<Store>(set => ({
 export default useStore;
 
 interface LetterEditorStore {
-  deliveryLetter: DeliveryLetterWriteRequest;
+  deliveryLetter: DeliveryLetterWriteRequest | DeliveryLetterWriteRequestV2;
 
   deliveryLetterTo:
     | {
         toNickname: string;
         toAddress: string;
+        addressId?: number;
       }
     | undefined;
 
   standardDeliveryDate: string;
 
-  setDeliveryLetterData: (value: DeliveryLetterWriteRequest) => void;
+  setDeliveryLetterData: (
+    value: DeliveryLetterWriteRequest | DeliveryLetterWriteRequestV2,
+  ) => void;
 
-  setDeliverLetterTo: (value: {toNickname: string; toAddress: string}) => void;
+  setDeliverLetterTo: (value: {
+    toNickname: string;
+    toAddress: string;
+    addressId?: number;
+  }) => void;
 
   setStandardDeliveryDate: (value: string) => void;
 
@@ -126,6 +134,9 @@ interface LetterEditorStore {
 
 export const useLetterEditorStore = create<LetterEditorStore>((set, get) => ({
   deliveryLetter: {
+    letterId: undefined,
+    letterBoxType: undefined,
+    opponentMemberId: undefined,
     id: undefined,
     title: undefined,
     content: undefined,
@@ -161,6 +172,9 @@ export const useLetterEditorStore = create<LetterEditorStore>((set, get) => ({
   initializeDeliverLetter: () =>
     set(() => ({
       deliveryLetter: {
+        letterId: undefined,
+        letterBoxType: undefined,
+        opponentMemberId: undefined,
         id: undefined,
         title: undefined,
         content: undefined,

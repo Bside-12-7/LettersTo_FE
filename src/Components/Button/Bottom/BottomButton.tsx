@@ -7,10 +7,11 @@ type Props = {
   buttonText: string;
   onPress: () => any | Promise<any>;
   white?: true;
+  blue?: true;
 };
 
 export const BottomButton = React.memo(
-  ({buttonText, onPress, disable, white}: Props) => {
+  ({buttonText, onPress, disable, white, blue}: Props) => {
     const [pressed, setPressed] = useState(false);
 
     const onPressButton = useCallback(async () => {
@@ -46,10 +47,17 @@ export const BottomButton = React.memo(
       </TouchableOpacity>
     );
 
-    // return white ? <WhiteButton /> : <GradientButton />;
+    const BlueButton = () => (
+      <TouchableOpacity activeOpacity={0.7} onPress={onPressButton}>
+        <View style={[styles.blueButton]}>
+          <Text style={styles.blueButtonText}>{buttonText}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+
     return (
       <View style={{paddingBottom: 10}}>
-        {white ? <WhiteButton /> : <GradientButton />}
+        {blue ? <BlueButton /> : white ? <WhiteButton /> : <GradientButton />}
       </View>
     );
   },
@@ -76,4 +84,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   whiteButtonText: {fontFamily: 'Galmuri11', color: '#0000cc'},
+  blueButton: {
+    marginHorizontal: 16,
+    borderRadius: 10,
+    height: 52,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#0000cc',
+    borderColor: '#0000cc',
+    borderWidth: 1,
+  },
+  blueButtonText: {fontFamily: 'Galmuri11', color: 'white'},
 });

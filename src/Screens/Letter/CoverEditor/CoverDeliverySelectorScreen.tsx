@@ -17,7 +17,7 @@ import {Header2} from '@components/Headers/Header2';
 import {LinearGradient} from 'expo-linear-gradient';
 import {StepIndicator} from '@components/StepIndicator';
 import {PRIVATE_COVER_EDIT_STEPS} from '@constants/user';
-import {getDeliveryDate} from '@apis/letter';
+import {getDeliveryDate, getEstimatedDeliveryTime} from '@apis/letter';
 import {DeliveryType} from '@type/types';
 import {getUserInfo} from '@apis/member';
 import {useQuery} from 'react-query';
@@ -35,8 +35,12 @@ export function CoverDeliverySelector({navigation, route}: Props) {
 
   const [deliveryType, setDeliveryType] = useState<DeliveryType>('STANDARD');
 
-  const {deliveryLetter, standardDeliveryDate, setStandardDeliveryDate} =
-    useLetterEditorStore();
+  const {
+    deliveryLetter,
+    deliveryLetterTo,
+    standardDeliveryDate,
+    setStandardDeliveryDate,
+  } = useLetterEditorStore();
 
   const {setDeliveryLetterData} = useLetterEditorStore();
 
@@ -70,9 +74,17 @@ export function CoverDeliverySelector({navigation, route}: Props) {
 
   useEffect(() => {
     const getStandardDeliveryDate = async () => {
-      if (deliveryLetter.id) {
-        const {deliveryDate} = await getDeliveryDate(deliveryLetter?.id);
+      if (deliveryLetter.letterId) {
+        const {deliveryDate} = await getDeliveryDate(deliveryLetter.letterId);
         setStandardDeliveryDate(deliveryDate);
+      }
+
+      if (deliveryLetterTo?.addressId) {
+        const {deliveryTime} = await getEstimatedDeliveryTime(
+          'STANDARD',
+          deliveryLetterTo.addressId,
+        );
+        setStandardDeliveryDate(deliveryTime);
       }
     };
 
@@ -96,7 +108,9 @@ export function CoverDeliverySelector({navigation, route}: Props) {
     };
 
     if (userInfo) {
-      setCoverNickname(userInfo.nickname);
+      if (deliveryLetter.letterBoxType === 'DIRECT_MESSAGE')
+        setCoverNickname(userInfo.safeNickname);
+      else setCoverNickname(userInfo.nickname);
       try {
         getFromAddress(userInfo.geolocationId, userInfo.parentGeolocationId);
       } catch (error: any) {

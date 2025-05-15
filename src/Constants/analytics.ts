@@ -23,6 +23,10 @@ export const CLICK_BUTTON_EVENT_PARAMS = {
     button_class: 'EditPersonality',
     button_name: '성향 관리',
   },
+  MANAGE_ADDRESS: {
+    button_class: 'ManageAddress',
+    button_name: '주소록 관리',
+  },
   EDIT_LOCATION: {
     button_class: 'EditLocation',
     button_name: '위치 정보 관리',

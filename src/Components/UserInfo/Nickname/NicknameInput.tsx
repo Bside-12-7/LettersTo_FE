@@ -15,6 +15,7 @@ export const NicknameInput = React.memo(
           style={styles.nicknameInput}
           value={nickname}
           placeholder={placeholder}
+          placeholderTextColor={'#0000CC50'}
           onChangeText={onChangeNickname}
         />
       </View>

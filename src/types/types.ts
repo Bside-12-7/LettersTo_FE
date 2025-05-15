@@ -123,6 +123,8 @@ export interface PublicLetterContent {
   title: string;
   content: string;
   fromAddress: string;
+  fromAddressId: number;
+  fromMemberId: number;
   fromNickname: string;
   paperColor: PaperColor;
   paperType: PaperStyle | 'LINE';
@@ -132,6 +134,7 @@ export interface PublicLetterContent {
   canReply: boolean;
   files: string[];
   createdDate: Date;
+  letterBoxType: LetterBoxType;
 }
 
 export interface DeliveryLetterContent {
@@ -139,6 +142,7 @@ export interface DeliveryLetterContent {
   title: string;
   content: string;
   fromAddress: string;
+  fromMemberId: number;
   fromNickname: string;
   paperColor: PaperColor;
   paperType: PaperStyle | 'LINE';
@@ -148,6 +152,7 @@ export interface DeliveryLetterContent {
   canReply: boolean;
   files: string[];
   createdDate: Date;
+  letterBoxType: LetterBoxType;
 }
 
 export interface DeliveryLetterWriteRequest {
@@ -162,8 +167,25 @@ export interface DeliveryLetterWriteRequest {
   deliveryType?: 'NONE' | 'STANDARD' | 'EXPRESS';
 }
 
+export type LetterBoxType = 'ANONYMOUS_DIRECT_MESSAGE' | 'DIRECT_MESSAGE';
+
+export interface DeliveryLetterWriteRequestV2 {
+  letterId?: number;
+  letterBoxType?: LetterBoxType;
+  opponentMemberId?: number;
+  title?: string;
+  content?: string;
+  paperType?: PaperStyle;
+  paperColor?: PaperColor;
+  alignType?: AlignType;
+  stampId?: number;
+  files?: string[];
+  deliveryType?: 'NONE' | 'STANDARD' | 'EXPRESS';
+}
+
 export interface LetterBox {
   id: number;
+  type: LetterBoxType;
   fromMemberId: number;
   fromMemberNickname: string;
   new: boolean;
@@ -235,4 +257,18 @@ export type DeliveryType = 'STANDARD' | 'EXPRESS';
 export interface DeliveryDate {
   deliveryDate: Date;
   deliveryType: DeliveryType;
+}
+
+export interface InvitationCode {
+  invitationCode: string;
+  expirationDate: string;
+  expired: boolean;
+}
+
+export interface Friend {
+  id: number;
+  memberId: number;
+  nickname: string;
+  address: string;
+  addressId: number;
 }
