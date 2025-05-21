@@ -1,5 +1,5 @@
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useCallback} from 'react';
+import React, {useCallback, useState} from 'react';
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {
@@ -28,9 +28,12 @@ export const LetterComplete = ({navigation, route}: Props) => {
   const {cover, letter} = useStore();
   const {deliveryLetter} = useLetterEditorStore();
   const queryClient = useQueryClient();
+  const [sending, setSending] = useState(false);
 
   const sendPublicLetter = useCallback(async () => {
+    if (sending) return;
     if (cover.stamp && letter) {
+      setSending(true);
       try {
         const letterData: PublicLetterWriteRequest = {
           title: letter.title,
@@ -48,6 +51,7 @@ export const LetterComplete = ({navigation, route}: Props) => {
         Toast.show('편지 작성이 완료되었습니다!');
         queryClient.refetchQueries('letterBox');
         queryClient.refetchQueries('userInfo');
+        setSending(false);
         navigation.navigate('Main');
       } catch (error: any) {
         console.error(error.message);
