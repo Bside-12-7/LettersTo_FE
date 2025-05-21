@@ -56,17 +56,14 @@ export function CoverStampSelector({navigation, route}: Props) {
   }, [stamp]);
 
   useEffect(() => {
-    if (!route.params?.reply) {
+    if (!route.params) {
       setCoverStampId(selectedStampId);
     } else {
       setDeliveryLetterData({stampId: selectedStampId});
     }
   }, [setDeliveryLetterData, selectedStampId, setCoverStampId, route.params]);
 
-  const step = useMemo(
-    () => (!route.params?.reply ? 3 : 2),
-    [route.params?.reply],
-  );
+  const step = useMemo(() => (!route.params ? 3 : 2), [route.params]);
 
   if (!isSuccess) {
     return <></>;
@@ -89,7 +86,7 @@ export function CoverStampSelector({navigation, route}: Props) {
           disableNext={disableNext}
         />
         <View style={styles.cover}>
-          {!route.params?.reply ? (
+          {!route.params ? (
             <LetterCoverPreview />
           ) : (
             <DeliveryLetterCoverPreview />

@@ -1,7 +1,9 @@
 type ProviderType = 'KAKAO' | 'APPLE';
 
 export interface UserInfo {
+  id: number;
   nickname: string;
+  safeNickname: string;
   personalityIds: number[];
   topicIds: number[];
   geolocationId: number;
@@ -31,6 +33,7 @@ export interface RegisterInfo {
 
 export interface PatchUserInfoRequest {
   nickname?: string;
+  safeNickname?: string;
   geolocationId?: number;
   topicIds?: number[];
   personalityIds?: number[];

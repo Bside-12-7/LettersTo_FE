@@ -3,7 +3,7 @@ import React, {useCallback} from 'react';
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {
-  postDeliveryLetter,
+  postDeliveryLetterV2,
   postPublicLetter,
   replyPublicLetter,
 } from '@apis/letter';
@@ -20,12 +20,14 @@ import {
   PublicLetterWriteRequest,
 } from '@type/types';
 import Toast from '@components/Toast/toast';
+import {useQueryClient} from 'react-query';
 
 type Props = NativeStackScreenProps<StackParamsList, 'LetterComplete'>;
 
 export const LetterComplete = ({navigation, route}: Props) => {
   const {cover, letter} = useStore();
   const {deliveryLetter} = useLetterEditorStore();
+  const queryClient = useQueryClient();
 
   const sendPublicLetter = useCallback(async () => {
     if (cover.stamp && letter) {
@@ -44,13 +46,22 @@ export const LetterComplete = ({navigation, route}: Props) => {
 
         await postPublicLetter(letterData);
         Toast.show('편지 작성이 완료되었습니다!');
+        queryClient.refetchQueries('letterBox');
+        queryClient.refetchQueries('userInfo');
         navigation.navigate('Main');
       } catch (error: any) {
         console.error(error.message);
         Toast.show('문제가 발생했습니다');
       }
     }
-  }, [cover.personalityIds, cover.stamp, cover.topicIds, letter, navigation]);
+  }, [
+    cover.personalityIds,
+    cover.stamp,
+    cover.topicIds,
+    letter,
+    navigation,
+    queryClient,
+  ]);
 
   const sendDeliveryLetter = useCallback(async () => {
     try {
@@ -61,15 +72,17 @@ export const LetterComplete = ({navigation, route}: Props) => {
       if (route.params?.to === 'PUBLIC') {
         await replyPublicLetter(letterData);
       } else if (route.params?.to === 'DELIVERY') {
-        await postDeliveryLetter(letterData);
+        await postDeliveryLetterV2(letterData);
       }
+      queryClient.refetchQueries('letterBox');
+      queryClient.refetchQueries('userInfo');
       Toast.show('편지 작성이 완료되었습니다!');
       navigation.navigate('Main');
     } catch (error: any) {
       console.error(error.message);
       Toast.show('문제가 발생했습니다');
     }
-  }, [deliveryLetter, navigation, route.params?.to]);
+  }, [deliveryLetter, navigation, route.params?.to, queryClient]);
 
   const sendLetter = useCallback(() => {
     if (route.params) {
@@ -88,7 +101,7 @@ export const LetterComplete = ({navigation, route}: Props) => {
         <View style={styles.contentContainer}>
           <Text style={styles.completeText}>Complete!</Text>
           <Text style={styles.descText}>편지 작성을 완료했어요!</Text>
-          {!route.params?.reply ? (
+          {!route.params ? (
             <View style={styles.cover}>
               <LetterCoverPreview />
             </View>
@@ -115,7 +128,7 @@ export const LetterComplete = ({navigation, route}: Props) => {
           )}
         </View>
 
-        <SendLetterButton reply={!!route.params?.reply} onPress={sendLetter} />
+        <SendLetterButton reply={!!route.params} onPress={sendLetter} />
       </SafeAreaView>
     </View>
   );

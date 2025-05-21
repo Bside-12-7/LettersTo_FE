@@ -19,7 +19,7 @@ import {
   DeliveryLetters,
   PaperColor,
 } from '@type/types';
-import {getLetterBoxInfo, getDeliveryLetters} from '@apis/letterBox';
+import {getLetterBoxInfo, getDeliveryLettersV2} from '@apis/letterBox';
 import {Header2} from '@components/Headers/Header2';
 import {dateFormatter} from '@utils/dateFormatter';
 import {LetterItem} from './LetterItem';
@@ -47,12 +47,11 @@ export function LetterBoxDetail({route, navigation}: Props) {
     [],
   );
   const [currentCursor, setCurrentCursor] = useState<number>();
-  // const [fromMemberId, setFromMemberId] = useState<number>();
   const [avatarColor, setAvatarColor] = useState<PaperColor>();
 
-  const getPublicLettersInit = useCallback((id: number) => {
+  const getPublicLettersInitV2 = useCallback((id: number) => {
     try {
-      getDeliveryLetters({fromMemberId: id}).then(data => {
+      getDeliveryLettersV2({letterBoxId: id}).then(data => {
         const {content, cursor} = data;
         setDeliveryLetters(content);
         setCurrentCursor(cursor);
@@ -64,7 +63,7 @@ export function LetterBoxDetail({route, navigation}: Props) {
   }, []);
 
   useEffect(() => {
-    const {id, fromMemberId, color} = route.params;
+    const {id, color} = route.params;
     setAvatarColor((color ?? getRandomColor()) as PaperColor);
 
     // 사서함 정보 조회
@@ -78,18 +77,19 @@ export function LetterBoxDetail({route, navigation}: Props) {
     }
 
     // 주고받은 편지 목록 조회
-    getPublicLettersInit(fromMemberId);
-  }, [getPublicLettersInit, route]);
+    getPublicLettersInitV2(id);
+  }, [getPublicLettersInitV2, route]);
 
   // 무한 스크롤
   const handleEndReached = useCallback(() => {
-    if (currentCursor && route.params.fromMemberId) {
+    if (currentCursor && route.params.id) {
       try {
-        getDeliveryLetters({
+        getDeliveryLettersV2({
           cursor: currentCursor,
-          fromMemberId: route.params.fromMemberId,
+          letterBoxId: route.params.id,
         }).then(data => {
           const {content, cursor} = data;
+          if (content.length === 0) return setCurrentCursor(undefined); // 임시
           const updatedArray = [...deliveryLetters].concat(content);
           setDeliveryLetters(updatedArray);
           setCurrentCursor(cursor);
@@ -99,7 +99,7 @@ export function LetterBoxDetail({route, navigation}: Props) {
         Toast.show('문제가 발생했습니다');
       }
     }
-  }, [currentCursor, deliveryLetters, route.params.fromMemberId]);
+  }, [currentCursor, deliveryLetters, route.params.id]);
 
   // n일째 인연
   const fromPeriod = useMemo(() => {
@@ -135,9 +135,14 @@ export function LetterBoxDetail({route, navigation}: Props) {
   // 편지 조회
   const goToLetterViewer = useCallback(
     (id: number) => {
-      navigation.navigate('LetterViewer', {id, to: 'DELIVERY'});
+      navigation.navigate('LetterViewer', {
+        id,
+        to: 'DELIVERY',
+        type: route.params.type,
+        fromMemberId: route.params.fromMemberId,
+      });
     },
-    [navigation],
+    [navigation, route.params],
   );
 
   const goBack = () => navigation.goBack();
@@ -154,6 +159,23 @@ export function LetterBoxDetail({route, navigation}: Props) {
       </View>
       <View style={styles.infoArea}>
         <View style={styles.infoHeader}>
+          {route.params.type === 'DIRECT_MESSAGE' && (
+            <Text
+              style={{
+                fontFamily: 'Galmuri11',
+                fontSize: 11,
+                marginRight: 8,
+                lineHeight: 18,
+                color: '#0000CC',
+                borderColor: '#0000CC',
+                borderWidth: 1,
+                width: 31,
+                height: 20,
+                textAlign: 'center',
+              }}>
+              찐친
+            </Text>
+          )}
           <Text style={styles.infoNickname}>{info?.fromNickname}</Text>
           <Text style={styles.infoAddress}>{info?.fromAddress}</Text>
           {fromPeriod && (
@@ -227,7 +249,11 @@ export function LetterBoxDetail({route, navigation}: Props) {
             <LetterItem
               data={item}
               color={avatarColor}
-              onOpenLetter={() => onOpenEnvelopeModal(item)}
+              onOpenLetter={() =>
+                item.read
+                  ? goToLetterViewer(item.id)
+                  : onOpenEnvelopeModal(item)
+              }
               style={[
                 {marginTop: isFirst ? 24 : 16},
                 isLast && {marginBottom: 80},

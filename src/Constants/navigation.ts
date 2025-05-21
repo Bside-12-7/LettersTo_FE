@@ -12,6 +12,7 @@ export const SCREEN_NAMES = {
 
   MY_PAGE: 'MyPage',
   ACCOUNT_DELETE: 'AccountDelete',
+  ADDRESS_MANAGE: 'AddressManage',
 
   LETTER_EDITOR: 'LetterEditor',
   COVER_DELIVERY_SELECTOR: 'CoverDeliverySelector',
