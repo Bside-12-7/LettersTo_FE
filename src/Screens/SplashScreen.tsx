@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getUserInfo} from '@apis/member';
 import {sendAttendance} from '@apis/attendances';
 import type {StackParamsList} from '@type/stackParamList';
+import mobileAds from 'react-native-google-mobile-ads';
 
 type Props = NativeStackScreenProps<StackParamsList, 'Splash'>;
 
@@ -36,13 +37,17 @@ export function Splash({}: Props) {
   );
 
   useEffect(() => {
-    if (!isLoading) {
-      if (isSuccess) {
-        authAction.login();
-        sendAttendance().catch(() => {});
-      }
-      authAction.endLoading();
-    }
+    mobileAds()
+      .initialize()
+      .then(() => {
+        if (!isLoading) {
+          if (isSuccess) {
+            authAction.login();
+            sendAttendance().catch(() => {});
+          }
+          authAction.endLoading();
+        }
+      });
   }, [isSuccess, isError, isLoading, authAction]);
 
   return (
