@@ -120,7 +120,9 @@ export const LetterComplete = ({navigation, route}: Props) => {
         <Header2 onPressBack={goBack} title={'작성완료'} />
         <View style={styles.contentContainer}>
           <Text style={styles.completeText}>Complete!</Text>
-          <Text style={styles.descText}>편지 작성을 완료했어요!</Text>
+          <Text style={styles.descText}>
+            {`편지를 작성했어요.\n이제 편지를 올리기만 하면 완료!`}
+          </Text>
           {!route.params ? (
             <View style={styles.cover}>
               <LetterCoverPreview />
@@ -172,7 +174,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Galmuri11',
     color: '#0000cc',
     fontSize: 15,
-    height: 25,
+    lineHeight: 24,
+    textAlign: 'center',
     marginBottom: 8,
   },
   cover: {paddingTop: 12},
