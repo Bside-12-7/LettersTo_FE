@@ -1,5 +1,5 @@
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {
@@ -21,6 +21,10 @@ import {
 } from '@type/types';
 import Toast from '@components/Toast/toast';
 import {useQueryClient} from 'react-query';
+import {TestIds, useInterstitialAd} from 'react-native-google-mobile-ads';
+import {INTERSTITIAL_UNIT_ID} from '@constants/googleAds';
+
+const adUnitId = __DEV__ ? TestIds.INTERSTITIAL : INTERSTITIAL_UNIT_ID;
 
 type Props = NativeStackScreenProps<StackParamsList, 'LetterComplete'>;
 
@@ -29,6 +33,8 @@ export const LetterComplete = ({navigation, route}: Props) => {
   const {deliveryLetter} = useLetterEditorStore();
   const queryClient = useQueryClient();
   const [sending, setSending] = useState(false);
+
+  const {isLoaded, isClosed, load, show} = useInterstitialAd(adUnitId);
 
   const sendPublicLetter = useCallback(async () => {
     if (sending) return;
@@ -89,14 +95,24 @@ export const LetterComplete = ({navigation, route}: Props) => {
   }, [deliveryLetter, navigation, route.params?.to, queryClient]);
 
   const sendLetter = useCallback(() => {
-    if (route.params) {
-      sendDeliveryLetter();
-    } else {
-      sendPublicLetter();
-    }
-  }, [route.params, sendDeliveryLetter, sendPublicLetter]);
+    if (isLoaded) show();
+  }, [isLoaded, show]);
 
   const goBack = useCallback(() => navigation.pop(), [navigation]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  useEffect(() => {
+    if (isClosed) {
+      if (route.params) {
+        sendDeliveryLetter();
+      } else {
+        sendPublicLetter();
+      }
+    }
+  }, [isClosed, route.params, sendDeliveryLetter, sendPublicLetter]);
 
   return (
     <View style={{backgroundColor: '#ffccee', flex: 1}}>

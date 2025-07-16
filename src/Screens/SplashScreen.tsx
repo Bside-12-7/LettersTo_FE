@@ -40,6 +40,7 @@ export function Splash({}: Props) {
     mobileAds()
       .initialize()
       .then(() => {
+        mobileAds().setAppMuted(true);
         if (!isLoading) {
           if (isSuccess) {
             authAction.login();
