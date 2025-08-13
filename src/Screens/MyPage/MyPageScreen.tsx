@@ -1,6 +1,16 @@
-import React, {useCallback, useMemo, useReducer} from 'react';
+import React, {useCallback, useEffect, useMemo, useReducer} from 'react';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {View, StyleSheet, StatusBar} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  StatusBar,
+  Image,
+  Text,
+  Pressable,
+  ScrollView,
+  Linking,
+  Platform,
+} from 'react-native';
 import {useQuery, useQueryClient} from 'react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -27,6 +37,12 @@ import {LogoutModal} from '@components/Modals/MyPage/LogoutModal';
 import type {StackParamsList} from '@type/stackParamList';
 import {FeedbackButton} from '@components/Feedback/FeedbackButton';
 import {CLICK_BUTTON_EVENT_PARAMS} from '@constants/analytics';
+import {
+  NotificationListItem,
+  NotificationListName,
+} from '@components/MyPage/NotificationSettingList';
+import notifee, {AuthorizationStatus} from '@notifee/react-native';
+import {useAppState} from '@hooks/useAppState';
 
 type Props = NativeStackScreenProps<StackParamsList, 'MyPage'>;
 
@@ -122,6 +138,41 @@ export const MyPage = ({navigation}: Props) => {
 
   const {data: userInfo, isSuccess} = useQuery('userInfo', getUserInfo);
 
+  const [allowedNotifications, setAllowedNotifications] = React.useState(false);
+  const [allowedMarketing, setAllowedMarketing] = React.useState(false);
+  const [isDeviceNotificationEnabled, setIsDeviceNotificationEnabled] =
+    React.useState(false);
+
+  const {appStateListener} = useAppState();
+
+  useEffect(() => {
+    async function getNotificationEnabled() {
+      const settings = await notifee.getNotificationSettings();
+      setIsDeviceNotificationEnabled(
+        settings.authorizationStatus === AuthorizationStatus.AUTHORIZED ||
+          settings.authorizationStatus === AuthorizationStatus.PROVISIONAL,
+      );
+    }
+
+    getNotificationEnabled();
+
+    const subscription = appStateListener({
+      onChangeToForeground: getNotificationEnabled,
+    });
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
+  async function openAppNotificationSettings() {
+    try {
+      if (Platform.OS === 'ios') Linking.openURL('app-settings:');
+      else await notifee.openNotificationSettings();
+    } catch (e) {
+      console.error('설정 화면 이동 실패:', e);
+    }
+  }
+
   if (!isSuccess) {
     return <></>;
   }
@@ -169,27 +220,86 @@ export const MyPage = ({navigation}: Props) => {
             paddingBottom: SAFE_AREA_BOTTOM,
           },
         ]}>
-        <View style={styles.feedbackButton}>
-          <FeedbackButton screenName="MYPAGE" />
-        </View>
-        <View style={styles.menuList}>
-          <View style={styles.menu}>
-            <ListName name="약관 정보" />
-            <ListItem
-              itmeName="서비스이용약관"
-              onPress={onPressTermsOfService}
-            />
-            <ListItem
-              itmeName="개인정보처리방침"
-              onPress={onPressPrivacyPolicy}
-            />
+        <ScrollView>
+          <View style={styles.feedbackButton}>
+            <FeedbackButton screenName="MYPAGE" />
           </View>
+          <View style={styles.menuList}>
+            <View style={styles.menu}>
+              <NotificationListName name="알림 설정" />
+              <NotificationListItem
+                itemName="서비스 알림 수신 설정"
+                value={allowedNotifications}
+                onPress={() => {
+                  setAllowedNotifications(!allowedNotifications);
+                }}
+                description="알림을 수신하면 편지 발송·도착 시 알려드려요!"
+              />
+              <NotificationListItem
+                itemName="마케팅 수신 설정"
+                value={allowedMarketing}
+                onPress={() => {
+                  setAllowedMarketing(!allowedMarketing);
+                }}
+                description="업데이트 및 재밌는 소식이 있을 때 알려드려요!"
+              />
 
-          <View style={styles.menu}>
-            <ListName name="계정 관리" />
-            <ListItem itmeName="회원 탈퇴" onPress={goToAccountDelete} />
+              {!isDeviceNotificationEnabled && (
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Image
+                    source={require('@assets/warning.png')}
+                    style={{width: 16, height: 16, marginRight: 4}}
+                  />
+                  <Text
+                    style={{
+                      fontFamily: 'Galmuri11',
+                      fontSize: 12,
+                      flex: 1,
+                      color: '#ff5757',
+                    }}>
+                    기기 알림을 켜야 알려드릴 수 있어요!
+                  </Text>
+                  <Pressable
+                    onPress={openAppNotificationSettings}
+                    style={{
+                      height: 26,
+                      width: 73,
+                      backgroundColor: '#0000cc',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: 10,
+                    }}>
+                    <Text
+                      style={{
+                        fontFamily: 'Galmuri11',
+                        fontSize: 13,
+                        color: '#ffffff',
+                      }}>
+                      알림 켜기
+                    </Text>
+                  </Pressable>
+                </View>
+              )}
+            </View>
+
+            <View style={styles.menu}>
+              <ListName name="약관 정보" />
+              <ListItem
+                itmeName="서비스이용약관"
+                onPress={onPressTermsOfService}
+              />
+              <ListItem
+                itmeName="개인정보처리방침"
+                onPress={onPressPrivacyPolicy}
+              />
+            </View>
+
+            <View style={styles.menu}>
+              <ListName name="계정 관리" />
+              <ListItem itmeName="회원 탈퇴" onPress={goToAccountDelete} />
+            </View>
           </View>
-        </View>
+        </ScrollView>
 
         <BottomButton
           white
