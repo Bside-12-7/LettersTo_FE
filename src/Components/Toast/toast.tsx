@@ -30,5 +30,7 @@ export default new StyledToast({
   delay: 0,
   textStyle: {
     fontFamily: 'Galmuri11',
+    fontSize: 15,
+    lineHeight: 24,
   },
 });

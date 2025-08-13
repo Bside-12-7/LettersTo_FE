@@ -7,13 +7,13 @@ const toggleButtonImage = {
 
 export function ToggleButton({
   value,
-  onPress,
+  onChange,
 }: {
   value: boolean;
-  onPress: () => void;
+  onChange: (value: boolean) => void;
 }) {
   return (
-    <Pressable style={{position: 'relative'}} onPress={onPress}>
+    <Pressable style={{position: 'relative'}} onPress={() => onChange(!value)}>
       <Image
         source={toggleButtonImage.outer}
         style={{width: 30, height: 20}}

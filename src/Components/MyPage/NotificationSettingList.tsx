@@ -6,7 +6,7 @@ type ListNameProps = {name: string};
 type ListItemProps = {
   itemName: string;
   value: boolean;
-  onPress: () => void;
+  onChange: (value: boolean) => void;
   description: string;
 };
 
@@ -22,7 +22,7 @@ export function NotificationListItem({
   itemName,
   description,
   value,
-  onPress,
+  onChange,
 }: ListItemProps) {
   return (
     <View style={styles.itemWrap}>
@@ -33,7 +33,7 @@ export function NotificationListItem({
           justifyContent: 'space-between',
         }}>
         <Text style={styles.itemText}>{itemName}</Text>
-        <ToggleButton value={value} onPress={onPress} />
+        <ToggleButton value={value} onChange={onChange} />
       </View>
       <Text style={styles.descriptionText}>{description}</Text>
     </View>

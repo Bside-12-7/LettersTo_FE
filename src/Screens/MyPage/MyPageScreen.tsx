@@ -43,6 +43,8 @@ import {
 } from '@components/MyPage/NotificationSettingList';
 import notifee, {AuthorizationStatus} from '@notifee/react-native';
 import {useAppState} from '@hooks/useAppState';
+import Toast from '@components/Toast/toast';
+import {dateFormatter} from '@utils/dateFormatter';
 
 type Props = NativeStackScreenProps<StackParamsList, 'MyPage'>;
 
@@ -173,6 +175,30 @@ export const MyPage = ({navigation}: Props) => {
     }
   }
 
+  const onChangeNotificationSetting =
+    (setting: 'allowedNotifications' | 'allowedMarketing') =>
+    (value: boolean) => {
+      if (setting === 'allowedNotifications') {
+        Toast.show(
+          value ? '알림 수신을 동의했습니다' : '알림 수신을 거부했습니다',
+        );
+        setAllowedNotifications(value);
+      } else {
+        Toast.show(
+          value
+            ? `${dateFormatter(
+                'yyyy.mm.dd',
+                new Date(),
+              )}\nletters to 마케팅 정보 수신을 동의했습니다`
+            : `${dateFormatter(
+                'yyyy.mm.dd',
+                new Date(),
+              )}\nletters to 마케팅 정보 수신을 거부했습니다`,
+        );
+        setAllowedMarketing(value);
+      }
+    };
+
   if (!isSuccess) {
     return <></>;
   }
@@ -230,17 +256,13 @@ export const MyPage = ({navigation}: Props) => {
               <NotificationListItem
                 itemName="서비스 알림 수신 설정"
                 value={allowedNotifications}
-                onPress={() => {
-                  setAllowedNotifications(!allowedNotifications);
-                }}
+                onChange={onChangeNotificationSetting('allowedNotifications')}
                 description="알림을 수신하면 편지 발송·도착 시 알려드려요!"
               />
               <NotificationListItem
                 itemName="마케팅 수신 설정"
                 value={allowedMarketing}
-                onPress={() => {
-                  setAllowedMarketing(!allowedMarketing);
-                }}
+                onChange={onChangeNotificationSetting('allowedMarketing')}
                 description="업데이트 및 재밌는 소식이 있을 때 알려드려요!"
               />
 
