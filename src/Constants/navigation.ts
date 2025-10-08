@@ -26,6 +26,7 @@ export const SCREEN_NAMES = {
   STAMP_HISTORY: 'StampHistory',
 
   AUTH: 'Auth',
+  POLICY: 'Policy',
   NICKNAME_FORM: 'NicknameForm',
   TOPIC_FORM: 'TopicsForm',
   PERSONALITY_FORM: 'PersonalityForm',

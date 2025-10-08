@@ -5,17 +5,12 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import {LinearGradient} from 'expo-linear-gradient';
 import {SCREEN_HEIGHT} from '@constants/screen';
 import {useLocation} from '@hooks/UserInfo/useLocation';
-import {SignUpButton} from '@components/Auth/SignUpButton';
-import {useAuthAction, useAuthStore} from '@stores/auth';
-import {useMutation} from 'react-query';
-import {signUp} from '@apis/member';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Toast from '@components/Toast/toast';
+import {NextButton} from '@components/Button/Bottom/NextButton';
+import {useAuthAction} from '@stores/auth';
 import {Header2} from '@components/Headers/Header2';
 import {NoticeBalloon} from '@components/UserInfo/Notice/NoticeBalloon';
 import {NoticeButton} from '@components/UserInfo/Notice/NoticeButton';
 import type {StackParamsList} from '@type/stackParamList';
-import {CLICK_BUTTON_EVENT_PARAMS} from '@constants/analytics';
 
 type Props = NativeStackScreenProps<StackParamsList, 'LocationForm'>;
 
@@ -35,9 +30,8 @@ export function LocationForm({navigation}: Props) {
   } = useLocation();
 
   const {setGeolocationIdInRegisterInfo} = useAuthAction();
-  const registerInfo = useAuthStore(state => state.registerInfo);
 
-  const disableSignUp = useMemo(
+  const disableNext = useMemo(
     () => !selectedCityId || !selectedRegionId,
     [selectedCityId, selectedRegionId],
   );
@@ -48,40 +42,9 @@ export function LocationForm({navigation}: Props) {
     }
   }, [selectedRegionId, selectedCityId, setGeolocationIdInRegisterInfo]);
 
-  const {mutate: mutateSignUp, isLoading} = useMutation(
-    ['signup', selectedCityId],
-    useCallback(async () => {
-      if (
-        !registerInfo.nickname ||
-        !registerInfo.topicIds.length ||
-        !registerInfo.personalityIds.length ||
-        !registerInfo.geolocationId
-      ) {
-        throw new Error('회원가입 정보 유실');
-      }
-
-      const {accessToken, refreshToken} = await signUp(registerInfo);
-      if (!accessToken || !refreshToken) {
-        throw new Error('회원가입 실패');
-      }
-
-      await Promise.all([
-        AsyncStorage.setItem('accessToken', accessToken),
-        AsyncStorage.setItem('refreshToken', refreshToken),
-      ]);
-
-      navigation.reset({routes: [{name: 'Coachmark'}]});
-    }, [navigation, registerInfo]),
-    {onSuccess: () => Toast.show('성공적으로 가입되었어요!')},
-  );
-
-  const onPressSignUp = useCallback(async () => {
-    if (isLoading) {
-      return Toast.show('처리중이에요!');
-    }
-
-    mutateSignUp();
-  }, [isLoading, mutateSignUp]);
+  const onPressNext = useCallback(() => {
+    navigation.navigate('Policy');
+  }, [navigation]);
 
   const onPressBack = useCallback(() => {
     navigation.pop();
@@ -142,11 +105,7 @@ export function LocationForm({navigation}: Props) {
             </View>
           )}
         </View>
-        <SignUpButton
-          clickButtonEvent={CLICK_BUTTON_EVENT_PARAMS.SIGN_UP}
-          disable={disableSignUp}
-          onPress={onPressSignUp}
-        />
+        <NextButton disable={disableNext} onPress={onPressNext} />
       </SafeAreaView>
     </LinearGradient>
   );

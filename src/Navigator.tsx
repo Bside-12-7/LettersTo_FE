@@ -14,6 +14,7 @@ import {LetterBoxDetail} from '@screens/LetterBox/LetterBoxDetail';
 
 // 로그인 & 회원가입 스크린
 import {Auth} from '@screens/Auth/AuthScreen';
+import {Policy} from '@screens/Auth/PolicyScreen';
 import {NicknameForm} from '@screens/Auth/NicknameFormScreen';
 import {TopicsForm} from '@screens/Auth/TopicsFormScreen';
 import {PersonalityForm} from '@screens/Auth/PersonalityFormScreen';
@@ -136,6 +137,7 @@ export default function StackNavigator() {
             name={SCREEN_NAMES.LOCATION_FORM}
             component={LocationForm}
           />
+          <Stack.Screen name={SCREEN_NAMES.POLICY} component={Policy} />
           <Stack.Screen name={SCREEN_NAMES.COACHMARK} component={Coachmark} />
         </Stack.Group>
       )}

@@ -28,6 +28,7 @@ export interface StackParamsList {
 
   // 인증 관련 스택
   Auth: undefined;
+  Policy: undefined;
 
   // 회원가입 스택
   NicknameForm: undefined;
