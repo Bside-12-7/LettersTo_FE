@@ -15,6 +15,7 @@ import {LetterBoxDetail} from '@screens/LetterBox/LetterBoxDetail';
 // 로그인 & 회원가입 스크린
 import {Auth} from '@screens/Auth/AuthScreen';
 import {Policy} from '@screens/Auth/PolicyScreen';
+import {PolicyConsent} from '@screens/Auth/PolicyConsentScreen';
 import {NicknameForm} from '@screens/Auth/NicknameFormScreen';
 import {TopicsForm} from '@screens/Auth/TopicsFormScreen';
 import {PersonalityForm} from '@screens/Auth/PersonalityFormScreen';
@@ -42,6 +43,8 @@ import {StampHistory} from '@screens/Stamp/StampHistory';
 import {useAuthStore} from '@stores/auth';
 import {SCREEN_NAMES} from '@constants/navigation';
 import {AddressManage} from '@screens/MyPage/AddressManageScreen';
+import {STORAGE_KEYS} from '@constants/common';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createNativeStackNavigator<StackParamsList>();
 
@@ -51,6 +54,20 @@ export default function StackNavigator() {
     isLoading: state.isLoading,
   }));
 
+  const [termsAgreed, setTermsAgreed] = React.useState<boolean | null>(null);
+
+  // 약관 동의 여부 확인
+  React.useEffect(() => {
+    const checkTermsAgreed = async () => {
+      const agreed = await AsyncStorage.getItem(STORAGE_KEYS.TERMS_AGREED);
+      setTermsAgreed(agreed === 'true');
+    };
+
+    if (isLoggedIn && !isLoading) {
+      checkTermsAgreed();
+    }
+  }, [isLoggedIn, isLoading]);
+
   return (
     <Stack.Navigator
       screenOptions={{headerShown: false}}
@@ -58,8 +75,14 @@ export default function StackNavigator() {
       {isLoading ? (
         <Stack.Screen name={SCREEN_NAMES.SPLASH} component={Splash} />
       ) : isLoggedIn ? (
-        <Stack.Group screenOptions={{headerShown: false}}>
-          <Stack.Screen name={SCREEN_NAMES.MAIN.MAIN} component={Main} />
+        termsAgreed === false ? (
+          <Stack.Screen
+            name={SCREEN_NAMES.POLICY_CONSENT}
+            component={PolicyConsent}
+          />
+        ) : termsAgreed === true ? (
+          <Stack.Group screenOptions={{headerShown: false}}>
+            <Stack.Screen name={SCREEN_NAMES.MAIN.MAIN} component={Main} />
           <Stack.Screen
             name={SCREEN_NAMES.LETTER_VIEWER}
             component={LetterViewer}
@@ -121,6 +144,9 @@ export default function StackNavigator() {
             component={StampHistory}
           />
         </Stack.Group>
+        ) : (
+          <Stack.Screen name={SCREEN_NAMES.SPLASH} component={Splash} />
+        )
       ) : (
         <Stack.Group>
           <Stack.Screen name={SCREEN_NAMES.AUTH} component={Auth} />

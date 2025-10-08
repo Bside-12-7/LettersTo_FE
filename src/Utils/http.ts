@@ -92,12 +92,14 @@ axiosInstance.interceptors.response.use(
   },
 );
 
-function logRequestResult(response: AxiosResponse): void {
+async function logRequestResult(response: AxiosResponse) {
+  const accessToken = await AsyncStorage.getItem('accessToken');
   const message = [
     response.config.method?.toUpperCase(),
     [response.config.baseURL, response.config.url].join(''),
     '|',
     response.status,
+    ...(accessToken ? ['|', accessToken] : []),
   ];
 
   if (response.status !== 200) {

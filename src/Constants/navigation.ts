@@ -27,6 +27,7 @@ export const SCREEN_NAMES = {
 
   AUTH: 'Auth',
   POLICY: 'Policy',
+  POLICY_CONSENT: 'PolicyConsent',
   NICKNAME_FORM: 'NicknameForm',
   TOPIC_FORM: 'TopicsForm',
   PERSONALITY_FORM: 'PersonalityForm',

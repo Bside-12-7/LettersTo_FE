@@ -5,7 +5,6 @@ import {
   Text,
   StyleSheet,
   SafeAreaView,
-  Platform,
   TouchableOpacity,
   Image,
   Modal,
@@ -13,15 +12,11 @@ import {
 import {LinearGradient} from 'expo-linear-gradient';
 import {SCREEN_HEIGHT} from '@constants/screen';
 import {SignUpButton} from '@components/Auth/SignUpButton';
-import {Header2} from '@components/Headers/Header2';
-import {StepIndicator} from '@components/StepIndicator';
 import {BackButton} from '@components/Button/Header/BackButton';
 import type {StackParamsList} from '@type/stackParamList';
 import {CLICK_BUTTON_EVENT_PARAMS} from '@constants/analytics';
-import {useAuthAction, useAuthStore} from '@stores/auth';
-import {useMutation, useQuery} from 'react-query';
-import {signUp} from '@apis/member';
-import {getTerms} from '@apis/terms';
+import {useQuery, useMutation} from 'react-query';
+import {getTerms, recordTermsReAgreement} from '@apis/terms';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from '@components/Toast/toast';
 import {WebView} from 'react-native-webview';
@@ -30,18 +25,15 @@ import {BASE_URL_TEST, STORAGE_KEYS} from '@constants/common';
 const checkboxChecked = require('@assets/checkbox_checked.png');
 const checkboxUnchecked = require('@assets/checkbox_unchecked.png');
 
-type Props = NativeStackScreenProps<StackParamsList, 'Policy'>;
+type Props = NativeStackScreenProps<StackParamsList, 'PolicyConsent'>;
 
-export function Policy({navigation}: Props) {
+export function PolicyConsent({navigation}: Props) {
   const [allAgreed, setAllAgreed] = useState(false);
   const [termsOfService, setTermsOfService] = useState(false);
   const [privacy, setPrivacy] = useState(false);
   const [marketing, setMarketing] = useState(false);
   const [webViewVisible, setWebViewVisible] = useState(false);
   const [webViewUrl, setWebViewUrl] = useState('');
-
-  const {setConsentsInRegisterInfo} = useAuthAction();
-  const registerInfo = useAuthStore(state => state.registerInfo);
 
   // 약관 정보 가져오기
   const {data: termsData} = useQuery('terms', getTerms);
@@ -91,18 +83,9 @@ export function Policy({navigation}: Props) {
     }
   }, [termsOfService, privacy, marketing]);
 
-  const {mutate: mutateSignUp, isLoading} = useMutation(
-    ['signup'],
+  const {mutate: mutateRecordTerms, isLoading} = useMutation(
+    ['recordTermsReAgreement'],
     useCallback(async () => {
-      if (
-        !registerInfo.nickname ||
-        !registerInfo.topicIds.length ||
-        !registerInfo.personalityIds.length ||
-        !registerInfo.geolocationId
-      ) {
-        throw new Error('회원가입 정보 유실');
-      }
-
       // 약관 동의 정보 생성
       const now = new Date().toISOString();
 
@@ -130,66 +113,43 @@ export function Policy({navigation}: Props) {
           agreed: privacy,
           requestedAt: now,
         },
-        {
-          termsType: 'MARKETING' as const,
-          termsVersionNumber: marketingVersion,
-          agreed: marketing,
-          requestedAt: now,
-        },
       ];
 
-      setConsentsInRegisterInfo(consents);
+      await recordTermsReAgreement({consents});
 
-      const {accessToken, refreshToken} = await signUp({
-        ...registerInfo,
-        consents,
-      });
-
-      if (!accessToken || !refreshToken) {
-        throw new Error('회원가입 실패');
-      }
-
-      await Promise.all([
-        AsyncStorage.setItem('accessToken', accessToken),
-        AsyncStorage.setItem('refreshToken', refreshToken),
-        AsyncStorage.setItem(STORAGE_KEYS.TERMS_AGREED, 'true'),
-      ]);
-
-      navigation.reset({routes: [{name: 'Coachmark'}]});
-    }, [
-      navigation,
-      registerInfo,
-      termsOfService,
-      privacy,
-      marketing,
-      setConsentsInRegisterInfo,
-      termsData,
-    ]),
-    {onSuccess: () => Toast.show('성공적으로 가입되었어요!')},
+      // 약관 동의 정보를 로컬 스토리지에 저장
+      await AsyncStorage.setItem(STORAGE_KEYS.TERMS_AGREED, 'true');
+    }, [termsOfService, privacy, marketing, termsData]),
+    {
+      onSuccess: () => {
+        Toast.show('약관 동의가 완료되었어요!');
+        // 메인 화면으로 이동
+        navigation.reset({
+          routes: [{name: 'Main'}],
+        });
+      },
+      onError: () => {
+        Toast.show('약관 동의 중 오류가 발생했어요.');
+      },
+    },
   );
 
   const onPressBack = useCallback(() => {
-    navigation.pop();
+    navigation.goBack();
   }, [navigation]);
 
-  const onPressSignUp = useCallback(async () => {
+  const onPressConfirm = useCallback(async () => {
     if (isLoading) {
       return Toast.show('처리중이에요!');
     }
 
-    mutateSignUp();
-  }, [isLoading, mutateSignUp]);
+    mutateRecordTerms();
+  }, [isLoading, mutateRecordTerms]);
 
   return (
     <LinearGradient colors={['#ffccee', 'white', 'white', 'white', '#ffffcc']}>
-      <SafeAreaView
-        style={
-          Platform.OS === 'android'
-            ? styles.container_android
-            : styles.container_ios
-        }>
-        <Header2 onPressBack={onPressBack} />
-
+      <SafeAreaView style={[styles.container_ios]}>
+        <View style={{height: 52}} />
         <View style={styles.titleBox}>
           <View style={styles.titleWrap}>
             <Text style={styles.titleText}>이용 약관에</Text>
@@ -250,11 +210,8 @@ export function Policy({navigation}: Props) {
         <SignUpButton
           clickButtonEvent={CLICK_BUTTON_EVENT_PARAMS.SIGN_UP}
           disable={!isRequiredAgreed}
-          onPress={onPressSignUp}
+          onPress={onPressConfirm}
         />
-        <View style={styles.stepIndicatorWrap}>
-          <StepIndicator current={5} of={5} />
-        </View>
       </SafeAreaView>
 
       <Modal
@@ -274,7 +231,6 @@ export function Policy({navigation}: Props) {
 
 const styles = StyleSheet.create({
   container_ios: {height: SCREEN_HEIGHT},
-  container_android: {height: SCREEN_HEIGHT, paddingVertical: 15},
   titleBox: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -295,13 +251,6 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 24,
     marginTop: 15,
-  },
-  stepIndicatorWrap: {
-    position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 100 : 115,
-    left: 0,
-    right: 0,
-    height: 50,
   },
   policyItem: {
     flexDirection: 'row',
