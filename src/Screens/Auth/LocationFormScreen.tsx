@@ -8,6 +8,7 @@ import {useLocation} from '@hooks/UserInfo/useLocation';
 import {NextButton} from '@components/Button/Bottom/NextButton';
 import {useAuthAction} from '@stores/auth';
 import {Header2} from '@components/Headers/Header2';
+import {StepIndicator} from '@components/StepIndicator';
 import {NoticeBalloon} from '@components/UserInfo/Notice/NoticeBalloon';
 import {NoticeButton} from '@components/UserInfo/Notice/NoticeButton';
 import type {StackParamsList} from '@type/stackParamList';
@@ -105,7 +106,11 @@ export function LocationForm({navigation}: Props) {
             </View>
           )}
         </View>
+
         <NextButton disable={disableNext} onPress={onPressNext} />
+        <View style={styles.stepIndicatorWrap}>
+          <StepIndicator current={4} of={5} />
+        </View>
       </SafeAreaView>
     </LinearGradient>
   );
@@ -149,5 +154,12 @@ const styles = StyleSheet.create({
   pickerText: {
     fontFamily: 'Galmuri11',
     color: '#0000cc',
+  },
+  stepIndicatorWrap: {
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? 100 : 115,
+    left: 0,
+    right: 0,
+    height: 50,
   },
 });

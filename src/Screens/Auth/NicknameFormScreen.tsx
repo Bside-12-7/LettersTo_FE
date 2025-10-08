@@ -14,6 +14,7 @@ import {useNickname} from '@hooks/UserInfo/useNickname';
 import {NicknameInput} from '@components/UserInfo/Nickname/NicknameInput';
 import {NicknameAvailableAlert} from '@components/UserInfo/Alert/NicknameAvailableAlert';
 import {Header2} from '@components/Headers/Header2';
+import {StepIndicator} from '@components/StepIndicator';
 import {Title} from '@components/UserInfo/TitleText';
 import {useAuthAction} from '@stores/auth';
 
@@ -65,6 +66,9 @@ export const NicknameForm = ({navigation}: Props) => {
           />
         </ScrollView>
         <NextButton disable={disable} onPress={goToTopicForm} />
+        <View style={styles.stepIndicatorWrap}>
+          <StepIndicator current={1} of={5} />
+        </View>
       </SafeAreaView>
     </LinearGradient>
   );
@@ -77,5 +81,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginHorizontal: 24,
+  },
+  stepIndicatorWrap: {
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? 100 : 115,
+    left: 0,
+    right: 0,
+    height: 50,
   },
 });

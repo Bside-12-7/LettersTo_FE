@@ -5,6 +5,7 @@ import {LinearGradient} from 'expo-linear-gradient';
 import {SCREEN_HEIGHT} from '@constants/screen';
 import {SignUpButton} from '@components/Auth/SignUpButton';
 import {Header2} from '@components/Headers/Header2';
+import {StepIndicator} from '@components/StepIndicator';
 import type {StackParamsList} from '@type/stackParamList';
 import {CLICK_BUTTON_EVENT_PARAMS} from '@constants/analytics';
 
@@ -43,6 +44,9 @@ export function Policy({navigation}: Props) {
           disable={false}
           onPress={onPressSignUp}
         />
+        <View style={styles.stepIndicatorWrap}>
+          <StepIndicator current={5} of={5} />
+        </View>
       </SafeAreaView>
     </LinearGradient>
   );
@@ -71,5 +75,12 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 24,
     marginTop: 15,
+  },
+  stepIndicatorWrap: {
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? 100 : 115,
+    left: 0,
+    right: 0,
+    height: 50,
   },
 });

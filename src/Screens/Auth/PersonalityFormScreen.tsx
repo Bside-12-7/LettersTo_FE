@@ -15,9 +15,9 @@ import {PersonalityList} from '@components/UserInfo/Personality/PersonalityList'
 import {usePersonality} from '@hooks/UserInfo/usePersonality';
 import {MAX_PERSONALITY_LIMIT} from '@constants/user';
 import {Header2} from '@components/Headers/Header2';
+import {StepIndicator} from '@components/StepIndicator';
 import {Title} from '@components/UserInfo/TitleText';
 import {Counter} from '@components/UserInfo/CounterText';
-import {MaximumAlert} from '@components/UserInfo/Alert/MaximumAlert';
 import {useAuthAction} from '@stores/auth';
 import type {StackParamsList} from '@type/stackParamList';
 
@@ -28,7 +28,6 @@ export const PersonalityForm = ({navigation}: Props) => {
     personalities,
     selectedPersonalityIds,
     selectPersonality,
-    alertOpacity,
     counter,
     reset,
   } = usePersonality();
@@ -72,8 +71,10 @@ export const PersonalityForm = ({navigation}: Props) => {
             selectedPersonalityIds={selectedPersonalityIds}
           />
         </ScrollView>
-        <MaximumAlert alertOpacity={alertOpacity} max={MAX_PERSONALITY_LIMIT} />
         <NextButton disable={disableNext} onPress={goToLocationForm} />
+        <View style={styles.stepIndicatorWrap}>
+          <StepIndicator current={3} of={5} />
+        </View>
       </SafeAreaView>
     </LinearGradient>
   );
@@ -90,5 +91,12 @@ const styles = StyleSheet.create({
   counterWrap: {alignItems: 'center', flexDirection: 'row'},
   personalityBox: {
     paddingHorizontal: 24,
+  },
+  stepIndicatorWrap: {
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? 100 : 115,
+    left: 0,
+    right: 0,
+    height: 50,
   },
 });

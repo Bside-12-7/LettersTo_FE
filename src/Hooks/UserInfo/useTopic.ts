@@ -3,6 +3,7 @@ import {Animated} from 'react-native';
 import {useQuery} from 'react-query';
 import {getTopics} from '@apis/topic';
 import {MAX_TOPIC_LIMIT} from '@constants/user';
+import Toast from '@components/Toast/toast';
 
 export const useTopic = (currentTopics: number[] = []) => {
   const [selectedTopicIds, setSelectedTopicIds] = useState<number[]>([]);
@@ -39,7 +40,7 @@ export const useTopic = (currentTopics: number[] = []) => {
       } else if (selectedTopicIds.includes(topicId) === true) {
         setSelectedTopicIds([...selectedTopicIds].filter(e => e !== topicId));
       } else {
-        alert.start();
+        Toast.show(`최대 ${MAX_TOPIC_LIMIT}개까지만 선택 가능해요!`);
       }
     },
     [alert, counter, selectedTopicIds, setSelectedTopicIds],

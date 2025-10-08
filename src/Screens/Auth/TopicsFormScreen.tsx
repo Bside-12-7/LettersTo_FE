@@ -15,17 +15,16 @@ import {TopicList} from '@components/UserInfo/Topic/TopicList';
 import {useTopic} from '@hooks/UserInfo/useTopic';
 import {MAX_TOPIC_LIMIT} from '@constants/user';
 import {Counter} from '@components/UserInfo/CounterText';
-import {MaximumAlert} from '@components/UserInfo/Alert/MaximumAlert';
 import {Title} from '@components/UserInfo/TitleText';
 import {Header2} from '@components/Headers/Header2';
+import {StepIndicator} from '@components/StepIndicator';
 import {useAuthAction} from '@stores/auth';
 import type {StackParamsList} from '@type/stackParamList';
 
 type Props = NativeStackScreenProps<StackParamsList, 'TopicsForm'>;
 
 export const TopicsForm = ({navigation}: Props) => {
-  const {topics, selectedTopicIds, selectTopic, alertOpacity, counter, reset} =
-    useTopic();
+  const {topics, selectedTopicIds, selectTopic, counter, reset} = useTopic();
 
   const {setTopicIdsInRegisterInfo} = useAuthAction();
 
@@ -66,8 +65,10 @@ export const TopicsForm = ({navigation}: Props) => {
             selectedTopicIds={selectedTopicIds}
           />
         </ScrollView>
-        <MaximumAlert alertOpacity={alertOpacity} max={MAX_TOPIC_LIMIT} />
         <NextButton disable={disableNext} onPress={goToPersonalityForm} />
+        <View style={styles.stepIndicatorWrap}>
+          <StepIndicator current={2} of={5} />
+        </View>
       </SafeAreaView>
     </LinearGradient>
   );
@@ -85,5 +86,12 @@ const styles = StyleSheet.create({
   topicBox: {
     flex: 1,
     marginHorizontal: 24,
+  },
+  stepIndicatorWrap: {
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? 100 : 115,
+    left: 0,
+    right: 0,
+    height: 50,
   },
 });

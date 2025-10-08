@@ -54,7 +54,7 @@ export const usePersonality = (currentPersonalities: number[] = []) => {
           [...selectedPersonalityIds].filter(e => e !== personalityId),
         );
       } else {
-        alert.start();
+        Toast.show(`최대 ${MAX_PERSONALITY_LIMIT}개까지만 선택 가능해요!`);
       }
     },
     [alert, counter, selectedPersonalityIds, setSelectedPersonalityIds],
