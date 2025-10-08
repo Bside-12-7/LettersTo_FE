@@ -7,6 +7,7 @@ import {RegisterInfo, UserInfo} from '@type/auth';
 interface AuthStore {
   isLoggedIn: boolean;
   isLoading: boolean;
+  termsAgreed: boolean | null;
 
   userInfo: UserInfo;
 
@@ -26,12 +27,14 @@ interface AuthStore {
     logout: () => void;
     startLoading: () => void;
     endLoading: () => void;
+    setTermsAgreed: (agreed: boolean) => void;
   };
 }
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
   isLoggedIn: false,
   isLoading: true,
+  termsAgreed: null,
 
   userInfo: {
     nickname: '',
@@ -93,6 +96,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     logout: () => set(() => ({isLoggedIn: false})),
     startLoading: () => set(() => ({isLoading: true})),
     endLoading: () => set(() => ({isLoading: false})),
+    setTermsAgreed: agreed => set(() => ({termsAgreed: agreed})),
     initRegisterInfo: registerToken =>
       set(() => ({
         registerInfo: {

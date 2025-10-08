@@ -23,6 +23,16 @@ export async function getTerms() {
   return await axiosInstance.get<TermsInfo[]>('/terms/json');
 }
 
+export interface MemberTermsConsentResponse {
+  TERMS_OF_SERVICE: boolean;
+  PRIVACY: boolean;
+  MARKETING: boolean;
+}
+
+export async function getMemberTermsConsent() {
+  return await axiosInstance.get<MemberTermsConsentResponse>('/member-terms-consent');
+}
+
 export async function recordTermsReAgreement(
   request: RecordTermsReAgreementRequest,
 ) {

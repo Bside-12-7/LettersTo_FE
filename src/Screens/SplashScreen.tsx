@@ -8,6 +8,7 @@ import {getUserInfo} from '@apis/member';
 import {sendAttendance} from '@apis/attendances';
 import type {StackParamsList} from '@type/stackParamList';
 import mobileAds from 'react-native-google-mobile-ads';
+import {getMemberTermsConsent} from '@apis/terms';
 
 type Props = NativeStackScreenProps<StackParamsList, 'Splash'>;
 
@@ -39,12 +40,28 @@ export function Splash({}: Props) {
   useEffect(() => {
     mobileAds()
       .initialize()
-      .then(() => {
+      .then(async () => {
         mobileAds().setAppMuted(true);
         if (!isLoading) {
           if (isSuccess) {
             authAction.login();
             sendAttendance().catch(() => {});
+
+            // 약관 동의 여부 확인
+            try {
+              const termsConsent = await getMemberTermsConsent();
+              console.log(termsConsent);
+              // 필수 약관(이용약관, 개인정보)이 모두 false인지 확인
+              const requiredTermsNotAgreed =
+                termsConsent.TERMS_OF_SERVICE === false &&
+                termsConsent.PRIVACY === false;
+              authAction.setTermsAgreed(!requiredTermsNotAgreed);
+            } catch (error) {
+              console.error('Failed to fetch terms consent:', error);
+              authAction.setTermsAgreed(true); // 실패 시 기본값 true
+            }
+          } else {
+            authAction.setTermsAgreed(false);
           }
           authAction.endLoading();
         }

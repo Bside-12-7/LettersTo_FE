@@ -43,44 +43,29 @@ import {StampHistory} from '@screens/Stamp/StampHistory';
 import {useAuthStore} from '@stores/auth';
 import {SCREEN_NAMES} from '@constants/navigation';
 import {AddressManage} from '@screens/MyPage/AddressManageScreen';
-import {STORAGE_KEYS} from '@constants/common';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createNativeStackNavigator<StackParamsList>();
 
 export default function StackNavigator() {
-  const {isLoggedIn, isLoading} = useAuthStore(state => ({
+  const {isLoggedIn, isLoading, termsAgreed} = useAuthStore(state => ({
     isLoggedIn: state.isLoggedIn,
     isLoading: state.isLoading,
+    termsAgreed: state.termsAgreed,
   }));
-
-  const [termsAgreed, setTermsAgreed] = React.useState<boolean | null>(null);
-
-  // 약관 동의 여부 확인
-  React.useEffect(() => {
-    const checkTermsAgreed = async () => {
-      const agreed = await AsyncStorage.getItem(STORAGE_KEYS.TERMS_AGREED);
-      setTermsAgreed(agreed === 'true');
-    };
-
-    if (isLoggedIn && !isLoading) {
-      checkTermsAgreed();
-    }
-  }, [isLoggedIn, isLoading]);
 
   return (
     <Stack.Navigator
       screenOptions={{headerShown: false}}
       initialRouteName={SCREEN_NAMES.SPLASH}>
-      {isLoading ? (
+      {isLoading || (isLoggedIn && termsAgreed === null) ? (
         <Stack.Screen name={SCREEN_NAMES.SPLASH} component={Splash} />
       ) : isLoggedIn ? (
-        termsAgreed === false ? (
+        !termsAgreed ? (
           <Stack.Screen
             name={SCREEN_NAMES.POLICY_CONSENT}
             component={PolicyConsent}
           />
-        ) : termsAgreed === true ? (
+        ) : (
           <Stack.Group screenOptions={{headerShown: false}}>
             <Stack.Screen name={SCREEN_NAMES.MAIN.MAIN} component={Main} />
           <Stack.Screen
@@ -144,8 +129,6 @@ export default function StackNavigator() {
             component={StampHistory}
           />
         </Stack.Group>
-        ) : (
-          <Stack.Screen name={SCREEN_NAMES.SPLASH} component={Splash} />
         )
       ) : (
         <Stack.Group>

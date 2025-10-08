@@ -25,7 +25,7 @@ import {getTerms} from '@apis/terms';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from '@components/Toast/toast';
 import {WebView} from 'react-native-webview';
-import {BASE_URL_TEST, STORAGE_KEYS} from '@constants/common';
+import {BASE_URL_TEST} from '@constants/common';
 
 const checkboxChecked = require('@assets/checkbox_checked.png');
 const checkboxUnchecked = require('@assets/checkbox_unchecked.png');
@@ -152,7 +152,6 @@ export function Policy({navigation}: Props) {
       await Promise.all([
         AsyncStorage.setItem('accessToken', accessToken),
         AsyncStorage.setItem('refreshToken', refreshToken),
-        AsyncStorage.setItem(STORAGE_KEYS.TERMS_AGREED, 'true'),
       ]);
 
       navigation.reset({routes: [{name: 'Coachmark'}]});

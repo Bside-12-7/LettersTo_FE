@@ -17,10 +17,10 @@ import type {StackParamsList} from '@type/stackParamList';
 import {CLICK_BUTTON_EVENT_PARAMS} from '@constants/analytics';
 import {useQuery, useMutation} from 'react-query';
 import {getTerms, recordTermsReAgreement} from '@apis/terms';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from '@components/Toast/toast';
 import {WebView} from 'react-native-webview';
-import {BASE_URL_TEST, STORAGE_KEYS} from '@constants/common';
+import {BASE_URL_TEST} from '@constants/common';
+import {useAuthAction} from '@stores/auth';
 
 const checkboxChecked = require('@assets/checkbox_checked.png');
 const checkboxUnchecked = require('@assets/checkbox_unchecked.png');
@@ -34,6 +34,8 @@ export function PolicyConsent({navigation}: Props) {
   const [marketing, setMarketing] = useState(false);
   const [webViewVisible, setWebViewVisible] = useState(false);
   const [webViewUrl, setWebViewUrl] = useState('');
+
+  const {setTermsAgreed} = useAuthAction();
 
   // 약관 정보 가져오기
   const {data: termsData} = useQuery('terms', getTerms);
@@ -116,17 +118,12 @@ export function PolicyConsent({navigation}: Props) {
       ];
 
       await recordTermsReAgreement({consents});
-
-      // 약관 동의 정보를 로컬 스토리지에 저장
-      await AsyncStorage.setItem(STORAGE_KEYS.TERMS_AGREED, 'true');
     }, [termsOfService, privacy, marketing, termsData]),
     {
       onSuccess: () => {
         Toast.show('약관 동의가 완료되었어요!');
-        // 메인 화면으로 이동
-        navigation.reset({
-          routes: [{name: 'Main'}],
-        });
+        // Zustand store에 약관 동의 상태 업데이트
+        setTermsAgreed(true);
       },
       onError: () => {
         Toast.show('약관 동의 중 오류가 발생했어요.');
