@@ -7,7 +7,7 @@ import type {
 import {axiosInstance} from '@utils/http';
 
 export async function signUp(registerInfo: RegisterInfo) {
-  return await axiosInstance.post<AuthTokens>('/members', {...registerInfo});
+  return await axiosInstance.post<AuthTokens>('/members/v2', {...registerInfo});
 }
 
 export async function getUserInfo() {

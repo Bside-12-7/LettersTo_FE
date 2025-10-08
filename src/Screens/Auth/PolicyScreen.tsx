@@ -1,24 +1,183 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useState, useMemo, useEffect} from 'react';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {View, Text, StyleSheet, SafeAreaView, Platform} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  Platform,
+  TouchableOpacity,
+  Image,
+  Modal,
+} from 'react-native';
 import {LinearGradient} from 'expo-linear-gradient';
 import {SCREEN_HEIGHT} from '@constants/screen';
 import {SignUpButton} from '@components/Auth/SignUpButton';
 import {Header2} from '@components/Headers/Header2';
 import {StepIndicator} from '@components/StepIndicator';
+import {BackButton} from '@components/Button/Header/BackButton';
 import type {StackParamsList} from '@type/stackParamList';
 import {CLICK_BUTTON_EVENT_PARAMS} from '@constants/analytics';
+import {useAuthAction, useAuthStore} from '@stores/auth';
+import {useMutation, useQuery} from 'react-query';
+import {signUp} from '@apis/member';
+import {getTerms} from '@apis/terms';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from '@components/Toast/toast';
+import {WebView} from 'react-native-webview';
+import {BASE_URL_TEST} from '@constants/common';
+
+const checkboxChecked = require('@assets/checkbox_checked.png');
+const checkboxUnchecked = require('@assets/checkbox_unchecked.png');
 
 type Props = NativeStackScreenProps<StackParamsList, 'Policy'>;
 
 export function Policy({navigation}: Props) {
+  const [allAgreed, setAllAgreed] = useState(false);
+  const [termsOfService, setTermsOfService] = useState(false);
+  const [privacy, setPrivacy] = useState(false);
+  const [marketing, setMarketing] = useState(false);
+  const [webViewVisible, setWebViewVisible] = useState(false);
+  const [webViewUrl, setWebViewUrl] = useState('');
+
+  const {setConsentsInRegisterInfo} = useAuthAction();
+  const registerInfo = useAuthStore(state => state.registerInfo);
+
+  // 약관 정보 가져오기
+  const {data: termsData} = useQuery('terms', getTerms);
+
+  const openTermsWebView = useCallback((termsType: string) => {
+    setWebViewUrl(`${BASE_URL_TEST}/terms/html?termsType=${termsType}`);
+    setWebViewVisible(true);
+  }, []);
+
+  const closeWebView = useCallback(() => {
+    setWebViewVisible(false);
+  }, []);
+
+  // 전체 동의 체크 시 모든 약관 동의
+  const handleAllAgreed = useCallback(() => {
+    const newValue = !allAgreed;
+    setAllAgreed(newValue);
+    setTermsOfService(newValue);
+    setPrivacy(newValue);
+    setMarketing(newValue);
+  }, [allAgreed]);
+
+  // 개별 약관 동의 토글
+  const toggleTermsOfService = useCallback(() => {
+    setTermsOfService(prev => !prev);
+  }, []);
+
+  const togglePrivacy = useCallback(() => {
+    setPrivacy(prev => !prev);
+  }, []);
+
+  const toggleMarketing = useCallback(() => {
+    setMarketing(prev => !prev);
+  }, []);
+
+  // 필수 약관이 모두 동의되었는지 확인
+  const isRequiredAgreed = useMemo(() => {
+    return termsOfService && privacy;
+  }, [termsOfService, privacy]);
+
+  // 모든 약관이 동의되면 전체 동의 체크
+  useEffect(() => {
+    if (termsOfService && privacy && marketing) {
+      setAllAgreed(true);
+    } else {
+      setAllAgreed(false);
+    }
+  }, [termsOfService, privacy, marketing]);
+
+  const {mutate: mutateSignUp, isLoading} = useMutation(
+    ['signup'],
+    useCallback(async () => {
+      if (
+        !registerInfo.nickname ||
+        !registerInfo.topicIds.length ||
+        !registerInfo.personalityIds.length ||
+        !registerInfo.geolocationId
+      ) {
+        throw new Error('회원가입 정보 유실');
+      }
+
+      // 약관 동의 정보 생성
+      const now = new Date().toISOString();
+
+      // 약관별 버전 정보 찾기
+      const termsOfServiceVersion =
+        termsData?.find(t => t.termsType === 'TERMS_OF_SERVICE')
+          ?.termsVersionNumber || 1;
+      const privacyVersion =
+        termsData?.find(t => t.termsType === 'PRIVACY')?.termsVersionNumber ||
+        1;
+      const marketingVersion =
+        termsData?.find(t => t.termsType === 'MARKETING')?.termsVersionNumber ||
+        1;
+
+      const consents = [
+        {
+          termsType: 'TERMS_OF_SERVICE' as const,
+          termsVersionNumber: termsOfServiceVersion,
+          agreed: termsOfService,
+          requestedAt: now,
+        },
+        {
+          termsType: 'PRIVACY' as const,
+          termsVersionNumber: privacyVersion,
+          agreed: privacy,
+          requestedAt: now,
+        },
+        {
+          termsType: 'MARKETING' as const,
+          termsVersionNumber: marketingVersion,
+          agreed: marketing,
+          requestedAt: now,
+        },
+      ];
+
+      setConsentsInRegisterInfo(consents);
+
+      const {accessToken, refreshToken} = await signUp({
+        ...registerInfo,
+        consents,
+      });
+
+      if (!accessToken || !refreshToken) {
+        throw new Error('회원가입 실패');
+      }
+
+      await Promise.all([
+        AsyncStorage.setItem('accessToken', accessToken),
+        AsyncStorage.setItem('refreshToken', refreshToken),
+      ]);
+
+      navigation.reset({routes: [{name: 'Coachmark'}]});
+    }, [
+      navigation,
+      registerInfo,
+      termsOfService,
+      privacy,
+      marketing,
+      setConsentsInRegisterInfo,
+      termsData,
+    ]),
+    {onSuccess: () => Toast.show('성공적으로 가입되었어요!')},
+  );
+
   const onPressBack = useCallback(() => {
     navigation.pop();
   }, [navigation]);
 
-  const onPressSignUp = useCallback(() => {
-    // TODO: 회원가입 로직
-  }, []);
+  const onPressSignUp = useCallback(async () => {
+    if (isLoading) {
+      return Toast.show('처리중이에요!');
+    }
+
+    mutateSignUp();
+  }, [isLoading, mutateSignUp]);
 
   return (
     <LinearGradient colors={['#ffccee', 'white', 'white', 'white', '#ffffcc']}>
@@ -37,17 +196,77 @@ export function Policy({navigation}: Props) {
           </View>
         </View>
 
-        <View style={styles.contentWrap}></View>
+        <View style={styles.contentWrap}>
+          <View style={styles.policyItem}>
+            <TouchableOpacity onPress={handleAllAgreed}>
+              <Image
+                source={allAgreed ? checkboxChecked : checkboxUnchecked}
+                style={styles.checkboxIcon}
+              />
+            </TouchableOpacity>
+            <Text style={styles.policyText}>전체 동의</Text>
+          </View>
+          <View style={styles.policyItem}>
+            <TouchableOpacity onPress={toggleTermsOfService}>
+              <Image
+                source={termsOfService ? checkboxChecked : checkboxUnchecked}
+                style={styles.checkboxIcon}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => openTermsWebView('TERMS_OF_SERVICE')}>
+              <Text style={styles.policyTextLink}>이용 약관 동의 (필수)</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.policyItem}>
+            <TouchableOpacity onPress={togglePrivacy}>
+              <Image
+                source={privacy ? checkboxChecked : checkboxUnchecked}
+                style={styles.checkboxIcon}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => openTermsWebView('PRIVACY')}>
+              <Text style={styles.policyTextLink}>
+                개인정보 수집 및 이용 동의 (필수)
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.policyItem}>
+            <TouchableOpacity onPress={toggleMarketing}>
+              <Image
+                source={marketing ? checkboxChecked : checkboxUnchecked}
+                style={styles.checkboxIcon}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => openTermsWebView('MARKETING')}>
+              <Text style={styles.policyTextLink}>
+                서비스 소식 등 마케팅 수신 동의 (선택)
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
         <SignUpButton
           clickButtonEvent={CLICK_BUTTON_EVENT_PARAMS.SIGN_UP}
-          disable={false}
+          disable={!isRequiredAgreed}
           onPress={onPressSignUp}
         />
         <View style={styles.stepIndicatorWrap}>
           <StepIndicator current={5} of={5} />
         </View>
       </SafeAreaView>
+
+      <Modal
+        visible={webViewVisible}
+        animationType="slide"
+        onRequestClose={closeWebView}>
+        <SafeAreaView style={{flex: 1}}>
+          <View style={styles.webViewHeader}>
+            <BackButton color="blue" onPress={closeWebView} />
+          </View>
+          <WebView source={{uri: webViewUrl}} style={{flex: 1}} />
+        </SafeAreaView>
+      </Modal>
     </LinearGradient>
   );
 }
@@ -82,5 +301,33 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 50,
+  },
+  policyItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  checkboxIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 10,
+  },
+  policyText: {
+    fontFamily: 'Galmuri11',
+    fontSize: 14,
+    color: '#0000cc',
+  },
+  policyTextLink: {
+    fontFamily: 'Galmuri11',
+    fontSize: 14,
+    color: '#0000cc',
+    textDecorationLine: 'underline',
+  },
+  webViewHeader: {
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
 });

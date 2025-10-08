@@ -13,6 +13,7 @@ interface AuthStore {
   registerInfo: RegisterInfo;
 
   action: {
+    setConsentsInRegisterInfo: (consents: RegisterInfo['consents']) => void;
     loginWithExistTokens: () => void;
     initRegisterInfo: (registerToken: string) => void;
     setNicknameInRegisterInfo: (nickname: string) => void;
@@ -47,6 +48,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     geolocationId: 0,
     topicIds: [],
     personalityIds: [],
+    consents: [],
   },
 
   action: {
@@ -99,6 +101,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           geolocationId: 0,
           topicIds: [],
           personalityIds: [],
+          consents: [],
         },
       })),
     setNicknameInRegisterInfo: nickname =>
@@ -116,6 +119,10 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     setGeolocationIdInRegisterInfo: geolocationId =>
       set(state => ({
         registerInfo: {...state.registerInfo, geolocationId},
+      })),
+    setConsentsInRegisterInfo: consents =>
+      set(state => ({
+        registerInfo: {...state.registerInfo, consents},
       })),
     signup: async () => {
       const {registerInfo} = get();

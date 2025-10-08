@@ -29,6 +29,12 @@ export interface RegisterInfo {
   personalityIds: number[];
   topicIds: number[];
   geolocationId: number;
+  consents: {
+    termsType: 'TERMS_OF_SERVICE' | 'PRIVACY' | 'MARKETING';
+    termsVersionNumber: number;
+    agreed: boolean;
+    requestedAt: string;
+  }[];
 }
 
 export interface PatchUserInfoRequest {

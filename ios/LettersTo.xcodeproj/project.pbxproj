@@ -621,7 +621,7 @@
 				CODE_SIGN_ENTITLEMENTS = LettersTo/LettersToDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 250629;
+				CURRENT_PROJECT_VERSION = 2507162141;
 				DEVELOPMENT_TEAM = UWL8SJ2YMP;
 				ENABLE_BITCODE = NO;
 				HEADER_SEARCH_PATHS = (
@@ -715,7 +715,7 @@
 					"$(inherited)",
 					/usr/lib/swift,
 				);
-				MARKETING_VERSION = 2.2.5;
+				MARKETING_VERSION = 2.2.6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -749,7 +749,7 @@
 				CODE_SIGN_ENTITLEMENTS = LettersTo/LettersToRelease.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 250629;
+				CURRENT_PROJECT_VERSION = 2507162141;
 				DEVELOPMENT_TEAM = UWL8SJ2YMP;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -842,7 +842,7 @@
 					"$(inherited)",
 					/usr/lib/swift,
 				);
-				MARKETING_VERSION = 2.2.5;
+				MARKETING_VERSION = 2.2.6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
