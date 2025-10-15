@@ -1,6 +1,12 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {useQuery} from 'react-query';
-import {ActivityIndicator, View, StyleSheet} from 'react-native';
+import {
+  ActivityIndicator,
+  View,
+  StyleSheet,
+  Platform,
+  Linking,
+} from 'react-native';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useAuthAction} from '@stores/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,11 +15,40 @@ import {sendAttendance} from '@apis/attendances';
 import type {StackParamsList} from '@type/stackParamList';
 import mobileAds from 'react-native-google-mobile-ads';
 import {getMemberTermsConsent} from '@apis/terms';
+import {checkForcedUpdate} from '@apis/appVersion';
+import {ForceUpdateModal} from '@components/Modals/ForceUpdateModal';
+import DeviceInfo from 'react-native-device-info';
 
 type Props = NativeStackScreenProps<StackParamsList, 'Splash'>;
 
 export function Splash({}: Props) {
   const authAction = useAuthAction();
+  const [showForceUpdate, setShowForceUpdate] = useState(false);
+  const [shouldCheckLogin, setShouldCheckLogin] = useState(false);
+
+  // 강제 업데이트 체크
+  useEffect(() => {
+    const checkUpdate = async () => {
+      try {
+        const platform = Platform.OS === 'ios' ? 'IOS' : 'ANDROID';
+        const currentVersion = DeviceInfo.getVersion();
+        const currentBuildNumber = parseInt(DeviceInfo.getBuildNumber(), 10);
+
+        const result = await checkForcedUpdate({
+          platform,
+          currentVersion,
+          currentBuildNumber,
+        });
+
+        setShowForceUpdate(result.shouldForceUpdate);
+      } catch (error) {
+        console.error('Failed to check force update:', error);
+        setShouldCheckLogin(true); // 실패해도 로그인 체크는 진행
+      }
+    };
+
+    checkUpdate();
+  }, []);
 
   const loginWithStoredToken = useCallback(async () => {
     const [accessToken, refreshToken] = await Promise.all([
@@ -38,6 +73,11 @@ export function Splash({}: Props) {
   );
 
   useEffect(() => {
+    // 강제 업데이트가 필요한 경우 로그인 로직 실행 안 함
+    if (showForceUpdate) {
+      return;
+    }
+
     mobileAds()
       .initialize()
       .then(async () => {
@@ -66,7 +106,18 @@ export function Splash({}: Props) {
           authAction.endLoading();
         }
       });
-  }, [isSuccess, isError, isLoading, authAction]);
+  }, [isSuccess, isError, isLoading, authAction, showForceUpdate]);
+
+  const handlePressUpdate = useCallback(() => {
+    const storeUrl = Platform.select({
+      ios: 'https://apps.apple.com/app/id6444780538',
+      android: 'https://play.google.com/store/apps/details?id=com.lettersto',
+    });
+
+    if (storeUrl) {
+      Linking.openURL(storeUrl);
+    }
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -75,6 +126,10 @@ export function Splash({}: Props) {
         color={'#6990F7'}
         size={'large'}
         style={styles.activityIndicator}
+      />
+      <ForceUpdateModal
+        isVisible={showForceUpdate}
+        onPressUpdate={handlePressUpdate}
       />
     </View>
   );

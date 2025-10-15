@@ -1,10 +1,11 @@
 import React from 'react';
 import {Pressable, Text, View, Modal, StyleSheet, Image} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ModalBlur} from './ModalBlur';
 
 type Props = {
   visible: boolean;
-  hideModal: () => void;
+  hideModal?: () => void;
   title?: string;
   text: string;
   children: JSX.Element;
@@ -27,17 +28,24 @@ export const AlertModal = ({
       onRequestClose={hideModal}
       visible={visible}>
       <View style={styles.container}>
+        <ModalBlur />
         <View style={[styles.modalView, {paddingBottom: SAFE_AREA_BOTTOM}]}>
-          <View style={styles.header}>
-            <Pressable onPress={hideModal}>
-              <Image
-                source={require('@assets/Icon/close/close_blue.png')}
-                style={styles.closeButton}
-              />
-            </Pressable>
-            <Text style={styles.title}>{title}</Text>
-            <View style={styles.headerBlank} />
-          </View>
+          {
+            <View style={styles.header}>
+              {hideModal ? (
+                <Pressable onPress={hideModal}>
+                  <Image
+                    source={require('@assets/Icon/close/close_blue.png')}
+                    style={styles.closeButton}
+                  />
+                </Pressable>
+              ) : (
+                <View style={styles.headerBlank} />
+              )}
+              <Text style={styles.title}>{title}</Text>
+              <View style={styles.headerBlank} />
+            </View>
+          }
           <View
             style={{
               paddingVertical: 50,
