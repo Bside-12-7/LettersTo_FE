@@ -70,17 +70,19 @@ export const FeedbackButton = React.memo(({screenName}: Props) => {
             ? FEEDBACK_BUTTON_TEXT.HOME
             : FEEDBACK_BUTTON_TEXT.SIMPLE}
         </Text>
-        <Pressable
-          onPress={() => {
-            if (screenName === 'HOME') return clearFeedbackButtonOnHome();
-            if (screenName === 'LETTERBOX')
-              return clearFeedbackButtonOnLetterBox();
-          }}>
-          <Image
-            source={closeImg}
-            style={screenName === 'HOME' ? styles.next_24 : styles.next_20}
-          />
-        </Pressable>
+        {screenName !== 'MYPAGE' && (
+          <Pressable
+            onPress={() => {
+              if (screenName === 'HOME') return clearFeedbackButtonOnHome();
+              if (screenName === 'LETTERBOX')
+                return clearFeedbackButtonOnLetterBox();
+            }}>
+            <Image
+              source={closeImg}
+              style={screenName === 'HOME' ? styles.next_24 : styles.next_20}
+            />
+          </Pressable>
+        )}
       </Animated.View>
     </TouchableWithoutFeedback>
   );
