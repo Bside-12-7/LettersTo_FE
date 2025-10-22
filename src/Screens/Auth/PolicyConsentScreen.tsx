@@ -16,7 +16,11 @@ import {BackButton} from '@components/Button/Header/BackButton';
 import type {StackParamsList} from '@type/stackParamList';
 import {CLICK_BUTTON_EVENT_PARAMS} from '@constants/analytics';
 import {useQuery, useMutation} from 'react-query';
-import {getTerms, recordTermsReAgreement} from '@apis/terms';
+import {
+  ConsentItem,
+  getTerms,
+  recordTermsReAgreement,
+} from '@apis/terms';
 import Toast from '@components/Toast/toast';
 import {WebView} from 'react-native-webview';
 import {BASE_URL_TEST} from '@constants/common';
@@ -89,7 +93,7 @@ export function PolicyConsent({navigation}: Props) {
     ['recordTermsReAgreement'],
     useCallback(async () => {
       // 약관 동의 정보 생성
-      const now = new Date().toISOString();
+      const now = new Date().toISOString().replace('Z', '');
 
       // 약관별 버전 정보 찾기
       const termsOfServiceVersion =
@@ -98,24 +102,33 @@ export function PolicyConsent({navigation}: Props) {
       const privacyVersion =
         termsData?.find(t => t.termsType === 'PRIVACY')?.termsVersionNumber ||
         1;
-      const marketingVersion =
-        termsData?.find(t => t.termsType === 'MARKETING')?.termsVersionNumber ||
-        1;
 
-      const consents = [
+      const consents: ConsentItem[] = [
         {
-          termsType: 'TERMS_OF_SERVICE' as const,
+          termsType: 'TERMS_OF_SERVICE',
           termsVersionNumber: termsOfServiceVersion,
           agreed: termsOfService,
           requestedAt: now,
         },
         {
-          termsType: 'PRIVACY' as const,
+          termsType: 'PRIVACY',
           termsVersionNumber: privacyVersion,
           agreed: privacy,
           requestedAt: now,
         },
       ];
+
+      if (marketing) {
+        const marketingVersion =
+          termsData?.find(t => t.termsType === 'MARKETING')
+            ?.termsVersionNumber || 1;
+        consents.push({
+          termsType: 'MARKETING',
+          termsVersionNumber: marketingVersion,
+          agreed: privacy,
+          requestedAt: now,
+        });
+      }
 
       await recordTermsReAgreement({consents});
     }, [termsOfService, privacy, marketing, termsData]),

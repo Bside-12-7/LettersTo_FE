@@ -104,7 +104,7 @@ export function Policy({navigation}: Props) {
       }
 
       // 약관 동의 정보 생성
-      const now = new Date().toISOString();
+      const now = new Date().toISOString().replace('Z', '');
 
       // 약관별 버전 정보 찾기
       const termsOfServiceVersion =
@@ -117,32 +117,32 @@ export function Policy({navigation}: Props) {
         termsData?.find(t => t.termsType === 'MARKETING')?.termsVersionNumber ||
         1;
 
-      const consents = [
+      const termsConsents = [
         {
           termsType: 'TERMS_OF_SERVICE' as const,
           termsVersionNumber: termsOfServiceVersion,
           agreed: termsOfService,
-          requestedAt: now,
+          consentedAt: now,
         },
         {
           termsType: 'PRIVACY' as const,
           termsVersionNumber: privacyVersion,
           agreed: privacy,
-          requestedAt: now,
+          consentedAt: now,
         },
         {
           termsType: 'MARKETING' as const,
           termsVersionNumber: marketingVersion,
           agreed: marketing,
-          requestedAt: now,
+          consentedAt: now,
         },
       ];
 
-      setConsentsInRegisterInfo(consents);
+      setConsentsInRegisterInfo(termsConsents);
 
       const {accessToken, refreshToken} = await signUp({
         ...registerInfo,
-        consents,
+        termsConsents,
       });
 
       if (!accessToken || !refreshToken) {

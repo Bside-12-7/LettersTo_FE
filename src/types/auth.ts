@@ -29,11 +29,11 @@ export interface RegisterInfo {
   personalityIds: number[];
   topicIds: number[];
   geolocationId: number;
-  consents: {
+  termsConsents: {
     termsType: 'TERMS_OF_SERVICE' | 'PRIVACY' | 'MARKETING';
     termsVersionNumber: number;
     agreed: boolean;
-    requestedAt: string;
+    consentedAt: string;
   }[];
 }
 
