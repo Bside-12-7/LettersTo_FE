@@ -24,7 +24,6 @@ type Props = NativeStackScreenProps<StackParamsList, 'Splash'>;
 export function Splash({}: Props) {
   const authAction = useAuthAction();
   const [showForceUpdate, setShowForceUpdate] = useState(false);
-  const [shouldCheckLogin, setShouldCheckLogin] = useState(false);
 
   // 강제 업데이트 체크
   useEffect(() => {
@@ -43,7 +42,6 @@ export function Splash({}: Props) {
         setShowForceUpdate(result.shouldForceUpdate);
       } catch (error) {
         console.error('Failed to check force update:', error);
-        setShouldCheckLogin(true); // 실패해도 로그인 체크는 진행
       }
     };
 
@@ -90,7 +88,6 @@ export function Splash({}: Props) {
             // 약관 동의 여부 확인
             try {
               const termsConsent = await getMemberTermsConsent();
-              console.log(termsConsent);
               // 필수 약관(이용약관, 개인정보)이 모두 false인지 확인
               const requiredTermsNotAgreed =
                 termsConsent.TERMS_OF_SERVICE === false &&

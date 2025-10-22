@@ -19,6 +19,12 @@ export interface RecordTermsReAgreementRequest {
   consents: ConsentItem[];
 }
 
+export interface RecordMarketingAgreementRequest {
+  termsVersionNumber: number;
+  agreed: boolean;
+  requestedAt: string;
+}
+
 export async function getTerms() {
   return await axiosInstance.get<TermsInfo[]>('/terms/json');
 }
@@ -30,7 +36,9 @@ export interface MemberTermsConsentResponse {
 }
 
 export async function getMemberTermsConsent() {
-  return await axiosInstance.get<MemberTermsConsentResponse>('/member-terms-consent');
+  return await axiosInstance.get<MemberTermsConsentResponse>(
+    '/member-terms-consent',
+  );
 }
 
 export async function recordTermsReAgreement(
@@ -44,5 +52,14 @@ export async function recordTermsReAgreement(
         'Content-Type': 'application/json',
       },
     },
+  );
+}
+
+export async function recordMarketingAgreement(
+  request: RecordMarketingAgreementRequest,
+) {
+  return await axiosInstance.post(
+    '/member-terms-consent/record-marketing-agreement',
+    request,
   );
 }

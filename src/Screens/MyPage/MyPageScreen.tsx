@@ -11,7 +11,7 @@ import {
   Linking,
   Platform,
 } from 'react-native';
-import {useQuery, useQueryClient} from 'react-query';
+import {useMutation, useQuery, useQueryClient} from 'react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
@@ -45,6 +45,17 @@ import notifee, {AuthorizationStatus} from '@notifee/react-native';
 import {useAppState} from '@hooks/useAppState';
 import Toast from '@components/Toast/toast';
 import {dateFormatter} from '@utils/dateFormatter';
+import {
+  getMemberTermsConsent,
+  getTerms,
+  recordMarketingAgreement,
+  RecordMarketingAgreementRequest,
+} from '@apis/terms';
+import {
+  getNotificationPreference,
+  NotificationPreferenceRequest,
+  setNotificationPreference,
+} from '@apis/notification';
 
 type Props = NativeStackScreenProps<StackParamsList, 'MyPage'>;
 
@@ -98,6 +109,7 @@ export const MyPage = ({navigation}: Props) => {
   );
 
   const queryClient = useQueryClient();
+  const {data: termsData} = useQuery('terms', getTerms);
 
   const isAnyModalVisible = useMemo(
     () =>
@@ -139,13 +151,19 @@ export const MyPage = ({navigation}: Props) => {
   }, [navigation]);
 
   const {data: userInfo, isSuccess} = useQuery('userInfo', getUserInfo);
+  const {data: notificationPreference} = useQuery(
+    'notification-preference',
+    getNotificationPreference,
+  );
 
-  const [allowedNotifications, setAllowedNotifications] = React.useState(false);
-  const [allowedMarketing, setAllowedMarketing] = React.useState(false);
   const [isDeviceNotificationEnabled, setIsDeviceNotificationEnabled] =
     React.useState(false);
 
   const {appStateListener} = useAppState();
+
+  const {mutate} = useMutation({
+    mutationFn: setNotificationPreference,
+  });
 
   useEffect(() => {
     async function getNotificationEnabled() {
@@ -175,28 +193,36 @@ export const MyPage = ({navigation}: Props) => {
     }
   }
 
+  console.log(notificationPreference);
+
   const onChangeNotificationSetting =
-    (setting: 'allowedNotifications' | 'allowedMarketing') =>
-    (value: boolean) => {
-      if (setting === 'allowedNotifications') {
-        Toast.show(
-          value ? '알림 수신을 동의했습니다' : '알림 수신을 거부했습니다',
-        );
-        setAllowedNotifications(value);
-      } else {
-        Toast.show(
-          value
-            ? `${dateFormatter(
-                'yyyy.mm.dd',
-                new Date(),
-              )}\nletters to 마케팅 정보 수신을 동의했습니다`
-            : `${dateFormatter(
-                'yyyy.mm.dd',
-                new Date(),
-              )}\nletters to 마케팅 정보 수신을 거부했습니다`,
-        );
-        setAllowedMarketing(value);
-      }
+    (receptionType: 'SERVICE' | 'MARKETING') => (value: boolean) => {
+      const request: NotificationPreferenceRequest = {
+        receptionType,
+        enabled: value,
+      };
+      mutate(request, {
+        onSuccess() {
+          queryClient.invalidateQueries('notification-preference');
+          if (receptionType === 'SERVICE') {
+            Toast.show(
+              value ? '알림 수신을 동의했습니다' : '알림 수신을 거부했습니다',
+            );
+          } else {
+            Toast.show(
+              value
+                ? `${dateFormatter(
+                    'yyyy.mm.dd',
+                    new Date(),
+                  )}\nletters to 마케팅 정보 수신을 동의했습니다`
+                : `${dateFormatter(
+                    'yyyy.mm.dd',
+                    new Date(),
+                  )}\nletters to 마케팅 정보 수신을 거부했습니다`,
+            );
+          }
+        },
+      });
     };
 
   if (!isSuccess) {
@@ -255,14 +281,14 @@ export const MyPage = ({navigation}: Props) => {
               <NotificationListName name="알림 설정" />
               <NotificationListItem
                 itemName="서비스 알림 수신 설정"
-                value={allowedNotifications}
-                onChange={onChangeNotificationSetting('allowedNotifications')}
+                value={notificationPreference?.SERVICE ?? false}
+                onChange={onChangeNotificationSetting('SERVICE')}
                 description="알림을 수신하면 편지 발송·도착 시 알려드려요!"
               />
               <NotificationListItem
                 itemName="마케팅 수신 설정"
-                value={allowedMarketing}
-                onChange={onChangeNotificationSetting('allowedMarketing')}
+                value={notificationPreference?.MARKETING ?? false}
+                onChange={onChangeNotificationSetting('MARKETING')}
                 description="업데이트 및 재밌는 소식이 있을 때 알려드려요!"
               />
 
