@@ -115,8 +115,7 @@ export const MyPage = ({navigation}: Props) => {
     () =>
       isModalVisible.NICKNAME ||
       isModalVisible.TOPIC ||
-      isModalVisible.PERSONALITY ||
-      isModalVisible.LOGOUT,
+      isModalVisible.PERSONALITY,
     [isModalVisible],
   );
 
@@ -192,8 +191,6 @@ export const MyPage = ({navigation}: Props) => {
       console.error('설정 화면 이동 실패:', e);
     }
   }
-
-  console.log(notificationPreference);
 
   const onChangeNotificationSetting =
     (receptionType: 'SERVICE' | 'MARKETING') => (value: boolean) => {

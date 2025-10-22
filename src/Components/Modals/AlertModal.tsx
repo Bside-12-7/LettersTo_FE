@@ -21,46 +21,48 @@ export const AlertModal = ({
   const {bottom: SAFE_AREA_BOTTOM} = useSafeAreaInsets();
 
   return (
-    <Modal
-      statusBarTranslucent={true} // android
-      animationType="slide"
-      transparent={true}
-      onRequestClose={hideModal}
-      visible={visible}>
-      <View style={styles.container}>
-        <ModalBlur />
-        <View style={[styles.modalView, {paddingBottom: SAFE_AREA_BOTTOM}]}>
-          {
-            <View style={styles.header}>
-              {hideModal ? (
-                <Pressable onPress={hideModal}>
-                  <Image
-                    source={require('@assets/Icon/close/close_blue.png')}
-                    style={styles.closeButton}
-                  />
-                </Pressable>
-              ) : (
+    <>
+      {visible && <ModalBlur />}
+      <Modal
+        statusBarTranslucent={true} // android
+        animationType="slide"
+        transparent={true}
+        onRequestClose={hideModal}
+        visible={visible}>
+        <View style={styles.container}>
+          <View style={[styles.modalView, {paddingBottom: SAFE_AREA_BOTTOM}]}>
+            {
+              <View style={styles.header}>
+                {hideModal ? (
+                  <Pressable onPress={hideModal}>
+                    <Image
+                      source={require('@assets/Icon/close/close_blue.png')}
+                      style={styles.closeButton}
+                    />
+                  </Pressable>
+                ) : (
+                  <View style={styles.headerBlank} />
+                )}
+                <Text style={styles.title}>{title}</Text>
                 <View style={styles.headerBlank} />
-              )}
-              <Text style={styles.title}>{title}</Text>
-              <View style={styles.headerBlank} />
+              </View>
+            }
+            <View
+              style={{
+                paddingVertical: 50,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Text style={{fontFamily: 'Galmuri11', color: '#0000cc'}}>
+                {text}
+              </Text>
             </View>
-          }
-          <View
-            style={{
-              paddingVertical: 50,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <Text style={{fontFamily: 'Galmuri11', color: '#0000cc'}}>
-              {text}
-            </Text>
-          </View>
 
-          {children}
+            {children}
+          </View>
         </View>
-      </View>
-    </Modal>
+      </Modal>
+    </>
   );
 };
 const styles = StyleSheet.create({
