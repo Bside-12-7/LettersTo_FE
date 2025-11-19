@@ -125,7 +125,7 @@ export function PolicyConsent({navigation}: Props) {
         consents.push({
           termsType: 'MARKETING',
           termsVersionNumber: marketingVersion,
-          agreed: privacy,
+          agreed: marketing,
           requestedAt: now,
         });
       }
