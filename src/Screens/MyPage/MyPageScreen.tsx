@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useReducer} from 'react';
+import React, {useCallback, useEffect, useMemo, useReducer, useState} from 'react';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {
   View,
@@ -10,6 +10,8 @@ import {
   ScrollView,
   Linking,
   Platform,
+  Modal,
+  SafeAreaView,
 } from 'react-native';
 import {useMutation, useQuery, useQueryClient} from 'react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,11 +20,13 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {getUserInfo} from '@apis/member';
 import {useAuthAction} from '@stores/auth';
 import {SCREEN_HEIGHT, SCREEN_WIDTH} from '@constants/screen';
-import {onPressPrivacyPolicy, onPressTermsOfService} from '@utils/hyperlink';
+import {BASE_URL_TEST} from '@constants/common';
+import {WebView} from 'react-native-webview';
 
 import {ListItem, ListName} from '@components/MyPage/MyPageList';
 import {Header2} from '@components/Headers/Header2';
 import {BottomButton} from '@components/Button/Bottom/BottomButton';
+import {BackButton} from '@components/Button/Header/BackButton';
 import {Profile} from '@components/MyPage/ProfileView';
 import {EditNicknameButton} from '@components/MyPage/EditNicknameButton';
 import {StampBox} from '@components/MyPage/StampBox';
@@ -108,6 +112,9 @@ export const MyPage = ({navigation}: Props) => {
     INITIAL_MODAL_STATE,
   );
 
+  const [webViewVisible, setWebViewVisible] = useState(false);
+  const [webViewUrl, setWebViewUrl] = useState('');
+
   const queryClient = useQueryClient();
   const {data: termsData} = useQuery('terms', getTerms);
 
@@ -132,6 +139,23 @@ export const MyPage = ({navigation}: Props) => {
 
   const toggleModal = (modalName: ModalName) => () =>
     dispatch({type: `TOGGLE_${modalName}_MODAL`});
+
+  const openTermsWebView = useCallback((termsType: string) => {
+    setWebViewUrl(`${BASE_URL_TEST}/terms/html?termsType=${termsType}`);
+    setWebViewVisible(true);
+  }, []);
+
+  const closeWebView = useCallback(() => {
+    setWebViewVisible(false);
+  }, []);
+
+  const onPressTermsOfService = useCallback(() => {
+    openTermsWebView('TERMS_OF_SERVICE');
+  }, [openTermsWebView]);
+
+  const onPressPrivacyPolicy = useCallback(() => {
+    openTermsWebView('PRIVACY');
+  }, [openTermsWebView]);
 
   const goBack = useCallback(() => {
     navigation.pop();
@@ -374,6 +398,18 @@ export const MyPage = ({navigation}: Props) => {
         onPressClose={toggleModal(MODAL_NAME.LOGOUT)}
         onPressLogout={onPressLogout}
       />
+
+      <Modal
+        visible={webViewVisible}
+        animationType="slide"
+        onRequestClose={closeWebView}>
+        <SafeAreaView style={{flex: 1}}>
+          <View style={styles.webViewHeader}>
+            <BackButton color="blue" onPress={closeWebView} />
+          </View>
+          <WebView source={{uri: webViewUrl}} style={{flex: 1}} />
+        </SafeAreaView>
+      </Modal>
     </View>
   );
 };
@@ -437,4 +473,11 @@ const styles = StyleSheet.create({
   },
   avatarText: {fontFamily: 'Galmuri11-Bold', fontSize: 13, color: '#0000CC'},
   feedbackButton: {margin: 16},
+  webViewHeader: {
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
 });
