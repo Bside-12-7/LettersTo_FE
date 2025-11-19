@@ -16,14 +16,12 @@ import {
   login as loginWithKakaoOAuth,
 } from '@react-native-seoul/kakao-login';
 import appleAuth from '@invertase/react-native-apple-authentication';
-import {onPressPrivacyPolicy, onPressTermsOfService} from '@utils/hyperlink';
 
 import Toast from '@components/Toast/toast';
 import {ProviderToken} from '@type/auth';
 import {useAuthAction} from '@stores/auth';
 import {AuthButton} from '@components/Auth/AuthButton';
 import {Logo} from '@components/Logo/LogoAnimation';
-import {PolicyNotice} from '@components/Auth/PolicyNoticeText';
 
 const kakaoLogo = require('@assets/Image/social/kakao.png');
 const appleLogo = require('@assets/Image/social/apple.png');
@@ -136,10 +134,6 @@ export function Auth({navigation}: Props) {
             />
           )}
         </View>
-        <PolicyNotice
-          onPressPrivacyPolicy={onPressPrivacyPolicy}
-          onPressTermsOfService={onPressTermsOfService}
-        />
       </SafeAreaView>
     </View>
   );
