@@ -99,7 +99,6 @@ async function logRequestResult(response: AxiosResponse) {
     [response.config.baseURL, response.config.url].join(''),
     '|',
     response.status,
-    ...(accessToken ? ['|', accessToken] : []),
   ];
 
   if (response.status !== 200) {

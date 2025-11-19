@@ -23,6 +23,7 @@ type Props = NativeStackScreenProps<StackParamsList, 'Splash'>;
 
 export function Splash({}: Props) {
   const authAction = useAuthAction();
+  const [updateCheckComplete, setUpdateCheckComplete] = useState(false);
   const [showForceUpdate, setShowForceUpdate] = useState(false);
 
   // 강제 업데이트 체크
@@ -42,6 +43,11 @@ export function Splash({}: Props) {
         setShowForceUpdate(result.shouldForceUpdate);
       } catch (error) {
         console.error('Failed to check force update:', error);
+        // 에러 발생 시에도 앱 진입 허용 (관대한 정책)
+        setShowForceUpdate(false);
+      } finally {
+        // 성공/실패 여부와 관계없이 체크 완료 표시
+        setUpdateCheckComplete(true);
       }
     };
 
@@ -63,6 +69,7 @@ export function Splash({}: Props) {
     'login',
     loginWithStoredToken,
     {
+      enabled: updateCheckComplete && !showForceUpdate,
       retry: false,
       onError: (error: any) => {
         console.error('Query Error: ', error.message);
@@ -118,12 +125,14 @@ export function Splash({}: Props) {
 
   return (
     <View style={styles.container}>
-      <ActivityIndicator
-        animating={true}
-        color={'#6990F7'}
-        size={'large'}
-        style={styles.activityIndicator}
-      />
+      {!showForceUpdate && (
+        <ActivityIndicator
+          animating={true}
+          color={'#6990F7'}
+          size={'large'}
+          style={styles.activityIndicator}
+        />
+      )}
       <ForceUpdateModal
         isVisible={showForceUpdate}
         onPressUpdate={handlePressUpdate}
