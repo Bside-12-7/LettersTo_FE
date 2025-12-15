@@ -83,11 +83,11 @@ export function Splash({}: Props) {
         // 약관 동의 여부 확인
         try {
           const termsConsent = await getMemberTermsConsent();
-          // 필수 약관(이용약관, 개인정보)이 모두 false인지 확인
-          const requiredTermsNotAgreed =
-            termsConsent.TERMS_OF_SERVICE === false &&
-            termsConsent.PRIVACY === false;
-          authAction.setTermsAgreed(!requiredTermsNotAgreed);
+          // 필수 약관(이용약관, 개인정보)이 모두 동의했는지 확인
+          const requiredTermsAgreed =
+            termsConsent.TERMS_OF_SERVICE === true &&
+            termsConsent.PRIVACY === true;
+          authAction.setTermsAgreed(requiredTermsAgreed);
         } catch (error) {
           console.error('Failed to fetch terms consent:', error);
           authAction.setTermsAgreed(false);
