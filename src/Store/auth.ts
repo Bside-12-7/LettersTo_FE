@@ -79,9 +79,24 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
         const userInfo = await getUserInfo();
 
+        // 로그인 성공 시 약관 동의 여부 확인
+        let requiredTermsAgreed = false;
+        try {
+          const {getMemberTermsConsent} = await import('../APIs/terms');
+          const termsConsent = await getMemberTermsConsent();
+          requiredTermsAgreed =
+            termsConsent.TERMS_OF_SERVICE === true &&
+            termsConsent.PRIVACY === true;
+        } catch (termsError: any) {
+          console.error('Failed to fetch terms consent:', termsError.message);
+          requiredTermsAgreed = false;
+        }
+
+        // isLoggedIn과 termsAgreed를 동시에 설정
         set(() => ({
           isLoggedIn: true,
           userInfo: {...userInfo},
+          termsAgreed: requiredTermsAgreed,
         }));
 
         sendAttendance();

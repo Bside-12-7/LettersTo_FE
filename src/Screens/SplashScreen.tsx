@@ -10,7 +10,6 @@ import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useAuthAction} from '@stores/auth';
 import type {StackParamsList} from '@type/stackParamList';
 import mobileAds from 'react-native-google-mobile-ads';
-import {getMemberTermsConsent} from '@apis/terms';
 import {checkForcedUpdate} from '@apis/appVersion';
 import {ForceUpdateModal} from '@components/Modals/ForceUpdateModal';
 import DeviceInfo from 'react-native-device-info';
@@ -77,21 +76,8 @@ export function Splash({}: Props) {
       .then(async () => {
         mobileAds().setAppMuted(true);
 
-        // 자동 로그인 시도
+        // 자동 로그인 시도 (내부에서 약관 동의 여부도 함께 확인함)
         await authAction.loginWithExistTokens();
-
-        // 약관 동의 여부 확인
-        try {
-          const termsConsent = await getMemberTermsConsent();
-          // 필수 약관(이용약관, 개인정보)이 모두 동의했는지 확인
-          const requiredTermsAgreed =
-            termsConsent.TERMS_OF_SERVICE === true &&
-            termsConsent.PRIVACY === true;
-          authAction.setTermsAgreed(requiredTermsAgreed);
-        } catch (error) {
-          console.error('Failed to fetch terms consent:', error);
-          authAction.setTermsAgreed(false);
-        }
       });
   }, [authAction, showForceUpdate, updateCheckComplete]);
 
