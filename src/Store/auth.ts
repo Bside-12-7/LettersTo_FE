@@ -14,7 +14,9 @@ interface AuthStore {
   registerInfo: RegisterInfo;
 
   action: {
-    setConsentsInRegisterInfo: (consents: RegisterInfo['consents']) => void;
+    setConsentsInRegisterInfo: (
+      consents: RegisterInfo['termsConsents'],
+    ) => void;
     loginWithExistTokens: () => void;
     initRegisterInfo: (registerToken: string) => void;
     setNicknameInRegisterInfo: (nickname: string) => void;
@@ -37,7 +39,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   termsAgreed: null,
 
   userInfo: {
+    id: 0,
     nickname: '',
+    safeNickname: '',
     personalityIds: [],
     topicIds: [],
     geolocationId: 0,
@@ -51,7 +55,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     geolocationId: 0,
     topicIds: [],
     personalityIds: [],
-    consents: [],
+    termsConsents: [],
   },
 
   action: {
@@ -105,7 +109,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           geolocationId: 0,
           topicIds: [],
           personalityIds: [],
-          consents: [],
+          termsConsents: [],
         },
       })),
     setNicknameInRegisterInfo: nickname =>
@@ -124,9 +128,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       set(state => ({
         registerInfo: {...state.registerInfo, geolocationId},
       })),
-    setConsentsInRegisterInfo: consents =>
+    setConsentsInRegisterInfo: termsConsents =>
       set(state => ({
-        registerInfo: {...state.registerInfo, consents},
+        registerInfo: {...state.registerInfo, termsConsents},
       })),
     signup: async () => {
       const {registerInfo} = get();

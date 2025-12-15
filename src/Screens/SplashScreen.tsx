@@ -1,5 +1,4 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {useQuery} from 'react-query';
 import {
   ActivityIndicator,
   View,
@@ -9,9 +8,6 @@ import {
 } from 'react-native';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useAuthAction} from '@stores/auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {getUserInfo} from '@apis/member';
-import {sendAttendance} from '@apis/attendances';
 import type {StackParamsList} from '@type/stackParamList';
 import mobileAds from 'react-native-google-mobile-ads';
 import {getMemberTermsConsent} from '@apis/terms';
@@ -21,13 +17,26 @@ import DeviceInfo from 'react-native-device-info';
 
 type Props = NativeStackScreenProps<StackParamsList, 'Splash'>;
 
+// 앱 전체에서 한 번만 강제 업데이트 체크하도록 전역 플래그
+let forceUpdateChecked = false;
+let forceUpdateResult = false;
+
 export function Splash({}: Props) {
   const authAction = useAuthAction();
-  const [updateCheckComplete, setUpdateCheckComplete] = useState(false);
-  const [showForceUpdate, setShowForceUpdate] = useState(false);
+  const [updateCheckComplete, setUpdateCheckComplete] = useState(
+    forceUpdateChecked,
+  );
+  const [showForceUpdate, setShowForceUpdate] = useState(forceUpdateResult);
 
-  // 강제 업데이트 체크
+  // 강제 업데이트 체크 (앱 최초 실행 시 1회만)
   useEffect(() => {
+    if (forceUpdateChecked) {
+      // 이미 체크했으면 저장된 결과 사용
+      setUpdateCheckComplete(true);
+      setShowForceUpdate(forceUpdateResult);
+      return;
+    }
+
     const checkUpdate = async () => {
       try {
         const platform = Platform.OS === 'ios' ? 'IOS' : 'ANDROID';
@@ -40,13 +49,16 @@ export function Splash({}: Props) {
           currentBuildNumber,
         });
 
+        forceUpdateResult = result.shouldForceUpdate;
         setShowForceUpdate(result.shouldForceUpdate);
       } catch (error) {
         console.error('Failed to check force update:', error);
         // 에러 발생 시에도 앱 진입 허용 (관대한 정책)
+        forceUpdateResult = false;
         setShowForceUpdate(false);
       } finally {
         // 성공/실패 여부와 관계없이 체크 완료 표시
+        forceUpdateChecked = true;
         setUpdateCheckComplete(true);
       }
     };
@@ -54,32 +66,9 @@ export function Splash({}: Props) {
     checkUpdate();
   }, []);
 
-  const loginWithStoredToken = useCallback(async () => {
-    const [accessToken, refreshToken] = await Promise.all([
-      AsyncStorage.getItem('accessToken'),
-      AsyncStorage.getItem('refreshToken'),
-    ]);
-    if (!accessToken || !refreshToken) {
-      return Promise.reject('저장된 토큰 없음');
-    }
-    return getUserInfo();
-  }, []);
-
-  const {isError, isLoading, isSuccess} = useQuery(
-    'login',
-    loginWithStoredToken,
-    {
-      enabled: updateCheckComplete && !showForceUpdate,
-      retry: false,
-      onError: (error: any) => {
-        console.error('Query Error: ', error.message);
-      },
-    },
-  );
-
   useEffect(() => {
     // 강제 업데이트가 필요한 경우 로그인 로직 실행 안 함
-    if (showForceUpdate) {
+    if (showForceUpdate || !updateCheckComplete) {
       return;
     }
 
@@ -87,30 +76,24 @@ export function Splash({}: Props) {
       .initialize()
       .then(async () => {
         mobileAds().setAppMuted(true);
-        if (!isLoading) {
-          if (isSuccess) {
-            authAction.login();
-            sendAttendance().catch(() => {});
 
-            // 약관 동의 여부 확인
-            try {
-              const termsConsent = await getMemberTermsConsent();
-              // 필수 약관(이용약관, 개인정보)이 모두 false인지 확인
-              const requiredTermsNotAgreed =
-                termsConsent.TERMS_OF_SERVICE === false &&
-                termsConsent.PRIVACY === false;
-              authAction.setTermsAgreed(!requiredTermsNotAgreed);
-            } catch (error) {
-              console.error('Failed to fetch terms consent:', error);
-              authAction.setTermsAgreed(true); // 실패 시 기본값 true
-            }
-          } else {
-            authAction.setTermsAgreed(false);
-          }
-          authAction.endLoading();
+        // 자동 로그인 시도
+        await authAction.loginWithExistTokens();
+
+        // 약관 동의 여부 확인
+        try {
+          const termsConsent = await getMemberTermsConsent();
+          // 필수 약관(이용약관, 개인정보)이 모두 false인지 확인
+          const requiredTermsNotAgreed =
+            termsConsent.TERMS_OF_SERVICE === false &&
+            termsConsent.PRIVACY === false;
+          authAction.setTermsAgreed(!requiredTermsNotAgreed);
+        } catch (error) {
+          console.error('Failed to fetch terms consent:', error);
+          authAction.setTermsAgreed(false);
         }
       });
-  }, [isSuccess, isError, isLoading, authAction, showForceUpdate]);
+  }, [authAction, showForceUpdate, updateCheckComplete]);
 
   const handlePressUpdate = useCallback(() => {
     const storeUrl = Platform.select({
