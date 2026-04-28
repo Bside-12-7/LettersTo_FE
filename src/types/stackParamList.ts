@@ -1,12 +1,5 @@
 import {LetterBoxType} from './types';
 
-// Bottom Tab Navigator 타입 정의
-export interface BottomTabParamList {
-  [key: string]: any;
-  Home: undefined;
-  LetterBox: undefined;
-}
-
 export interface StackParamsList {
   [keys: string]: any;
 
@@ -25,6 +18,7 @@ export interface StackParamsList {
         type: LetterBoxType;
         fromMemberId: number;
       };
+  LetterBoxList: undefined;
   LetterBoxDetail: {
     id: number;
     fromMemberId: number;
