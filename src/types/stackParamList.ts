@@ -9,6 +9,9 @@ export interface StackParamsList {
   // 메인 서비스 스택
   Main: undefined;
   RealtimeChat: undefined;
+  ChatRoom: {
+    roomId: number;
+  };
 
   // 편지 관련 스택
   LetterViewer:

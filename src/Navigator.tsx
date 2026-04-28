@@ -9,6 +9,9 @@ import {Splash} from '@screens/SplashScreen';
 import {Main} from '@screens/Main/MainScreen';
 import {RealtimeChat} from '@screens/Main/RealtimeChatScreen';
 
+// 채팅 스크린
+import {ChatRoomScreen} from '@screens/Chat/ChatRoomScreen';
+
 // 편지 관련 스크린
 import {LetterViewer} from '@screens/Letter/LetterViewerScreen';
 import {LetterBoxDetail} from '@screens/LetterBox/LetterBoxDetail';
@@ -69,68 +72,72 @@ export default function StackNavigator() {
         ) : (
           <Stack.Group screenOptions={{headerShown: false}}>
             <Stack.Screen name={SCREEN_NAMES.MAIN.MAIN} component={Main} />
-            <Stack.Screen name={SCREEN_NAMES.MAIN.REALTIME_CHAT} component={RealtimeChat} />
-          <Stack.Screen
-            name={SCREEN_NAMES.LETTER_VIEWER}
-            component={LetterViewer}
-          />
-          <Stack.Screen
-            name={SCREEN_NAMES.LETTER_BOX_DETAIL}
-            component={LetterBoxDetail}
-          />
+            <Stack.Screen
+              name={SCREEN_NAMES.MAIN.REALTIME_CHAT}
+              component={RealtimeChat}
+            />
+            <Stack.Screen name="ChatRoom" component={ChatRoomScreen} />
+            <Stack.Screen
+              name={SCREEN_NAMES.LETTER_VIEWER}
+              component={LetterViewer}
+            />
+            <Stack.Screen
+              name={SCREEN_NAMES.LETTER_BOX_DETAIL}
+              component={LetterBoxDetail}
+            />
 
-          {/* 회원정보 수정 */}
-          <Stack.Screen name={SCREEN_NAMES.MY_PAGE} component={MyPage} />
-          <Stack.Screen
-            name={SCREEN_NAMES.ACCOUNT_DELETE}
-            component={AccountDelete}
-          />
-          <Stack.Screen
-            name={SCREEN_NAMES.ADDRESS_MANAGE}
-            component={AddressManage}
-          />
+            {/* 회원정보 수정 */}
+            <Stack.Screen name={SCREEN_NAMES.MY_PAGE} component={MyPage} />
+            <Stack.Screen
+              name={SCREEN_NAMES.ACCOUNT_DELETE}
+              component={AccountDelete}
+            />
+            <Stack.Screen
+              name={SCREEN_NAMES.ADDRESS_MANAGE}
+              component={AddressManage}
+            />
 
-          {/* 편지 작성 */}
-          <Stack.Screen
-            name={SCREEN_NAMES.LETTER_EDITOR}
-            component={LetterEditor}
-            options={{
-              gestureEnabled: false,
-            }}
-          />
-          <Stack.Screen
-            name={SCREEN_NAMES.COVER_DELIVERY_SELECTOR}
-            component={CoverDeliverySelector}
-          />
-          <Stack.Screen
-            name={SCREEN_NAMES.COVER_TOPIC_EDITOR}
-            component={CoverTopicEditor}
-          />
-          <Stack.Screen
-            name={SCREEN_NAMES.COVER_PERSONALITY_EDITOR}
-            component={CoverPersonalityEditor}
-          />
-          <Stack.Screen
-            name={SCREEN_NAMES.COVER_STAMP_SELECTOR}
-            component={CoverStampSelector}
-          />
-          <Stack.Screen
-            name={SCREEN_NAMES.LETTER_COMPLETE}
-            component={LetterComplete}
-          />
+            {/* 편지 작성 */}
+            <Stack.Screen
+              name={SCREEN_NAMES.LETTER_EDITOR}
+              component={LetterEditor}
+              options={{
+                gestureEnabled: false,
+              }}
+            />
+            <Stack.Screen
+              name={SCREEN_NAMES.COVER_DELIVERY_SELECTOR}
+              component={CoverDeliverySelector}
+            />
+            <Stack.Screen
+              name={SCREEN_NAMES.COVER_TOPIC_EDITOR}
+              component={CoverTopicEditor}
+            />
+            <Stack.Screen
+              name={SCREEN_NAMES.COVER_PERSONALITY_EDITOR}
+              component={CoverPersonalityEditor}
+            />
+            <Stack.Screen
+              name={SCREEN_NAMES.COVER_STAMP_SELECTOR}
+              component={CoverStampSelector}
+            />
+            <Stack.Screen
+              name={SCREEN_NAMES.LETTER_COMPLETE}
+              component={LetterComplete}
+            />
 
-          {/* 알림 */}
-          <Stack.Screen
-            name={SCREEN_NAMES.NOTIFICATIONS}
-            component={Notifications}
-          />
+            {/* 알림 */}
+            <Stack.Screen
+              name={SCREEN_NAMES.NOTIFICATIONS}
+              component={Notifications}
+            />
 
-          {/* 우표 */}
-          <Stack.Screen
-            name={SCREEN_NAMES.STAMP_HISTORY}
-            component={StampHistory}
-          />
-        </Stack.Group>
+            {/* 우표 */}
+            <Stack.Screen
+              name={SCREEN_NAMES.STAMP_HISTORY}
+              component={StampHistory}
+            />
+          </Stack.Group>
         )
       ) : (
         <Stack.Group>

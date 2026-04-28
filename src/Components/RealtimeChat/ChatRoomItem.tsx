@@ -35,7 +35,10 @@ export const ChatRoomItem = ({room, onPress}: Props) => {
     <View style={styles.container}>
       <View style={styles.leftSection}>
         <Text
-          style={[styles.statusLabel, {color: getCongestionColor(room.congestion)}]}>
+          style={[
+            styles.statusLabel,
+            {color: getCongestionColor(room.congestion)},
+          ]}>
           {getCongestionLabel(room.congestion)}
         </Text>
         <Text style={styles.roomTitle}>{room.name}</Text>

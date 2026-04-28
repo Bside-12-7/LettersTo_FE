@@ -285,3 +285,21 @@ export interface ChatRoom {
 }
 
 export type ChatRooms = ChatRoom[];
+
+export type ChatTicketStatus = 'NONE' | 'ACTIVE' | 'EXPIRED' | 'KICKED';
+
+export interface ChatTicket {
+  status: ChatTicketStatus;
+  ticketId?: number;
+  issuedAt?: string;
+  expiresAt?: string;
+}
+
+export interface ChatTicketIssueResult {
+  ticketId: number;
+  chatRoomId: number;
+  status: 'ACTIVE' | 'EXPIRED' | 'KICKED';
+  issuedAt: string;
+  expiresAt: string;
+  alreadyIssued: boolean;
+}
