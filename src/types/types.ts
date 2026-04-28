@@ -272,3 +272,16 @@ export interface Friend {
   address: string;
   addressId: number;
 }
+
+export type Congestion = 'LOW' | 'MEDIUM' | 'HIGH';
+
+export interface ChatRoom {
+  id: number;
+  name: string;
+  description: string;
+  capacity: number;
+  participantCount: number;
+  congestion: Congestion;
+}
+
+export type ChatRooms = ChatRoom[];
