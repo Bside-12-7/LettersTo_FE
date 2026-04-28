@@ -26,7 +26,7 @@ export const InsufficientStampModal = React.memo(
         animationType="fade"
         transparent={true}
         onRequestClose={onPressClose}
-        visible={true}>
+        visible={isVisible}>
         <View style={styles.container}>
           <View style={styles.modal}>
             <TouchableOpacity
