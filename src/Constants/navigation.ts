@@ -5,6 +5,7 @@ export const SCREEN_NAMES = {
     MAIN: 'Main',
     Home: 'Home',
     LETTER_BOX: 'LetterBox',
+    REALTIME_CHAT: 'RealtimeChat',
   },
 
   LETTER_VIEWER: 'LetterViewer',

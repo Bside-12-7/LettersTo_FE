@@ -15,6 +15,7 @@ import {useFocusEffect} from '@react-navigation/native';
 import {registerPushNotificationToken} from '@apis/push';
 import messaging from '@react-native-firebase/messaging';
 import deviceInfo from 'react-native-device-info';
+import {SCREEN_NAMES} from '@constants/navigation';
 
 type Props = NativeStackScreenProps<StackParamsList, 'Main'>;
 
@@ -59,6 +60,10 @@ export const Main = ({navigation}: Props) => {
     setSelectedScreen('LetterBox');
   }, []);
 
+  const goToRealtimeChat = useCallback(() => {
+    navigation.navigate(SCREEN_NAMES.MAIN.REALTIME_CHAT);
+  }, [navigation]);
+
   const queryClient = useQueryClient();
 
   const {logScreenNameWithoutNavigation} = useAnalytics();
@@ -92,6 +97,7 @@ export const Main = ({navigation}: Props) => {
         currentScreen={selectedScreen}
         onPressHome={goToHome}
         onPressLetterBox={goToLetterBox}
+        onPressRealtimeChat={goToRealtimeChat}
       />
     </View>
   );

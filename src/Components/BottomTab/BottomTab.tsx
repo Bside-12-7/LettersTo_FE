@@ -5,15 +5,17 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 const triangleImg = require('@assets/Icon/tool/bottomTabButtonEdge.png');
 
 interface Params {
-  currentScreen: 'Home' | 'LetterBox';
+  currentScreen: 'Home' | 'LetterBox' | 'RealtimeChat';
   onPressHome: () => void;
   onPressLetterBox: () => void;
+  onPressRealtimeChat: () => void;
 }
 
 export const BottomTab = ({
   currentScreen,
   onPressHome,
   onPressLetterBox,
+  onPressRealtimeChat,
 }: Params) => {
   const {bottom: SAFE_AREA_BOTTOM} = useSafeAreaInsets();
 
@@ -65,6 +67,17 @@ export const BottomTab = ({
             </View>
           </Pressable>
         )}
+        <Pressable onPress={onPressRealtimeChat}>
+          <View style={styles.tabInactive}>
+            {currentScreen === 'LetterBox' && (
+              <Image
+                source={triangleImg}
+                style={[styles.triangle, {left: 0, transform: [{scaleX: -1}]}]}
+              />
+            )}
+            <Text style={styles.tabInactiveText}>실시간 통신</Text>
+          </View>
+        </Pressable>
       </View>
     </View>
   );
@@ -90,7 +103,7 @@ const styles = StyleSheet.create({
   tabActive: {
     position: 'relative',
     left: 0,
-    width: 164,
+    width: 120,
     height: 45,
     alignItems: 'center',
     justifyContent: 'center',
@@ -99,7 +112,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 10,
   },
   tabInactive: {
-    width: 164,
+    width: 120,
     height: 38,
     alignItems: 'center',
     justifyContent: 'center',

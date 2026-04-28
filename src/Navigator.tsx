@@ -7,6 +7,7 @@ import {Splash} from '@screens/SplashScreen';
 
 // 메인 서비스 스크린
 import {Main} from '@screens/Main/MainScreen';
+import {RealtimeChat} from '@screens/Main/RealtimeChatScreen';
 
 // 편지 관련 스크린
 import {LetterViewer} from '@screens/Letter/LetterViewerScreen';
@@ -68,6 +69,7 @@ export default function StackNavigator() {
         ) : (
           <Stack.Group screenOptions={{headerShown: false}}>
             <Stack.Screen name={SCREEN_NAMES.MAIN.MAIN} component={Main} />
+            <Stack.Screen name={SCREEN_NAMES.MAIN.REALTIME_CHAT} component={RealtimeChat} />
           <Stack.Screen
             name={SCREEN_NAMES.LETTER_VIEWER}
             component={LetterViewer}
