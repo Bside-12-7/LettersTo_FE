@@ -22,13 +22,18 @@ import {useQuery} from 'react-query';
 import {getUserInfo} from '@apis/member';
 
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import type {StackParamsList} from '@type/stackParamList';
+import type {CompositeNavigationProp} from '@react-navigation/native';
+import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
+import type {StackParamsList, BottomTabParamList} from '@type/stackParamList';
 import {useFeedbackStore} from '@stores/feedback';
 import {FeedbackButton} from '@components/Feedback/FeedbackButton';
 import {SelectLetterToWriteModal} from '@components/Modals/Letter/SelectLetterToWriteModal';
 
 type Props = {
-  navigation: NativeStackNavigationProp<StackParamsList, 'Main', undefined>;
+  navigation: CompositeNavigationProp<
+    BottomTabNavigationProp<BottomTabParamList, 'Home'>,
+    NativeStackNavigationProp<StackParamsList>
+  >;
 };
 
 export function Home({navigation}: Props) {

@@ -1,6 +1,8 @@
 import React, {useRef, useState} from 'react';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import type {StackParamsList} from '@type/stackParamList';
+import type {CompositeNavigationProp} from '@react-navigation/native';
+import type {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
+import type {StackParamsList, BottomTabParamList} from '@type/stackParamList';
 import {
   StyleSheet,
   View,
@@ -27,11 +29,17 @@ import {DeleteFriendModal} from '@components/Modals/MyPage/AddressManage/DeleteF
 import {ModalBlur} from '@components/Modals/ModalBlur';
 
 type Props = {
-  navigation: NativeStackNavigationProp<StackParamsList, 'Main', undefined>;
-  onPressHome: () => void;
+  navigation: CompositeNavigationProp<
+    BottomTabNavigationProp<BottomTabParamList, 'LetterBox'>,
+    NativeStackNavigationProp<StackParamsList>
+  >;
 };
 
-export function LetterBoxList({navigation, onPressHome}: Props) {
+export function LetterBoxList({navigation}: Props) {
+  // Home 탭으로 이동
+  const goToHome = () => {
+    navigation.navigate('Home');
+  };
   const queryClient = useQueryClient();
   const flatListRef = useRef<FlatList<LetterBox>>(null);
   const {top: SAFE_AREA_TOP} = useSafeAreaInsets();
@@ -84,7 +92,7 @@ export function LetterBoxList({navigation, onPressHome}: Props) {
       <Text style={styles.emptyText}>
         아직 주고받은 편지가 없어요!{'\n'}답장할 편지를 찾아볼까요?
       </Text>
-      <Pressable style={styles.emptyBtn} onPress={onPressHome}>
+      <Pressable style={styles.emptyBtn} onPress={goToHome}>
         <LinearGradient
           colors={['#FF6ECE', '#FF3DBD']}
           style={styles.emptyBtnBg}>

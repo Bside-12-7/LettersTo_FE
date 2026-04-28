@@ -1,21 +1,40 @@
 import React from 'react';
 import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import type {BottomTabBarProps} from '@react-navigation/bottom-tabs';
 
 const triangleImg = require('@assets/Icon/tool/bottomTabButtonEdge.png');
 
-interface Params {
-  currentScreen: 'Home' | 'LetterBox';
-  onPressHome: () => void;
-  onPressLetterBox: () => void;
+interface CustomTabBarProps extends BottomTabBarProps {
+  onTabChange?: (screen: 'Home' | 'LetterBox') => void;
 }
 
 export const BottomTab = ({
-  currentScreen,
-  onPressHome,
-  onPressLetterBox,
-}: Params) => {
+  state,
+  navigation,
+  onTabChange,
+}: CustomTabBarProps) => {
   const {bottom: SAFE_AREA_BOTTOM} = useSafeAreaInsets();
+
+  // state에서 현재 탭 추출
+  const currentIndex = state.index;
+  const currentScreen = state.routes[currentIndex].name as 'Home' | 'LetterBox';
+
+  // Analytics를 위해 탭 변경 알림
+  React.useEffect(() => {
+    if (onTabChange) {
+      onTabChange(currentScreen);
+    }
+  }, [currentScreen, onTabChange]);
+
+  // 탭 전환 핸들러
+  const onPressHome = () => {
+    navigation.navigate('Home');
+  };
+
+  const onPressLetterBox = () => {
+    navigation.navigate('LetterBox');
+  };
 
   return (
     <View style={[styles.tabBottom, {height: SAFE_AREA_BOTTOM || 12}]}>
