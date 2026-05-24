@@ -15,7 +15,6 @@ import {
 } from 'react-native';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import type {StackParamsList} from '@type/stackParamList';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useInfiniteQuery, useQueryClient} from 'react-query';
 import EventSource from 'react-native-sse';
 import * as ImagePicker from 'expo-image-picker';
@@ -43,7 +42,6 @@ const HEARTBEAT_TIMEOUT = 90000; // 90초
 
 export const ChatRoomScreen = ({route, navigation}: Props) => {
   const {roomId, roomName} = route.params;
-  const {bottom: SAFE_AREA_BOTTOM} = useSafeAreaInsets();
   const queryClient = useQueryClient();
 
   // 사용자 정보
@@ -339,17 +337,28 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
   }, [roomId]);
 
   // 텍스티콘 토글
+  // - 진입: 키보드 dismiss → 슬라이드 다운 후 패널 노출 (300ms) → input 포커스 복원
+  //   (showSoftInputOnFocus={!texticonMode} 이므로 키보드는 안 올라오고 커서만 유지)
+  // - 해제: 패널 닫고 input focus → showSoftInputOnFocus 가 다시 true 라 키보드 복귀
   const toggleTexticonMode = useCallback(() => {
     if (texticonMode) {
       setTexticonMode(false);
-      inputRef.current?.focus();
+      inputRef.current?.blur();
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 1);
     } else {
       Keyboard.dismiss();
-      setTexticonMode(true);
+      setTimeout(() => {
+        setTexticonMode(true);
+      }, 300);
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 600);
     }
   }, [texticonMode]);
 
-  // 텍스티콘 삽입
+  // 텍스티콘 삽입 — 패널 유지, 연속 삽입 허용
   const insertTexticonAtCursor = useCallback(
     (texticon: string) => {
       const {start, end} = cursorPosition.current;
@@ -357,15 +366,8 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
         inputText.substring(0, start) + texticon + inputText.substring(end);
       setInputText(newText);
 
-      // 커서 위치 업데이트
       const newCursorPos = start + texticon.length;
       cursorPosition.current = {start: newCursorPos, end: newCursorPos};
-
-      // 텍스티콘 선택 후 키보드로 복귀
-      setTexticonMode(false);
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 100);
     },
     [inputText],
   );

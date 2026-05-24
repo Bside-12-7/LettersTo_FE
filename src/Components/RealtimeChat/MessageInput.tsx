@@ -78,6 +78,7 @@ export const MessageInput = React.memo(
               multiline
               maxLength={500}
               editable={!disabled}
+              showSoftInputOnFocus={!texticonMode}
             />
             {texticonMode && (
               <Pressable
