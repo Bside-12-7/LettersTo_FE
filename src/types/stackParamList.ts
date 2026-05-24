@@ -11,6 +11,7 @@ export interface StackParamsList {
   RealtimeChat: undefined;
   ChatRoom: {
     roomId: number;
+    roomName: string;
   };
 
   // 편지 관련 스택

@@ -1,12 +1,23 @@
-type DateFormat = 'yyyy.mm.dd';
+type DateFormat = 'yyyy.mm.dd' | 'yy년 m월 d일' | 'HH:mm';
+
+const pad2 = (n: number) => String(n).padStart(2, '0');
 
 export const dateFormatter = (format: DateFormat, ISO: Date) => {
-  const year = new Date(ISO).getFullYear();
-  const month = new Date(ISO).getMonth() + 1;
-  const date = new Date(ISO).getDate();
+  const d = new Date(ISO);
+  const year = d.getFullYear();
+  const month = d.getMonth() + 1;
+  const date = d.getDate();
 
   if (format === 'yyyy.mm.dd') {
     return `${year}.${month}.${date}`;
+  }
+
+  if (format === 'yy년 m월 d일') {
+    return `${year - 2000}년 ${month}월 ${date}일`;
+  }
+
+  if (format === 'HH:mm') {
+    return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
   }
 };
 

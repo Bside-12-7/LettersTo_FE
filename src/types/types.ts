@@ -303,3 +303,39 @@ export interface ChatTicketIssueResult {
   expiresAt: string;
   alreadyIssued: boolean;
 }
+
+// 채팅 메시지 관련
+export type MessageType = 'USER' | 'SYSTEM_JOIN' | 'SYSTEM_LEAVE';
+
+export interface ChatMessage {
+  id: number;
+  type: MessageType;
+  nickname: string;
+  senderId: number;
+  content: string;
+  pictureFileId?: string; // 사진 메시지일 때
+  sentAt: string; // ISO 8601
+}
+
+// SSE 이벤트 타입
+export interface SSEReadyEvent {
+  chatRoomId: number;
+}
+
+export interface SSEUpdatedEvent {
+  chatRoomId: number;
+  beginMessageId: number;
+  endMessageId: number;
+}
+
+export interface SSEEndedEvent {
+  reason: 'LEAVE' | 'INACTIVE' | 'EVICTED' | 'EXPIRED';
+}
+
+export interface ChatMemberProfile {
+  id: number;
+  nickname: string;
+  region: string;
+  topics: Topic[];
+  personalities: Personality[];
+}
