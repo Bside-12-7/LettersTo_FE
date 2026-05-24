@@ -99,14 +99,17 @@ export const MessageInput = React.memo(
             style={[styles.sendButton, !canSend && styles.sendButtonDisabled]}
             onPress={onSend}
             disabled={!canSend}>
-            {disabled ? <ActivityIndicator size="small" color="white" /> : null}
-            <Image
-              source={arrowUpIcon}
-              style={{
-                height: 12,
-                width: 9,
-              }}
-            />
+            {disabled ? (
+              <ActivityIndicator size="small" color="white" />
+            ) : (
+              <Image
+                source={arrowUpIcon}
+                style={{
+                  height: 12,
+                  width: 9,
+                }}
+              />
+            )}
           </Pressable>
         </View>
       </View>
