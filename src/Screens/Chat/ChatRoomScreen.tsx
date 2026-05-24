@@ -12,6 +12,7 @@ import {
   Keyboard,
   TextInput,
   FlatList,
+  AppState,
 } from 'react-native';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import type {StackParamsList} from '@type/stackParamList';
@@ -60,8 +61,10 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
 
   // Refs
   const sseRef = useRef<EventSource | null>(null);
-  const heartbeatTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const heartbeatTimerRef = useRef<number | null>(null);
   const lastHeartbeatRef = useRef<number>(Date.now());
+  // 한 번이라도 세션이 종료(타임아웃/SSE ended)되면 true — 이후 중복 Alert 방지
+  const sessionEndedRef = useRef<boolean>(false);
   const inputRef = useRef<TextInput>(null);
   const cursorPosition = useRef<{start: number; end: number}>({
     start: 0,
@@ -71,15 +74,12 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
 
   // useInfiniteQuery로 메시지 로드
   // 응답은 DESC(최신 우선). pages[0]가 최신 페이지, 각 page 안에서도 index 0이 최신.
+  // joinChatRoom 은 mount/foreground effect 에서 별도로 호출 — 캐시 히트 시
+  // queryFn 이 실행되지 않아 백엔드 세션 없이 SSE 만 붙는 문제 방지.
   const {data, fetchNextPage, hasNextPage, isFetchingNextPage} =
     useInfiniteQuery(
       ['chatMessages', roomId],
       async ({pageParam}) => {
-        // 첫 페이지 로드 시 채팅방 입장
-        if (!pageParam) {
-          await joinChatRoom(roomId);
-        }
-
         const response = await getChatMessages(roomId, {
           before: pageParam,
           size: 30,
@@ -228,22 +228,20 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
     }
   }, []);
 
-  // 타임아웃 확인
-  const checkTimeout = useCallback(() => {
-    const elapsed = Date.now() - lastHeartbeatRef.current;
-    if (elapsed > HEARTBEAT_TIMEOUT) {
-      Alert.alert(
-        '세션 종료',
-        '연결이 오랫동안 응답하지 않아 세션이 종료되었습니다.',
-        [{text: '확인', onPress: () => navigation.goBack()}],
-      );
-    }
-  }, [navigation]);
+  // 세션 종료 통합 처리 — sessionEndedRef 로 중복 호출 차단.
+  // 첫 호출에서 하트비트 정리/SSE 끊기/Alert 한 번만 노출 → 확인 시 goBack 한 번만 실행.
+  const terminateSession = useCallback(
+    (
+      reason: 'TIMEOUT' | 'LEAVE' | 'INACTIVE' | 'EVICTED' | 'EXPIRED' | string,
+    ) => {
+      if (sessionEndedRef.current) return;
+      sessionEndedRef.current = true;
 
-  // 세션 종료 처리
-  const handleSessionEnded = useCallback(
-    (reason: string) => {
-      const messages: {[key: string]: string} = {
+      stopHeartbeat();
+      disconnectSSE();
+
+      const messages: Record<string, string> = {
+        TIMEOUT: '연결이 오랫동안 응답하지 않아 세션이 종료되었습니다.',
         LEAVE: '채팅방을 나갔습니다.',
         INACTIVE: '활동이 없어 세션이 종료되었습니다.',
         EVICTED: '다른 기기에서 접속하여 세션이 종료되었습니다.',
@@ -254,7 +252,23 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
         {text: '확인', onPress: () => navigation.goBack()},
       ]);
     },
-    [navigation],
+    [disconnectSSE, navigation, stopHeartbeat],
+  );
+
+  // 타임아웃 확인
+  const checkTimeout = useCallback(() => {
+    const elapsed = Date.now() - lastHeartbeatRef.current;
+    if (elapsed > HEARTBEAT_TIMEOUT) {
+      terminateSession('TIMEOUT');
+    }
+  }, [terminateSession]);
+
+  // SSE ended 이벤트 처리
+  const handleSessionEnded = useCallback(
+    (reason: string) => {
+      terminateSession(reason);
+    },
+    [terminateSession],
   );
 
   // 텍스트 메시지 전송
@@ -413,16 +427,45 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
     );
   }, []);
 
-  // 초기화
-  useEffect(() => {
-    connectSSE();
-    startHeartbeat();
+  // 채팅방 입장 + SSE + 하트비트 시작 (재호출 가능)
+  const startChatSession = useCallback(async () => {
+    try {
+      await joinChatRoom(roomId);
+      queryClient.invalidateQueries(['chatMessages', roomId]);
+      lastHeartbeatRef.current = Date.now();
+      await connectSSE();
+      startHeartbeat();
+    } catch (error) {
+      console.error('채팅방 입장 실패:', error);
+      terminateSession('EXPIRED');
+    }
+  }, [connectSSE, queryClient, roomId, startHeartbeat, terminateSession]);
 
+  // 마운트: 세션 시작 / 언마운트: 정리
+  useEffect(() => {
+    sessionEndedRef.current = false;
+    startChatSession();
     return () => {
       disconnectSSE();
       stopHeartbeat();
     };
-  }, [connectSSE, startHeartbeat, disconnectSSE, stopHeartbeat]);
+  }, [startChatSession, disconnectSSE, stopHeartbeat]);
+
+  // 백그라운드/포그라운드 전환 대응
+  // - 백그라운드: SSE/하트비트 정리 (OS 가 어차피 끊으므로 미리 깔끔히)
+  // - 포그라운드 복귀: 세션 종료 상태가 아니라면 재join + 재연결
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', nextState => {
+      if (nextState === 'background' || nextState === 'inactive') {
+        disconnectSSE();
+        stopHeartbeat();
+      } else if (nextState === 'active') {
+        if (sessionEndedRef.current) return;
+        startChatSession();
+      }
+    });
+    return () => sub.remove();
+  }, [disconnectSSE, startChatSession, stopHeartbeat]);
 
   return (
     <View style={styles.container}>
