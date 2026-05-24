@@ -289,36 +289,30 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
         allowsEditing: false,
       });
 
-      if (!result.canceled && result.assets[0]) {
+      // expo-image-picker v13: 단일 선택 시 결과는 ImageInfo (cancelled, uri 등)
+      if (!result.cancelled) {
         setImageUploading(true);
-        const asset = result.assets[0];
 
-        // 파일명 생성
         const filename = `chat_${Date.now()}.jpg`;
 
-        // Presigned URL 발급
-        const uploadData = await getImageUploadUrl(filename);
-        const presignedUrl = uploadData.presignedUrl;
-        const imageUrl = uploadData.url;
+        // Presigned URL 발급 — 응답은 { uploadUrl, id }
+        const presignUrl = await getImageUploadUrl(filename);
 
-        // 이미지 파일 가져오기
-        const response = await fetch(asset.uri);
+        // 이미지 blob 으로 가져오기
+        const response = await fetch(result.uri);
         const blob = await response.blob();
 
-        // S3 업로드
-        await fetch(presignedUrl, {
+        // S3 PUT 업로드
+        await fetch(presignUrl.uploadUrl, {
           method: 'PUT',
           body: blob,
           headers: {
-            'Content-Type': 'image/jpeg',
+            'Content-Type': 'image/*',
           },
         });
 
-        // 파일 ID 추출 (URL에서 /files/ 이후 부분)
-        const fileId = imageUrl.split('/files/')[1];
-
-        // 사진 메시지 전송
-        await sendPictureMessage(roomId, [fileId]);
+        // 사진 메시지 전송 (응답의 id 가 그대로 fileId)
+        await sendPictureMessage(roomId, [presignUrl.id]);
 
         Toast.show('이미지가 전송되었습니다', {
           duration: Toast.durations.SHORT,
