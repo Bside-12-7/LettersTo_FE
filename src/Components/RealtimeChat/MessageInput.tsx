@@ -6,9 +6,11 @@ import {
   Pressable,
   ActivityIndicator,
   Image,
+  Text,
 } from 'react-native';
 
-const keyboardIcon = require('@assets/keyboardDismiss.png');
+const keyboardIcon = require('@assets/Icon/KeyboardDismiss/keyboard_dismiss_blue.png');
+const imageIcon = require('@assets/Icon/Image/image_white.png');
 
 interface Props {
   value: string;
@@ -45,13 +47,21 @@ export const MessageInput = React.memo(
             disabled={disabled}
             hitSlop={8}>
             {/* 이미지 아이콘 자리 */}
+            <Image source={imageIcon} style={{height: 24, width: 24}} />
           </Pressable>
           <Pressable
-            style={[styles.toolButton, texticonMode && styles.toolButtonActive]}
+            style={[styles.toolButton]}
             onPress={onPressTexticon}
             disabled={disabled}
             hitSlop={8}>
-            {/* 텍스티콘 아이콘 자리 */}
+            <Text
+              style={{
+                fontFamily: 'Galmuri11',
+                fontSize: 18,
+                color: '#ffffff',
+              }}>
+              (˙∇˙)
+            </Text>
           </Pressable>
         </View>
 
@@ -96,29 +106,27 @@ export const MessageInput = React.memo(
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#0000AA',
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 12,
+    backgroundColor: '#0000CC',
   },
   toolRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   toolButton: {
-    width: 32,
-    height: 32,
+    minWidth: 24,
+    height: 24,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
   },
-  toolButtonActive: {
-    opacity: 0.6,
-  },
   inputRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
   },
   inputWrapper: {
     flex: 1,
@@ -126,7 +134,7 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: 'white',
-    borderRadius: 24,
+    borderRadius: 8,
     paddingHorizontal: 18,
     paddingVertical: 10,
     fontFamily: 'Galmuri11',

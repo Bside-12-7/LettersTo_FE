@@ -454,12 +454,8 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
           />
 
           {/* 텍스티콘 선택기 (인라인: 키보드 자리 차지) */}
-          {texticonMode ? (
-            <View style={{paddingBottom: SAFE_AREA_BOTTOM}}>
-              <ChatTexticonSelector onSelectTexticon={insertTexticonAtCursor} />
-            </View>
-          ) : (
-            <View style={{height: SAFE_AREA_BOTTOM}} />
+          {texticonMode && (
+            <ChatTexticonSelector onSelectTexticon={insertTexticonAtCursor} />
           )}
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -477,7 +473,7 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0000AA',
+    backgroundColor: '#0000CC',
   },
   safeArea: {
     flex: 1,
