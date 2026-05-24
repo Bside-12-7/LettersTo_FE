@@ -264,9 +264,6 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
     const messageToSend = inputText.trim();
     setInputText('');
     setSendingMessage(true);
-    // 발송 버튼 탭으로 input 이 blur 되어 키보드가 내려가는 것을 막기 위해
-    // 다음 프레임에 포커스를 복원한다.
-    setTimeout(() => inputRef.current?.focus(), 0);
 
     try {
       await sendTextMessage(roomId, messageToSend);
