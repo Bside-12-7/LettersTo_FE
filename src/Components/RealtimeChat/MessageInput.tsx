@@ -11,6 +11,7 @@ import {
 
 const keyboardIcon = require('@assets/Icon/KeyboardDismiss/keyboard_dismiss_blue.png');
 const imageIcon = require('@assets/Icon/Image/image_white.png');
+const arrowUpIcon = require('@assets/arrow_up_white.png');
 
 interface Props {
   value: string;
@@ -46,7 +47,6 @@ export const MessageInput = React.memo(
             onPress={onPressImage}
             disabled={disabled}
             hitSlop={8}>
-            {/* 이미지 아이콘 자리 */}
             <Image source={imageIcon} style={{height: 24, width: 24}} />
           </Pressable>
           <Pressable
@@ -66,10 +66,14 @@ export const MessageInput = React.memo(
         </View>
 
         <View style={styles.inputRow}>
-          <View style={styles.inputWrapper}>
+          <View
+            style={[
+              styles.inputWrapper,
+              texticonMode && styles.inputWrapperWithIcon,
+            ]}>
             <TextInput
               ref={inputRef}
-              style={[styles.input, texticonMode && styles.inputWithIcon]}
+              style={styles.input}
               value={value}
               onChangeText={onChangeText}
               onSelectionChange={onSelectionChange}
@@ -97,7 +101,13 @@ export const MessageInput = React.memo(
             onPress={onSend}
             disabled={!canSend}>
             {disabled ? <ActivityIndicator size="small" color="white" /> : null}
-            {/* 발송 아이콘 자리 */}
+            <Image
+              source={arrowUpIcon}
+              style={{
+                height: 12,
+                width: 9,
+              }}
+            />
           </Pressable>
         </View>
       </View>
@@ -131,21 +141,22 @@ const styles = StyleSheet.create({
   },
   inputWrapper: {
     flex: 1,
-    justifyContent: 'center',
-  },
-  input: {
     backgroundColor: 'white',
     borderRadius: 8,
     paddingHorizontal: 18,
-    paddingVertical: 10,
+    paddingVertical: 6,
+    minHeight: 44,
+    justifyContent: 'center',
+  },
+  inputWrapperWithIcon: {
+    paddingRight: 48,
+  },
+  input: {
+    padding: 0,
     fontFamily: 'Galmuri11',
     fontSize: 14,
     color: '#0000CC',
-    maxHeight: 100,
-    minHeight: 44,
-  },
-  inputWithIcon: {
-    paddingRight: 48,
+    maxHeight: 88,
   },
   keyboardReturn: {
     position: 'absolute',
@@ -162,9 +173,9 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     marginLeft: 8,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 28,
+    height: 28,
+    borderRadius: 6,
     backgroundColor: '#FF44CC',
     justifyContent: 'center',
     alignItems: 'center',
