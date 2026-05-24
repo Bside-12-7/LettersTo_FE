@@ -5,7 +5,10 @@ import {
   StyleSheet,
   Pressable,
   ActivityIndicator,
+  Image,
 } from 'react-native';
+
+const keyboardIcon = require('@assets/keyboardDismiss.png');
 
 interface Props {
   value: string;
@@ -53,18 +56,31 @@ export const MessageInput = React.memo(
         </View>
 
         <View style={styles.inputRow}>
-          <TextInput
-            ref={inputRef}
-            style={styles.input}
-            value={value}
-            onChangeText={onChangeText}
-            onSelectionChange={onSelectionChange}
-            placeholder="메시지 입력"
-            placeholderTextColor="#999999"
-            multiline
-            maxLength={500}
-            editable={!disabled}
-          />
+          <View style={styles.inputWrapper}>
+            <TextInput
+              ref={inputRef}
+              style={[styles.input, texticonMode && styles.inputWithIcon]}
+              value={value}
+              onChangeText={onChangeText}
+              onSelectionChange={onSelectionChange}
+              placeholder="메시지 입력"
+              placeholderTextColor="#999999"
+              multiline
+              maxLength={500}
+              editable={!disabled}
+            />
+            {texticonMode && (
+              <Pressable
+                style={styles.keyboardReturn}
+                onPress={onPressTexticon}
+                hitSlop={8}>
+                <Image
+                  source={keyboardIcon}
+                  style={styles.keyboardReturnIcon}
+                />
+              </Pressable>
+            )}
+          </View>
           <Pressable
             style={[styles.sendButton, !canSend && styles.sendButtonDisabled]}
             onPress={onSend}
@@ -104,8 +120,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  input: {
+  inputWrapper: {
     flex: 1,
+    justifyContent: 'center',
+  },
+  input: {
     backgroundColor: 'white',
     borderRadius: 24,
     paddingHorizontal: 18,
@@ -115,6 +134,22 @@ const styles = StyleSheet.create({
     color: '#0000CC',
     maxHeight: 100,
     minHeight: 44,
+  },
+  inputWithIcon: {
+    paddingRight: 48,
+  },
+  keyboardReturn: {
+    position: 'absolute',
+    right: 10,
+    width: 28,
+    height: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  keyboardReturnIcon: {
+    width: 24,
+    height: 24,
+    resizeMode: 'contain',
   },
   sendButton: {
     marginLeft: 8,

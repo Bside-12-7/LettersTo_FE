@@ -439,28 +439,27 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
           />
 
           {/* 메시지 입력 */}
-          <View style={{paddingBottom: SAFE_AREA_BOTTOM}}>
-            <MessageInput
-              value={inputText}
-              onChangeText={setInputText}
-              onSend={handleSendMessage}
-              onPressImage={handleImagePick}
-              onPressTexticon={toggleTexticonMode}
-              texticonMode={texticonMode}
-              disabled={imageUploading || sendingMessage}
-              inputRef={inputRef}
-              onSelectionChange={event => {
-                cursorPosition.current = event.nativeEvent.selection;
-              }}
-            />
-          </View>
+          <MessageInput
+            value={inputText}
+            onChangeText={setInputText}
+            onSend={handleSendMessage}
+            onPressImage={handleImagePick}
+            onPressTexticon={toggleTexticonMode}
+            texticonMode={texticonMode}
+            disabled={imageUploading || sendingMessage}
+            inputRef={inputRef}
+            onSelectionChange={event => {
+              cursorPosition.current = event.nativeEvent.selection;
+            }}
+          />
 
-          {/* 텍스티콘 선택기 */}
-          {texticonMode && (
-            <ChatTexticonSelector
-              onSelectTexticon={insertTexticonAtCursor}
-              onClose={() => setTexticonMode(false)}
-            />
+          {/* 텍스티콘 선택기 (인라인: 키보드 자리 차지) */}
+          {texticonMode ? (
+            <View style={{paddingBottom: SAFE_AREA_BOTTOM}}>
+              <ChatTexticonSelector onSelectTexticon={insertTexticonAtCursor} />
+            </View>
+          ) : (
+            <View style={{height: SAFE_AREA_BOTTOM}} />
           )}
         </KeyboardAvoidingView>
       </SafeAreaView>

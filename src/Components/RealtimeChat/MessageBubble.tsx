@@ -140,9 +140,7 @@ const styles = StyleSheet.create({
     borderColor: 'white',
   },
   bubbleImage: {
-    paddingHorizontal: 0,
-    paddingVertical: 0,
-    overflow: 'hidden',
+    padding: 8,
   },
   messageText: {
     fontFamily: 'Galmuri11',
@@ -152,15 +150,16 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   image: {
-    width: 140,
-    height: 140,
+    width: 120,
+    height: 120,
+    borderRadius: 4,
   },
   time: {
     fontFamily: 'Galmuri11',
     fontSize: 11,
     color: '#ffffffaa',
     marginLeft: 6,
-    alignSelf: 'flex-end'
+    alignSelf: 'flex-end',
   },
   systemContainer: {
     alignItems: 'center',
