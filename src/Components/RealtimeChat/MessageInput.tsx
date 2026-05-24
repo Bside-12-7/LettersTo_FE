@@ -81,7 +81,6 @@ export const MessageInput = React.memo(
               placeholderTextColor="#999999"
               multiline
               maxLength={500}
-              editable={!disabled}
               showSoftInputOnFocus={!texticonMode}
             />
             {texticonMode && (
