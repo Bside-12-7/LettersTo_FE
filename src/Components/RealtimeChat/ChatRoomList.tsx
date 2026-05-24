@@ -5,7 +5,7 @@ import type {ChatRoom} from '@type/types';
 
 interface Props {
   rooms: ChatRoom[];
-  onPressRoom: (roomId: number) => void;
+  onPressRoom: (roomId: number, roomName: string) => void;
 }
 
 export const ChatRoomList = ({rooms, onPressRoom}: Props) => {

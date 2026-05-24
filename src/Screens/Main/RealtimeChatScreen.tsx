@@ -27,7 +27,7 @@ export const RealtimeChat = ({navigation}: Props) => {
     useState(false);
   const [entryModalVisible, setEntryModalVisible] = useState(false);
   const [entryModalData, setEntryModalData] = useState<
-    (ChatTicketIssueResult & {roomId: number}) | null
+    (ChatTicketIssueResult & {roomId: number; roomName: string}) | null
   >(null);
 
   const queryClient = useQueryClient();
@@ -56,7 +56,7 @@ export const RealtimeChat = ({navigation}: Props) => {
   }, [navigation]);
 
   const handleRoomPress = useCallback(
-    async (roomId: number) => {
+    async (roomId: number, roomName: string) => {
       try {
         // 1. 참여 여부 확인
         const ticket = await checkChatRoomTicket(roomId);
@@ -72,7 +72,7 @@ export const RealtimeChat = ({navigation}: Props) => {
             return;
           }
           // 채팅 화면으로 이동
-          navigation.navigate('ChatRoom', {roomId});
+          navigation.navigate('ChatRoom', {roomId, roomName});
         } else {
           // 3. 참여하지 않음 - 우표 확인
           if (userInfo && userInfo.stampQuantity <= 2) {
@@ -82,7 +82,7 @@ export const RealtimeChat = ({navigation}: Props) => {
             const result = await issueChatRoomTicket(roomId);
             // 우표 개수 갱신
             queryClient.invalidateQueries('userInfo');
-            setEntryModalData({roomId, ...result});
+            setEntryModalData({roomId, roomName, ...result});
             setEntryModalVisible(true);
           }
         }
@@ -113,7 +113,10 @@ export const RealtimeChat = ({navigation}: Props) => {
     }
 
     // 채팅 화면으로 이동
-    navigation.navigate('ChatRoom', {roomId: entryModalData.roomId});
+    navigation.navigate('ChatRoom', {
+      roomId: entryModalData.roomId,
+      roomName: entryModalData.roomName,
+    });
   }, [entryModalData, chatRooms, navigation]);
 
   const handleCloseInsufficientStampModal = useCallback(() => {

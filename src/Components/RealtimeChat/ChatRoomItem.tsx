@@ -5,7 +5,7 @@ import {LinearGradient} from 'expo-linear-gradient';
 
 interface Props {
   room: ChatRoom;
-  onPress: (roomId: number) => void;
+  onPress: (roomId: number, roomName: string) => void;
 }
 
 const getCongestionLabel = (congestion: ChatRoom['congestion']) => {
@@ -46,7 +46,7 @@ export const ChatRoomItem = ({room, onPress}: Props) => {
       <TouchableOpacity
         style={styles.enterButton}
         activeOpacity={0.7}
-        onPress={() => onPress(room.id)}>
+        onPress={() => onPress(room.id, room.name)}>
         <LinearGradient
           colors={['#FF6ECE', '#FF3DBD']}
           style={styles.buttonBackground}>
