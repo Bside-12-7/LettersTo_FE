@@ -61,12 +61,16 @@ export const MessageList = React.memo(
               olderMessage.type !== 'USER' ||
               olderMessage.senderId !== item.senderId;
 
+        // inverted FlatList: 셀 내부 children 이 시각적으로 뒤집힌다.
+        // 코드 순서를 의도와 반대로 작성해야 화면에 올바르게 노출.
+        //  - 코드 first → 시각 bottom (버블 아래) → 링크 경고문
+        //  - 코드 last  → 시각 top    (버블 위)   → 날짜 구분선
         return (
           <>
-            {showDateSeparator && (
-              <View style={styles.dateSeparatorContainer}>
-                <Text style={styles.dateSeparatorText}>
-                  {dateFormatter('yy년 m월 d일', new Date(item.sentAt))}
+            {hasLinkWarning && (
+              <View style={styles.linkWarningContainer}>
+                <Text style={styles.linkWarningText}>
+                  출처가 불분명한 링크는 클릭 시 항상 주의해 주세요
                 </Text>
               </View>
             )}
@@ -77,10 +81,10 @@ export const MessageList = React.memo(
               onPressNickname={onPressNickname}
               onPressLink={onPressLink}
             />
-            {hasLinkWarning && (
-              <View style={styles.linkWarningContainer}>
-                <Text style={styles.linkWarningText}>
-                  출처가 불분명한 링크는 클릭 시 항상 주의해 주세요
+            {showDateSeparator && (
+              <View style={styles.dateSeparatorContainer}>
+                <Text style={styles.dateSeparatorText}>
+                  {dateFormatter('yy년 m월 d일', new Date(item.sentAt))}
                 </Text>
               </View>
             )}
@@ -138,13 +142,13 @@ const styles = StyleSheet.create({
   },
   linkWarningContainer: {
     alignItems: 'center',
-    marginVertical: 6,
+    marginVertical: 20,
     marginHorizontal: 16,
   },
   linkWarningText: {
     fontFamily: 'Galmuri11',
     fontSize: 12,
-    color: '#ffffff80',
+    color: '#ffffff',
   },
   loadingFooter: {
     paddingVertical: 16,
