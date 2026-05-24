@@ -38,6 +38,8 @@ import {BackButton} from '@components/Button/Header/BackButton';
 
 type Props = NativeStackScreenProps<StackParamsList, 'ChatRoom'>;
 
+type SSEEventName = 'ready' | 'updated' | 'ended';
+
 const HEARTBEAT_INTERVAL = 30000; // 30초
 const HEARTBEAT_TIMEOUT = 90000; // 90초
 
@@ -60,7 +62,7 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
   const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
 
   // Refs
-  const sseRef = useRef<EventSource | null>(null);
+  const sseRef = useRef<EventSource<SSEEventName> | null>(null);
   const heartbeatTimerRef = useRef<number | null>(null);
   const lastHeartbeatRef = useRef<number>(Date.now());
   // 한 번이라도 세션이 종료(타임아웃/SSE ended)되면 true — 이후 중복 Alert 방지
@@ -157,7 +159,7 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
       ).default;
       const accessToken = await AsyncStorage.getItem('accessToken');
 
-      const eventSource = new EventSource(url, {
+      const eventSource = new EventSource<SSEEventName>(url, {
         headers: accessToken
           ? {
               Authorization: `Bearer ${accessToken}`,
