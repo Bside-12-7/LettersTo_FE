@@ -280,45 +280,67 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
     }
   }, [inputText, roomId, sendingMessage]);
 
-  // 이미지 선택 및 전송
+  // 이미지 선택 및 전송 (최대 5장 복수 선택)
   const handleImagePick = useCallback(async () => {
     try {
+      // 다중 선택 활성화 시 결과는 ImagePickerMultipleResult — { cancelled, selected[] }
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         quality: 0.8,
-        allowsEditing: false,
+        allowsMultipleSelection: true,
       });
 
-      // expo-image-picker v13: 단일 선택 시 결과는 ImageInfo (cancelled, uri 등)
-      if (!result.cancelled) {
-        setImageUploading(true);
+      if (result.cancelled) return;
 
-        const filename = `chat_${Date.now()}.jpg`;
+      const assets = (
+        result as ImagePicker.ImagePickerMultipleResult & {
+          selected: ImagePicker.ImageInfo[];
+        }
+      ).selected;
+      if (!assets || assets.length === 0) return;
 
-        // Presigned URL 발급 — 응답은 { uploadUrl, id }
-        const presignUrl = await getImageUploadUrl(filename);
-
-        // 이미지 blob 으로 가져오기
-        const response = await fetch(result.uri);
-        const blob = await response.blob();
-
-        // S3 PUT 업로드
-        await fetch(presignUrl.uploadUrl, {
-          method: 'PUT',
-          body: blob,
-          headers: {
-            'Content-Type': 'image/*',
-          },
-        });
-
-        // 사진 메시지 전송 (응답의 id 가 그대로 fileId)
-        await sendPictureMessage(roomId, [presignUrl.id]);
-
-        Toast.show('이미지가 전송되었습니다', {
+      // 메시지당 최대 5장 (백엔드 제약)
+      const picked = assets.slice(0, 5);
+      if (assets.length > 5) {
+        Toast.show('한 번에 최대 5장까지 보낼 수 있어요', {
           duration: Toast.durations.SHORT,
           position: Toast.positions.CENTER,
         });
       }
+
+      setImageUploading(true);
+
+      // 각 이미지마다 presign 발급 + S3 PUT 을 병렬 처리, fileId 배열 수집
+      const fileIds = await Promise.all(
+        picked.map(async (asset, index) => {
+          const filename = `chat_${Date.now()}_${index}.jpg`;
+          const presignUrl = await getImageUploadUrl(filename);
+
+          const response = await fetch(asset.uri);
+          const blob = await response.blob();
+
+          await fetch(presignUrl.uploadUrl, {
+            method: 'PUT',
+            body: blob,
+            headers: {'Content-Type': 'image/*'},
+          });
+
+          return presignUrl.id;
+        }),
+      );
+
+      // 하나의 사진 메시지로 묶어 전송
+      await sendPictureMessage(roomId, fileIds);
+
+      Toast.show(
+        fileIds.length > 1
+          ? `${fileIds.length}장의 이미지를 전송했어요`
+          : '이미지가 전송되었어요',
+        {
+          duration: Toast.durations.SHORT,
+          position: Toast.positions.CENTER,
+        },
+      );
     } catch (error) {
       console.error('이미지 전송 실패:', error);
       Toast.show('이미지 전송에 실패했습니다', {
