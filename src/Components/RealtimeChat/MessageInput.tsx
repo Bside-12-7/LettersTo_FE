@@ -96,7 +96,7 @@ export const MessageInput = React.memo(
             )}
           </View>
           <Pressable
-            style={[styles.sendButton, !canSend && styles.sendButtonDisabled]}
+            style={[styles.sendButton]}
             onPress={onSend}
             disabled={!canSend}>
             {disabled ? (
@@ -181,8 +181,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF44CC',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  sendButtonDisabled: {
-    backgroundColor: '#ffffff40',
   },
 });

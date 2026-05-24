@@ -157,17 +157,17 @@ const styles = StyleSheet.create({
   time: {
     fontFamily: 'Galmuri11',
     fontSize: 11,
-    color: '#ffffffaa',
+    color: '#ffffff',
     marginLeft: 6,
     alignSelf: 'flex-end',
   },
   systemContainer: {
     alignItems: 'center',
-    marginVertical: 8,
+    marginVertical: 16,
   },
   systemText: {
     fontFamily: 'Galmuri11',
     fontSize: 12,
-    color: '#ffffff80',
+    color: '#ffffff',
   },
 });
