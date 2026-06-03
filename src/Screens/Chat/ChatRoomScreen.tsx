@@ -51,6 +51,9 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
   const userInfo = useAuthStore(state => state.userInfo);
   const myMemberId = userInfo.id;
 
+  // 입장 완료 여부 — 메시지 fetch 는 join 이후에만 허용
+  const [joined, setJoined] = useState(false);
+
   // 입력
   const [inputText, setInputText] = useState('');
   const [texticonMode, setTexticonMode] = useState(false);
@@ -89,6 +92,8 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
         return response || [];
       },
       {
+        // joinChatRoom 완료 전에는 메시지 fetch 를 차단 (세션 없는 상태로 400 발생 방지)
+        enabled: joined,
         // before=X 는 id<X 인 메시지를 DESC 로 반환하므로
         // 다음 페이지(더 과거) 커서는 마지막 페이지의 마지막 원소(가장 오래된 id) 가 되어야 한다.
         getNextPageParam: lastPage => {
@@ -147,9 +152,7 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
   // SSE 연결
   const connectSSE = useCallback(async () => {
     try {
-      const baseUrl = __DEV__
-        ? 'http://15.165.100.80/api'
-        : 'https://api.lettersto.co.kr/api';
+      const baseUrl = 'http://15.165.100.80/api';
 
       const url = `${baseUrl}/chat/rooms/${roomId}/messages/stream`;
 
@@ -433,6 +436,8 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
   const startChatSession = useCallback(async () => {
     try {
       await joinChatRoom(roomId);
+      // join 성공 이후에야 messages fetch 가능 → useInfiniteQuery 의 enabled 풀어줌
+      setJoined(true);
       queryClient.invalidateQueries(['chatMessages', roomId]);
       lastHeartbeatRef.current = Date.now();
       await connectSSE();
