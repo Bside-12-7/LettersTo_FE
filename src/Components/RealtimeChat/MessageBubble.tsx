@@ -75,12 +75,16 @@ export const MessageBubble = React.memo(
       );
     };
 
+    // 본인 프로필은 탭해도 모달이 열리지 않도록 Pressable 대신 View 로 렌더
+    const IdentityWrapper = isMyMessage ? View : Pressable;
+    const identityProps = isMyMessage
+      ? {}
+      : {onPress: () => onPressNickname(message.senderId)};
+
     return (
       <View style={styles.row}>
         {showIdentity ? (
-          <Pressable
-            style={styles.identity}
-            onPress={() => onPressNickname(message.senderId)}>
+          <IdentityWrapper style={styles.identity} {...identityProps}>
             <Avatar nickname={displayNickname} color={avatarColor} size={30} />
             <Text
               style={styles.nickname}
@@ -88,7 +92,7 @@ export const MessageBubble = React.memo(
               ellipsizeMode="tail">
               {displayNickname}
             </Text>
-          </Pressable>
+          </IdentityWrapper>
         ) : (
           <View style={styles.identity} />
         )}
