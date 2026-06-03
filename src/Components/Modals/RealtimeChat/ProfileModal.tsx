@@ -8,9 +8,14 @@ import {
   Image,
   ActivityIndicator,
 } from 'react-native';
+import {LinearGradient} from 'expo-linear-gradient';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useQuery} from 'react-query';
+import {useNavigation} from '@react-navigation/native';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import type {StackParamsList} from '@type/stackParamList';
 import {getChatMemberProfile} from '@apis/chatMessage';
+import {useLetterEditorStore} from '@stores/store';
 import {ModalBlur} from '../ModalBlur';
 
 const closeBtn = require('@assets/Icon/close/close_blue.png');
@@ -24,6 +29,9 @@ interface Props {
 export const ProfileModal = React.memo(
   ({visible, memberId, onClose}: Props) => {
     const {bottom: SAFE_AREA_BOTTOM} = useSafeAreaInsets();
+    const navigation =
+      useNavigation<NativeStackNavigationProp<StackParamsList>>();
+    const {setDeliverLetterTo} = useLetterEditorStore();
 
     const {data: profile, isLoading} = useQuery(
       ['chatMemberProfile', memberId],
@@ -32,6 +40,24 @@ export const ProfileModal = React.memo(
         enabled: visible && memberId !== null,
       },
     );
+
+    const onPressWriteLetter = () => {
+      if (!profile) return;
+      setDeliverLetterTo({
+        toNickname: profile.nickname,
+        toAddress: profile.geolocation.fullname,
+        addressId: profile.geolocation.id,
+      });
+      onClose();
+      navigation.navigate('LetterEditor', {
+        to: 'DELIVERY',
+        type: 'DIRECT_MESSAGE',
+        fromMemberId: profile.id,
+      });
+    };
+
+    // 프로필 조회 실패/미수신 시 모달 자체를 띄우지 않음
+    if (!isLoading && !profile) return null;
 
     return (
       <>
@@ -43,47 +69,76 @@ export const ProfileModal = React.memo(
           onRequestClose={onClose}
           visible={visible}>
           <View style={styles.container}>
-            <View style={[styles.modal, {paddingBottom: SAFE_AREA_BOTTOM}]}>
-              {/* 닫기 버튼 */}
-              <TouchableOpacity
-                style={styles.closeBtn}
-                activeOpacity={0.7}
-                onPress={onClose}>
-                <Image style={styles.closeBtnImg} source={closeBtn} />
-              </TouchableOpacity>
+            <View
+              style={[styles.sheet, {paddingBottom: SAFE_AREA_BOTTOM + 16}]}>
+              {/* 헤더: X 좌, 타이틀 중앙 */}
+              <View style={styles.header}>
+                <TouchableOpacity
+                  style={styles.closeBtn}
+                  activeOpacity={0.7}
+                  onPress={onClose}>
+                  <Image style={styles.closeBtnImg} source={closeBtn} />
+                </TouchableOpacity>
+                <Text style={styles.title}>프로필</Text>
+              </View>
 
               {/* 프로필 내용 */}
-              <View style={styles.contents}>
-                {isLoading ? (
+              {isLoading ? (
+                <View style={styles.loadingWrap}>
                   <ActivityIndicator size="large" color="#0000CC" />
-                ) : profile ? (
-                  <>
-                    {/* 닉네임 */}
+                </View>
+              ) : profile ? (
+                <View style={styles.contents}>
+                  {/* 닉네임 + 지역 (인라인, 좌측 정렬) */}
+                  <View style={styles.identityRow}>
                     <Text style={styles.nickname}>{profile.nickname}</Text>
-
-                    {/* 지역 */}
-                    <Text style={styles.region}>{profile.region}</Text>
-
-                    {/* 관심사 */}
-                    {profile.topics && profile.topics.length > 0 && (
-                      <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>관심사</Text>
-                        <View style={styles.tagContainer}>
-                          {profile.topics.map(topic => (
-                            <View key={topic.id} style={styles.tag}>
-                              <Text style={styles.tagText}>{topic.name}</Text>
-                            </View>
-                          ))}
-                        </View>
-                      </View>
+                    {!!profile.geolocation?.fullname && (
+                      <Text style={styles.region}>
+                        {profile.geolocation.fullname}
+                      </Text>
                     )}
-                  </>
-                ) : (
-                  <Text style={styles.errorText}>
-                    프로필을 불러올 수 없습니다
-                  </Text>
-                )}
-              </View>
+                  </View>
+
+                  {/* 관심사 */}
+                  {profile.topics && profile.topics.length > 0 && (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>관심사</Text>
+                      <View style={styles.tagWrap}>
+                        {profile.topics.map(topic => (
+                          <View key={topic.id} style={styles.tag}>
+                            <Text style={styles.tagText}>{topic.name}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  )}
+
+                  {/* 성향 */}
+                  {profile.personalities && profile.personalities.length > 0 && (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>성향</Text>
+                      <View style={styles.tagWrap}>
+                        {profile.personalities.map(p => (
+                          <View key={p.id} style={styles.tag}>
+                            <Text style={styles.tagText}>{p.name}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  )}
+
+                  {/* 편지 쓰기 버튼 */}
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={onPressWriteLetter}>
+                    <LinearGradient
+                      colors={['#ff6ece', '#ff3dbd']}
+                      style={styles.writeButton}>
+                      <Text style={styles.writeButtonText}>편지 쓰기</Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                </View>
+              ) : null}
             </View>
           </View>
         </Modal>
@@ -98,69 +153,98 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  modal: {
+  sheet: {
+    backgroundColor: 'white',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    backgroundColor: 'white',
-    paddingTop: 16,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    height: 52,
   },
   closeBtn: {
-    alignSelf: 'flex-end',
-    padding: 16,
+    position: 'absolute',
+    left: 16,
+    padding: 4,
   },
   closeBtnImg: {
     height: 28,
     width: 28,
   },
-  contents: {
+  title: {
+    fontFamily: 'Galmuri11',
+    fontSize: 15,
+    color: '#0000CC',
+  },
+  loadingWrap: {
     paddingHorizontal: 24,
-    paddingBottom: 32,
-    minHeight: 200,
+    paddingVertical: 32,
+    alignItems: 'center',
     justifyContent: 'center',
+    minHeight: 160,
+  },
+  contents: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  identityRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    marginBottom: 24,
   },
   nickname: {
-    fontFamily: 'Galmuri11',
-    fontSize: 20,
+    fontFamily: 'Galmuri11-Bold',
+    fontSize: 14,
     color: '#0000CC',
-    textAlign: 'center',
-    marginBottom: 8,
   },
   region: {
     fontFamily: 'Galmuri11',
-    fontSize: 14,
-    color: '#666666',
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  section: {
-    marginTop: 16,
-  },
-  sectionTitle: {
-    fontFamily: 'Galmuri11',
-    fontSize: 13,
+    fontSize: 12,
     color: '#0000CC',
-    marginBottom: 12,
+    marginLeft: 8,
   },
-  tagContainer: {
+  infoRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  infoLabel: {
+    fontFamily: 'Galmuri11',
+    fontSize: 14,
+    color: '#0000CC',
+    width: 52,
+    marginRight: 16,
+  },
+  tagWrap: {
+    flex: 1,
+    flexDirection: 'row',
+    overflow: 'hidden',
   },
   tag: {
-    backgroundColor: '#F0F0FF',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: '#0000CC',
+    padding: 6,
+    backgroundColor: '##0000CC0D',
+    marginRight: 4,
   },
   tagText: {
     fontFamily: 'Galmuri11',
     fontSize: 12,
     color: '#0000CC',
   },
-  errorText: {
+  writeButton: {
+    marginTop: 16,
+    height: 52,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  writeButtonText: {
     fontFamily: 'Galmuri11',
-    fontSize: 14,
-    color: '#666666',
-    textAlign: 'center',
+    fontSize: 16,
+    color: 'white',
   },
 });

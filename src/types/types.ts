@@ -334,8 +334,12 @@ export interface SSEEndedEvent {
 
 export interface ChatMemberProfile {
   id: number;
+  active: boolean;
   nickname: string;
-  region: string;
+  geolocation: {
+    id: number;
+    fullname: string;
+  };
   topics: Topic[];
   personalities: Personality[];
 }
