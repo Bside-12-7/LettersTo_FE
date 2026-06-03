@@ -8,41 +8,15 @@ interface Props {
   onPress: (roomId: number, roomName: string) => void;
 }
 
-const getCongestionLabel = (congestion: ChatRoom['congestion']) => {
-  switch (congestion) {
-    case 'HIGH':
-      return '혼잡';
-    case 'MEDIUM':
-      return '보통';
-    case 'LOW':
-      return '여유';
-  }
-};
-
-const getCongestionColor = (congestion: ChatRoom['congestion']) => {
-  switch (congestion) {
-    case 'HIGH':
-      return 'red';
-    case 'MEDIUM':
-      return 'yellow';
-    case 'LOW':
-      return '#89f500';
-  }
-};
-
 export const ChatRoomItem = ({room, onPress}: Props) => {
   return (
     <View style={styles.container}>
-      <View style={styles.leftSection}>
-        <Text
-          style={[
-            styles.statusLabel,
-            {color: getCongestionColor(room.congestion)},
-          ]}>
-          {getCongestionLabel(room.congestion)}
+      <Text style={styles.roomTitle}>
+        {room.name}
+        <Text style={styles.participantCount}>
+          {` (${room.participantCount}/${room.capacity})`}
         </Text>
-        <Text style={styles.roomTitle}>{room.name}</Text>
-      </View>
+      </Text>
       <TouchableOpacity
         style={styles.enterButton}
         activeOpacity={0.7}
@@ -65,20 +39,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 8,
   },
-  leftSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  statusLabel: {
-    fontFamily: 'Galmuri11',
-    fontSize: 11,
-    fontWeight: 'bold',
-    marginRight: 6,
-  },
   roomTitle: {
     fontFamily: 'Galmuri11',
     fontSize: 16,
     fontWeight: 'bold',
+    color: 'white',
+    flexShrink: 1,
+  },
+  participantCount: {
+    fontFamily: 'Galmuri11',
+    fontSize: 14,
+    fontWeight: 'normal',
     color: 'white',
   },
   enterButton: {
@@ -86,7 +57,6 @@ const styles = StyleSheet.create({
     height: 28,
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative',
   },
   buttonBackground: {
     borderRadius: 10,

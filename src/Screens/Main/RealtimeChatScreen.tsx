@@ -55,6 +55,10 @@ export const RealtimeChat = ({navigation}: Props) => {
     navigation.navigate('StampHistory');
   }, [navigation]);
 
+  const handlePressNotice = useCallback(() => {
+    navigation.navigate('ChatServiceGuide');
+  }, [navigation]);
+
   const handleRoomPress = useCallback(
     async (roomId: number, roomName: string) => {
       try {
@@ -148,6 +152,7 @@ export const RealtimeChat = ({navigation}: Props) => {
               onPressBack={handlePressBack}
               onPressHome={handlePressHome}
               onPressStamp={handlePressStamp}
+              onPressNotice={handlePressNotice}
             />
             <ChatRoomList
               rooms={chatRooms || []}

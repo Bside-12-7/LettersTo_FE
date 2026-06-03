@@ -3,12 +3,14 @@ import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
 
 const back_white = require('@assets/back_white.png');
 const home_white = require('@assets/Icon/Home/home_white.png');
+const warning_white = require('@assets/warning_white.png');
 
 interface Props {
   stampQuantity: number;
   onPressBack: () => void;
   onPressHome: () => void;
   onPressStamp: () => void;
+  onPressNotice: () => void;
 }
 
 export const RealtimeChatHeader = ({
@@ -16,6 +18,7 @@ export const RealtimeChatHeader = ({
   onPressBack,
   onPressHome,
   onPressStamp,
+  onPressNotice,
 }: Props) => {
   return (
     <View style={styles.container}>
@@ -37,6 +40,12 @@ export const RealtimeChatHeader = ({
       <Text style={styles.title}>실시간통신 포털</Text>
 
       <View style={styles.rightSection}>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={onPressNotice}
+          style={styles.noticeButton}>
+          <Image source={warning_white} style={styles.noticeIcon} />
+        </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={onPressStamp}
@@ -97,7 +106,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
-    width: 64,
+  },
+  noticeButton: {
+    width: 28,
+    height: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  noticeIcon: {
+    width: 24,
+    height: 24,
   },
   stampButton: {
     width: 40,

@@ -11,6 +11,7 @@ import {RealtimeChat} from '@screens/Main/RealtimeChatScreen';
 
 // 채팅 스크린
 import {ChatRoomScreen} from '@screens/Chat/ChatRoomScreen';
+import {ChatServiceGuideScreen} from '@screens/Chat/ChatServiceGuideScreen';
 
 // 편지 관련 스크린
 import {LetterViewer} from '@screens/Letter/LetterViewerScreen';
@@ -77,6 +78,10 @@ export default function StackNavigator() {
               component={RealtimeChat}
             />
             <Stack.Screen name="ChatRoom" component={ChatRoomScreen} />
+            <Stack.Screen
+              name="ChatServiceGuide"
+              component={ChatServiceGuideScreen}
+            />
             <Stack.Screen
               name={SCREEN_NAMES.LETTER_VIEWER}
               component={LetterViewer}
