@@ -36,6 +36,9 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>2601122237</string>
+	<!-- 수출 규정: 자체 암호화 미사용(iOS 제공 TLS 만 사용) → 제출 시 암호화 질문 생략 -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>KAKAO_APP_KEY</key>
 	<string>6d103f05f54b404a5f9e96eb2550ef77</string>
 	<key>LSApplicationQueriesSchemes</key>
