@@ -124,6 +124,8 @@ const styles = StyleSheet.create({
   },
   promoImg: {
     width: '100%',
+    // height 를 비워야 에셋 고유 높이(1016pt) 대신 aspectRatio 가 적용된다
+    height: undefined,
     // 에셋 원본 비율(1372x1016) 유지 — 기기 너비에 맞춰 높이가 계산된다
     aspectRatio: 1372 / 1016,
     borderRadius: 8,
