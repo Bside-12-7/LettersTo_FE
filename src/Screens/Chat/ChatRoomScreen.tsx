@@ -28,8 +28,10 @@ import {
   sendPictureMessage,
   sendHeartbeat,
   joinChatRoom,
+  leaveChatRoom,
 } from '@apis/chatMessage';
 import {getImageUploadUrl} from '@apis/file';
+import {BASE_URL_PROD, BASE_URL_TEST} from '@constants/common';
 import type {ChatMessage, SSEEndedEvent, SSEUpdatedEvent} from '@type/types';
 import {MessageList} from '@components/RealtimeChat/MessageList';
 import {MessageInput} from '@components/RealtimeChat/MessageInput';
@@ -181,7 +183,7 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
   // SSE 연결
   const connectSSE = useCallback(async () => {
     try {
-      const baseUrl = 'http://15.165.100.80/api';
+      const baseUrl = __DEV__ ? BASE_URL_TEST : BASE_URL_PROD;
 
       const url = `${baseUrl}/chat/rooms/${roomId}/messages/stream`;
 
@@ -278,6 +280,9 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
 
       stopHeartbeat();
       disconnectSSE();
+      // 세션이 끝난 뒤에도 joined 가 true 로 남아 있으면 메시지 재조회가 계속 나가
+      // 서버에 '입장 중인 채팅방이 아닙니다' 가 찍힌다 → 조회 자체를 막는다.
+      setJoined(false);
 
       const messages: Record<string, string> = {
         TIMEOUT: '연결이 오랫동안 응답하지 않아 세션이 종료되었습니다.',
@@ -540,8 +545,19 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
     return () => {
       disconnectSSE();
       stopHeartbeat();
+      // 서버에 퇴장을 알리지 않으면 참여 인원수가 즉시 줄지 않는다.
+      // - 입장에 성공한 적이 없으면(joinedRef) 세션이 없으므로 호출하지 않는다.
+      // - 이미 종료된 세션(TIMEOUT/EVICTED/EXPIRED)에 호출하면 서버에
+      //   '입장 중인 채팅방이 아닙니다' 로그만 남으므로 제외한다.
+      if (joinedRef.current && !sessionEndedRef.current) {
+        leaveChatRoom(roomId)
+          .catch(error => console.error('채팅방 퇴장 실패:', error))
+          // 목록 화면의 focus 재조회가 leave 보다 먼저 끝날 수 있어
+          // 퇴장 완료 후 한 번 더 갱신한다.
+          .finally(() => queryClient.invalidateQueries('chatRooms'));
+      }
     };
-  }, [startChatSession, disconnectSSE, stopHeartbeat]);
+  }, [startChatSession, disconnectSSE, stopHeartbeat, roomId, queryClient]);
 
   // 백그라운드/포그라운드 전환 대응
   // - background 진입: SSE/하트비트 정리 (OS 가 어차피 끊으므로 미리 깔끔히)

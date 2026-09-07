@@ -7,6 +7,7 @@ import {ChatRoomList} from '@components/RealtimeChat/ChatRoomList';
 import {InsufficientStampModal} from '@components/Modals/RealtimeChat/InsufficientStampModal';
 import {ChatRoomEntryModal} from '@components/Modals/RealtimeChat/ChatRoomEntryModal';
 import {useQuery, useQueryClient} from 'react-query';
+import {useFocusEffect} from '@react-navigation/native';
 import {getUserInfo} from '@apis/member';
 import {
   getChatRooms,
@@ -35,6 +36,14 @@ export const RealtimeChat = ({navigation}: Props) => {
   const queryClient = useQueryClient();
   const {data: userInfo} = useQuery('userInfo', getUserInfo);
   const {data: chatRooms} = useQuery('chatRooms', getChatRooms);
+
+  // 입장/퇴장으로 참여 인원수가 바뀌므로 목록 화면에 돌아올 때마다 갱신한다.
+  // (정원 초과 판정도 이 캐시를 쓰기 때문에 최신값이어야 한다)
+  useFocusEffect(
+    useCallback(() => {
+      queryClient.invalidateQueries('chatRooms');
+    }, [queryClient]),
+  );
 
   // 3초간 로딩 화면 표시
   useEffect(() => {
