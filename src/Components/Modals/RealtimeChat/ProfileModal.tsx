@@ -23,15 +23,20 @@ const closeBtn = require('@assets/Icon/close/close_blue.png');
 interface Props {
   visible: boolean;
   memberId: number | null;
+  myMemberId: number;
   onClose: () => void;
 }
 
 export const ProfileModal = React.memo(
-  ({visible, memberId, onClose}: Props) => {
+  ({visible, memberId, myMemberId, onClose}: Props) => {
     const {bottom: SAFE_AREA_BOTTOM} = useSafeAreaInsets();
     const navigation =
       useNavigation<NativeStackNavigationProp<StackParamsList>>();
     const {setDeliverLetterTo} = useLetterEditorStore();
+
+    // 본인 프로필에서는 편지를 보낼 수 없다 (서버에서도 거부됨).
+    // 말풍선의 isMyMessage 와 동일한 기준(myMemberId)으로 판정해 일관성을 유지한다.
+    const isMe = memberId !== null && memberId === myMemberId;
 
     const {data: profile, isLoading} = useQuery(
       ['chatMemberProfile', memberId],
@@ -42,7 +47,7 @@ export const ProfileModal = React.memo(
     );
 
     const onPressWriteLetter = () => {
-      if (!profile) return;
+      if (!profile || isMe) return;
       setDeliverLetterTo({
         toNickname: profile.nickname,
         toAddress: profile.geolocation.fullname,
@@ -51,7 +56,9 @@ export const ProfileModal = React.memo(
       onClose();
       navigation.navigate('LetterEditor', {
         to: 'DELIVERY',
-        type: 'DIRECT_MESSAGE',
+        // 채팅 프로필에서 보내는 1:1 편지는 서로 주소를 모르는 관계이므로
+        // 익명 편지함 타입으로 보낸다 (DIRECT_MESSAGE 로는 서버에서 처리되지 않음).
+        type: 'ANONYMOUS_DIRECT_MESSAGE',
         fromMemberId: profile.id,
       });
     };
@@ -127,16 +134,18 @@ export const ProfileModal = React.memo(
                     </View>
                   )}
 
-                  {/* 편지 쓰기 버튼 */}
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    onPress={onPressWriteLetter}>
-                    <LinearGradient
-                      colors={['#ff6ece', '#ff3dbd']}
-                      style={styles.writeButton}>
-                      <Text style={styles.writeButtonText}>편지 쓰기</Text>
-                    </LinearGradient>
-                  </TouchableOpacity>
+                  {/* 편지 쓰기 버튼 — 본인 프로필에서는 노출하지 않음 */}
+                  {!isMe && (
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={onPressWriteLetter}>
+                      <LinearGradient
+                        colors={['#ff6ece', '#ff3dbd']}
+                        style={styles.writeButton}>
+                        <Text style={styles.writeButtonText}>편지 쓰기</Text>
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  )}
                 </View>
               ) : null}
             </View>
@@ -151,7 +160,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    // 딤은 Modal 바깥의 ModalBlur 가 담당한다.
+    // 여기에 배경색을 주면 animationType="slide" 에 딤까지 딸려 올라온다.
   },
   sheet: {
     backgroundColor: 'white',

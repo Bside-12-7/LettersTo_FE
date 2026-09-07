@@ -11,6 +11,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ModalBlur} from './ModalBlur';
 
 const closeBtn = require('@assets/Icon/close/close_blue.png');
+const promoImg = require('@assets/Image/chat/realtime_chat_promo.png');
 
 interface Props {
   visible: boolean;
@@ -51,8 +52,12 @@ export const RealtimeChatPromoModal = React.memo(
                 </Text>
               </View>
 
-              {/* 이미지 placeholder — 자산 추후 채움 */}
-              <View style={styles.imagePlaceholder} />
+              {/* 안내 이미지 */}
+              <Image
+                style={styles.promoImg}
+                source={promoImg}
+                resizeMode="cover"
+              />
 
               {/* CTA */}
               <View style={styles.buttonRow}>
@@ -117,10 +122,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 8,
   },
-  imagePlaceholder: {
+  promoImg: {
     width: '100%',
-    aspectRatio: 1.5,
-    backgroundColor: '#FF44CC',
+    // height 를 비워야 에셋 고유 높이(1016pt) 대신 aspectRatio 가 적용된다
+    height: undefined,
+    // 에셋 원본 비율(1372x1016) 유지 — 기기 너비에 맞춰 높이가 계산된다
+    aspectRatio: 1372 / 1016,
     borderRadius: 8,
     marginBottom: 24,
   },

@@ -1,5 +1,5 @@
 import React, {useCallback, useState, useEffect} from 'react';
-import {View, Text, StyleSheet, SafeAreaView, StatusBar} from 'react-native';
+import {View, StyleSheet, SafeAreaView, StatusBar, Image} from 'react-native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import type {StackParamsList} from '@type/stackParamList';
 import {RealtimeChatHeader} from '@components/Headers/RealtimeChatHeader';
@@ -7,6 +7,7 @@ import {ChatRoomList} from '@components/RealtimeChat/ChatRoomList';
 import {InsufficientStampModal} from '@components/Modals/RealtimeChat/InsufficientStampModal';
 import {ChatRoomEntryModal} from '@components/Modals/RealtimeChat/ChatRoomEntryModal';
 import {useQuery, useQueryClient} from 'react-query';
+import {useFocusEffect} from '@react-navigation/native';
 import {getUserInfo} from '@apis/member';
 import {
   getChatRooms,
@@ -16,6 +17,8 @@ import {
 import {SCREEN_NAMES} from '@constants/navigation';
 import Toast from 'react-native-root-toast';
 import type {ChatTicketIssueResult} from '@type/types';
+
+const loadingImg = require('@assets/Image/chat/realtime_chat_loading.gif');
 
 interface Props {
   navigation: NativeStackNavigationProp<StackParamsList>;
@@ -33,6 +36,14 @@ export const RealtimeChat = ({navigation}: Props) => {
   const queryClient = useQueryClient();
   const {data: userInfo} = useQuery('userInfo', getUserInfo);
   const {data: chatRooms} = useQuery('chatRooms', getChatRooms);
+
+  // 입장/퇴장으로 참여 인원수가 바뀌므로 목록 화면에 돌아올 때마다 갱신한다.
+  // (정원 초과 판정도 이 캐시를 쓰기 때문에 최신값이어야 한다)
+  useFocusEffect(
+    useCallback(() => {
+      queryClient.invalidateQueries('chatRooms');
+    }, [queryClient]),
+  );
 
   // 3초간 로딩 화면 표시
   useEffect(() => {
@@ -142,8 +153,11 @@ export const RealtimeChat = ({navigation}: Props) => {
       <SafeAreaView style={styles.safeArea}>
         {isLoading ? (
           <View style={styles.loadingContainer}>
-            {/* TODO: GIF 이미지 추가 예정 */}
-            <Text style={styles.loadingText}>로딩 중...</Text>
+            <Image
+              style={styles.loadingImg}
+              source={loadingImg}
+              resizeMode="contain"
+            />
           </View>
         ) : (
           <>
@@ -188,9 +202,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  loadingText: {
-    fontFamily: 'Galmuri11',
-    fontSize: 16,
-    color: 'white',
+  loadingImg: {
+    // 에셋 원본이 400x400 정방형
+    width: 160,
+    height: 160,
   },
 });

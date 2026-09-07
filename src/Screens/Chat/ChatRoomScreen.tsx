@@ -14,6 +14,7 @@ import {
   FlatList,
   AppState,
 } from 'react-native';
+import type {AppStateStatus} from 'react-native';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import type {StackParamsList} from '@type/stackParamList';
 import {useInfiniteQuery, useQueryClient} from 'react-query';
@@ -27,8 +28,10 @@ import {
   sendPictureMessage,
   sendHeartbeat,
   joinChatRoom,
+  leaveChatRoom,
 } from '@apis/chatMessage';
 import {getImageUploadUrl} from '@apis/file';
+import {BASE_URL_PROD, BASE_URL_TEST} from '@constants/common';
 import type {ChatMessage, SSEEndedEvent, SSEUpdatedEvent} from '@type/types';
 import {MessageList} from '@components/RealtimeChat/MessageList';
 import {MessageInput} from '@components/RealtimeChat/MessageInput';
@@ -70,6 +73,12 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
   const lastHeartbeatRef = useRef<number>(Date.now());
   // 한 번이라도 세션이 종료(타임아웃/SSE ended)되면 true — 이후 중복 Alert 방지
   const sessionEndedRef = useRef<boolean>(false);
+  // join 요청 진행 중 여부 — 중복 join/중복 SSE 연결 방지
+  const joiningRef = useRef<boolean>(false);
+  // 최초 join 완료 여부 (joined state 의 ref 미러 — startChatSession 의 identity 를 고정하기 위함)
+  const joinedRef = useRef<boolean>(false);
+  // 직전 AppState — inactive 왕복과 실제 background 복귀를 구분하기 위함
+  const appStateRef = useRef<AppStateStatus>(AppState.currentState);
   const inputRef = useRef<TextInput>(null);
   const cursorPosition = useRef<{start: number; end: number}>({
     start: 0,
@@ -100,9 +109,18 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
           if (lastPage.length === 0) return undefined;
           return lastPage[lastPage.length - 1].id;
         },
+        // 일시적인 네트워크 오류로 목록이 비지 않도록 한 번 재시도 (전역 기본값은 retry: false)
+        retry: 1,
+        // 입장(join) 실패는 startChatSession 에서만 처리한다.
+        // 이 핸들러로 들어오는 오류는 '메시지 조회' 실패(초기 로드/과거 페이지/재조회)이므로
+        // 입장 실패로 알리면 실제로 입장에 성공한 상태에서도 실패 토스트가 뜬다.
+        // (전역 onError 의 '문제가 발생했습니다' 토스트도 이 핸들러가 대체한다)
         onError: error => {
           console.error('메시지 로드 실패:', error);
-          Toast.show('채팅방 입장에 실패했습니다', {
+          // 이미 한 번이라도 목록을 받아온 뒤의 실패(과거 페이지 로드/재조회)는 조용히 무시.
+          const loaded = queryClient.getQueryData(['chatMessages', roomId]);
+          if (loaded) return;
+          Toast.show('메시지를 불러오지 못했어요', {
             duration: Toast.durations.SHORT,
             position: Toast.positions.CENTER,
           });
@@ -123,7 +141,11 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
         pageParams: unknown[];
       }>(['chatMessages', roomId]);
       const newestId = cached?.pages[0]?.[0]?.id;
-      if (!newestId) return;
+      // 아직 받아온 메시지가 없으면 이어붙일 기준이 없으므로 목록 자체를 다시 조회한다.
+      if (!newestId) {
+        queryClient.invalidateQueries(['chatMessages', roomId]);
+        return;
+      }
 
       const response = await getChatMessages(roomId, {
         after: newestId,
@@ -138,10 +160,19 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
         if (!old) {
           return {pages: [descNew], pageParams: [undefined]};
         }
-        const [firstPage, ...rest] = old.pages as ChatMessage[][];
+        const pages = old.pages as ChatMessage[][];
+        // SSE updated 가 연달아 오거나 전송 직후 수동 갱신과 겹치면 같은 메시지를
+        // 두 번 prepend 할 수 있다 → 이미 가진 id 는 제외한다.
+        const existingIds = new Set(
+          pages.flatMap(page => page.map(message => message.id)),
+        );
+        const unseen = descNew.filter(message => !existingIds.has(message.id));
+        if (unseen.length === 0) return old;
+
+        const [firstPage, ...rest] = pages;
         return {
           ...old,
-          pages: [[...descNew, ...firstPage], ...rest],
+          pages: [[...unseen, ...firstPage], ...rest],
         };
       });
     } catch (error) {
@@ -152,7 +183,7 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
   // SSE 연결
   const connectSSE = useCallback(async () => {
     try {
-      const baseUrl = 'http://15.165.100.80/api';
+      const baseUrl = __DEV__ ? BASE_URL_TEST : BASE_URL_PROD;
 
       const url = `${baseUrl}/chat/rooms/${roomId}/messages/stream`;
 
@@ -214,6 +245,11 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
 
   // 하트비트 시작
   const startHeartbeat = useCallback(() => {
+    // 이전 타이머가 남아있으면 정리 (재입장 시 타이머 중복 방지)
+    if (heartbeatTimerRef.current) {
+      clearInterval(heartbeatTimerRef.current);
+      heartbeatTimerRef.current = null;
+    }
     heartbeatTimerRef.current = setInterval(async () => {
       try {
         await sendHeartbeat(roomId);
@@ -244,6 +280,9 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
 
       stopHeartbeat();
       disconnectSSE();
+      // 세션이 끝난 뒤에도 joined 가 true 로 남아 있으면 메시지 재조회가 계속 나가
+      // 서버에 '입장 중인 채팅방이 아닙니다' 가 찍힌다 → 조회 자체를 막는다.
+      setJoined(false);
 
       const messages: Record<string, string> = {
         TIMEOUT: '연결이 오랫동안 응답하지 않아 세션이 종료되었습니다.',
@@ -311,12 +350,21 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
 
       if (result.cancelled) return;
 
-      const assets = (
+      // 다중 선택을 지원하지 않는 환경(iOS 13 이하 등)에서는 selected 없이
+      // 단일 asset 형태로 내려온다 → 그 경우도 처리해야 사진이 유실되지 않는다.
+      const multipleSelected = (
         result as ImagePicker.ImagePickerMultipleResult & {
-          selected: ImagePicker.ImageInfo[];
+          selected?: ImagePicker.ImageInfo[];
         }
       ).selected;
-      if (!assets || assets.length === 0) return;
+      const singleSelected = result as unknown as ImagePicker.ImageInfo;
+      const assets =
+        multipleSelected && multipleSelected.length > 0
+          ? multipleSelected
+          : singleSelected?.uri
+          ? [singleSelected]
+          : [];
+      if (assets.length === 0) return;
 
       // 메시지당 최대 5장 (백엔드 제약)
       const picked = assets.slice(0, 5);
@@ -338,11 +386,19 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
           const response = await fetch(asset.uri);
           const blob = await response.blob();
 
-          await fetch(presignUrl.uploadUrl, {
+          const uploadResponse = await fetch(presignUrl.uploadUrl, {
             method: 'PUT',
             body: blob,
             headers: {'Content-Type': 'image/*'},
           });
+
+          // 업로드 실패를 무시하면 파일이 없는 fileId 로 메시지가 생성되어
+          // 말풍선은 뜨지만 사진은 영구히 보이지 않는 상태가 된다.
+          if (!uploadResponse.ok) {
+            throw new Error(
+              `이미지 업로드 실패 (${uploadResponse.status}) ${presignUrl.id}`,
+            );
+          }
 
           return presignUrl.id;
         }),
@@ -350,6 +406,10 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
 
       // 하나의 사진 메시지로 묶어 전송
       await sendPictureMessage(roomId, fileIds);
+
+      // SSE updated 를 놓치는 경우에도 보낸 사람에게는 바로 보이도록 직접 갱신
+      // (중복은 fetchNewMessages 의 id 필터가 걸러낸다)
+      await fetchNewMessages();
 
       Toast.show(
         fileIds.length > 1
@@ -369,7 +429,7 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
     } finally {
       setImageUploading(false);
     }
-  }, [roomId]);
+  }, [fetchNewMessages, roomId]);
 
   // 텍스티콘 토글
   // - 진입: 키보드 dismiss → 슬라이드 다운 후 패널 노출 (300ms) → input 포커스 복원
@@ -433,20 +493,50 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
   }, []);
 
   // 채팅방 입장 + SSE + 하트비트 시작 (재호출 가능)
+  // joinedRef/joiningRef 를 사용해 joined state 에 의존하지 않으므로 identity 가 고정된다
+  // (마운트 effect 의 의존성으로 안전하게 사용 가능).
   const startChatSession = useCallback(async () => {
+    // 이미 join 요청이 진행 중이면 무시 — 중복 join / SSE 이중 연결 방지
+    if (joiningRef.current) return;
+    joiningRef.current = true;
+
     try {
       await joinChatRoom(roomId);
-      // join 성공 이후에야 messages fetch 가능 → useInfiniteQuery 의 enabled 풀어줌
-      setJoined(true);
-      queryClient.invalidateQueries(['chatMessages', roomId]);
+      if (sessionEndedRef.current) return;
+
+      // 남아있는 이전 연결 정리 후 재연결 (중복 SSE/하트비트 방지)
+      disconnectSSE();
+      stopHeartbeat();
       lastHeartbeatRef.current = Date.now();
       await connectSSE();
       startHeartbeat();
+
+      if (joinedRef.current) {
+        // 재입장(포그라운드 복귀 등): 이미 로드된 전체 페이지를 재조회하면
+        // 요청 수가 늘고 실패 가능성만 커진다 → 새 메시지만 이어서 받는다.
+        fetchNewMessages();
+      } else {
+        // 최초 join 성공 이후에야 messages fetch 가능 → useInfiniteQuery 의 enabled 풀어줌
+        joinedRef.current = true;
+        setJoined(true);
+        queryClient.invalidateQueries(['chatMessages', roomId]);
+      }
     } catch (error) {
       console.error('채팅방 입장 실패:', error);
       terminateSession('EXPIRED');
+    } finally {
+      joiningRef.current = false;
     }
-  }, [connectSSE, queryClient, roomId, startHeartbeat, terminateSession]);
+  }, [
+    connectSSE,
+    disconnectSSE,
+    fetchNewMessages,
+    queryClient,
+    roomId,
+    startHeartbeat,
+    stopHeartbeat,
+    terminateSession,
+  ]);
 
   // 마운트: 세션 시작 / 언마운트: 정리
   useEffect(() => {
@@ -455,18 +545,39 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
     return () => {
       disconnectSSE();
       stopHeartbeat();
+      // 서버에 퇴장을 알리지 않으면 참여 인원수가 즉시 줄지 않는다.
+      // - 입장에 성공한 적이 없으면(joinedRef) 세션이 없으므로 호출하지 않는다.
+      // - 이미 종료된 세션(TIMEOUT/EVICTED/EXPIRED)에 호출하면 서버에
+      //   '입장 중인 채팅방이 아닙니다' 로그만 남으므로 제외한다.
+      if (joinedRef.current && !sessionEndedRef.current) {
+        leaveChatRoom(roomId)
+          .catch(error => console.error('채팅방 퇴장 실패:', error))
+          // 목록 화면의 focus 재조회가 leave 보다 먼저 끝날 수 있어
+          // 퇴장 완료 후 한 번 더 갱신한다.
+          .finally(() => queryClient.invalidateQueries('chatRooms'));
+      }
     };
-  }, [startChatSession, disconnectSSE, stopHeartbeat]);
+  }, [startChatSession, disconnectSSE, stopHeartbeat, roomId, queryClient]);
 
   // 백그라운드/포그라운드 전환 대응
-  // - 백그라운드: SSE/하트비트 정리 (OS 가 어차피 끊으므로 미리 깔끔히)
-  // - 포그라운드 복귀: 세션 종료 상태가 아니라면 재join + 재연결
+  // - background 진입: SSE/하트비트 정리 (OS 가 어차피 끊으므로 미리 깔끔히)
+  // - 포그라운드 복귀: 실제로 background 를 거친 경우에만 재join + 재연결
+  //
+  // iOS 는 알림 배너, 제어센터, 앱 스위처, 권한 팝업, 이미지 피커 등에서도 inactive 를
+  // 발생시킨다. inactive 왕복마다 재join + 전체 재조회를 하면 불필요한 요청이 반복되고
+  // 그 중 하나만 실패해도 입장에 성공한 상태에서 실패 토스트가 뜬다.
   useEffect(() => {
     const sub = AppState.addEventListener('change', nextState => {
-      if (nextState === 'background' || nextState === 'inactive') {
+      const prevState = appStateRef.current;
+      appStateRef.current = nextState;
+
+      if (nextState === 'background') {
         disconnectSSE();
         stopHeartbeat();
-      } else if (nextState === 'active') {
+        return;
+      }
+
+      if (nextState === 'active' && prevState === 'background') {
         if (sessionEndedRef.current) return;
         startChatSession();
       }
@@ -532,6 +643,7 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
       <ProfileModal
         visible={profileModalVisible}
         memberId={selectedMemberId}
+        myMemberId={myMemberId}
         onClose={() => setProfileModalVisible(false)}
       />
     </View>
