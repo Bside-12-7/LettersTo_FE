@@ -31,7 +31,7 @@ import {
   leaveChatRoom,
 } from '@apis/chatMessage';
 import {getImageUploadUrl} from '@apis/file';
-import {BASE_URL_PROD, BASE_URL_TEST} from '@constants/common';
+import {BASE_URL} from '@constants/common';
 import type {ChatMessage, SSEEndedEvent, SSEUpdatedEvent} from '@type/types';
 import {MessageList} from '@components/RealtimeChat/MessageList';
 import {MessageInput} from '@components/RealtimeChat/MessageInput';
@@ -183,9 +183,7 @@ export const ChatRoomScreen = ({route, navigation}: Props) => {
   // SSE 연결
   const connectSSE = useCallback(async () => {
     try {
-      const baseUrl = __DEV__ ? BASE_URL_TEST : BASE_URL_PROD;
-
-      const url = `${baseUrl}/chat/rooms/${roomId}/messages/stream`;
+      const url = `${BASE_URL}/chat/rooms/${roomId}/messages/stream`;
 
       // 인증 토큰 가져오기
       const AsyncStorage = (

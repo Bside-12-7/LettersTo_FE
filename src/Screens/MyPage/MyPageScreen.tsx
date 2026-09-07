@@ -20,7 +20,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {getUserInfo} from '@apis/member';
 import {useAuthAction} from '@stores/auth';
 import {SCREEN_HEIGHT, SCREEN_WIDTH} from '@constants/screen';
-import {BASE_URL_TEST} from '@constants/common';
+import {BASE_URL} from '@constants/common';
 import {WebView} from 'react-native-webview';
 
 import {ListItem, ListName} from '@components/MyPage/MyPageList';
@@ -141,7 +141,7 @@ export const MyPage = ({navigation}: Props) => {
     dispatch({type: `TOGGLE_${modalName}_MODAL`});
 
   const openTermsWebView = useCallback((termsType: string) => {
-    setWebViewUrl(`${BASE_URL_TEST}/terms/html?termsType=${termsType}`);
+    setWebViewUrl(`${BASE_URL}/terms/html?termsType=${termsType}`);
     setWebViewVisible(true);
   }, []);
 
