@@ -45,8 +45,6 @@ export const MessageBubble = React.memo(
     const renderContent = () => {
       if (message.pictureFileId) {
         // 파일 URL 은 앱 전체 공통 규칙(getImageUrl)을 따른다.
-        // 여기서만 __DEV__ 기준으로 테스트 서버를 가리키면 편지 첨부 이미지와 달리
-        // 개발/QA 빌드에서 사진이 로드되지 않는다.
         const imageUrl = getImageUrl(message.pictureFileId);
         return (
           <Image
