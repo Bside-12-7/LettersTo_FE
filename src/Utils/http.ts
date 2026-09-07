@@ -1,4 +1,4 @@
-import {BASE_URL_PROD, BASE_URL_TEST} from '../Constants/common';
+import {BASE_URL} from '../Constants/common';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import axios, {
@@ -26,7 +26,7 @@ interface CustomInstance extends AxiosInstance {
 }
 
 const axiosInstance: CustomInstance = axios.create({
-  baseURL: __DEV__ ? BASE_URL_TEST : BASE_URL_PROD,
+  baseURL: BASE_URL,
 });
 
 // 진행 중인 토큰 갱신 요청 — 병렬 401 이 몰려도 /token 호출은 한 번만 수행한다.

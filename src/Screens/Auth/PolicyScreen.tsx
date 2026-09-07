@@ -25,7 +25,7 @@ import {getTerms} from '@apis/terms';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from '@components/Toast/toast';
 import {WebView} from 'react-native-webview';
-import {BASE_URL_TEST} from '@constants/common';
+import {BASE_URL} from '@constants/common';
 
 const checkboxChecked = require('@assets/checkbox_checked.png');
 const checkboxUnchecked = require('@assets/checkbox_unchecked.png');
@@ -47,7 +47,7 @@ export function Policy({navigation}: Props) {
   const {data: termsData} = useQuery('terms', getTerms);
 
   const openTermsWebView = useCallback((termsType: string) => {
-    setWebViewUrl(`${BASE_URL_TEST}/terms/html?termsType=${termsType}`);
+    setWebViewUrl(`${BASE_URL}/terms/html?termsType=${termsType}`);
     setWebViewVisible(true);
   }, []);
 

@@ -23,7 +23,7 @@ import {
 } from '@apis/terms';
 import Toast from '@components/Toast/toast';
 import {WebView} from 'react-native-webview';
-import {BASE_URL_TEST} from '@constants/common';
+import {BASE_URL} from '@constants/common';
 import {useAuthAction} from '@stores/auth';
 
 const checkboxChecked = require('@assets/checkbox_checked.png');
@@ -45,7 +45,7 @@ export function PolicyConsent({navigation}: Props) {
   const {data: termsData} = useQuery('terms', getTerms);
 
   const openTermsWebView = useCallback((termsType: string) => {
-    setWebViewUrl(`${BASE_URL_TEST}/terms/html?termsType=${termsType}`);
+    setWebViewUrl(`${BASE_URL}/terms/html?termsType=${termsType}`);
     setWebViewVisible(true);
   }, []);
 
