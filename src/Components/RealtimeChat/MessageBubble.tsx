@@ -1,11 +1,9 @@
 import React from 'react';
 import {View, Text, StyleSheet, Pressable, Image} from 'react-native';
 import type {ChatMessage} from '@type/types';
-import {BASE_URL_TEST, BASE_URL_PROD} from '@constants/common';
 import {Avatar} from '@components/Avatar/Avatar';
 import {dateFormatter} from '@utils/dateFormatter';
-
-const BASE_URL = __DEV__ ? BASE_URL_TEST : BASE_URL_PROD;
+import {getImageUrl} from '@utils/image';
 
 interface Props {
   message: ChatMessage;
@@ -46,11 +44,22 @@ export const MessageBubble = React.memo(
 
     const renderContent = () => {
       if (message.pictureFileId) {
+        // 파일 URL 은 앱 전체 공통 규칙(getImageUrl)을 따른다.
+        // 여기서만 __DEV__ 기준으로 테스트 서버를 가리키면 편지 첨부 이미지와 달리
+        // 개발/QA 빌드에서 사진이 로드되지 않는다.
+        const imageUrl = getImageUrl(message.pictureFileId);
         return (
           <Image
-            source={{uri: `${BASE_URL}/files/${message.pictureFileId}`}}
+            source={{uri: imageUrl}}
             style={styles.image}
             resizeMode="cover"
+            onError={({nativeEvent}) =>
+              console.warn(
+                '채팅 이미지 로드 실패:',
+                imageUrl,
+                nativeEvent?.error,
+              )
+            }
           />
         );
       }

@@ -29,6 +29,9 @@ const axiosInstance: CustomInstance = axios.create({
   baseURL: __DEV__ ? BASE_URL_TEST : BASE_URL_PROD,
 });
 
+// 진행 중인 토큰 갱신 요청 — 병렬 401 이 몰려도 /token 호출은 한 번만 수행한다.
+let refreshPromise: Promise<void> | null = null;
+
 const refreshAccessToken = async () => {
   const {accessToken, refreshToken} = await axiosInstance.post<{
     accessToken: string;
@@ -42,6 +45,18 @@ const refreshAccessToken = async () => {
     AsyncStorage.setItem('accessToken', accessToken),
     AsyncStorage.setItem('refreshToken', refreshToken),
   ]);
+};
+
+// 여러 요청이 동시에 401 을 받아도 갱신은 한 번만 하고 결과를 공유한다.
+// (채팅처럼 하트비트/메시지 조회가 병렬로 도는 화면에서 refresh 토큰이 회전되며
+//  뒤늦은 갱신 요청이 실패해 정상 요청까지 실패로 떨어지는 문제 방지)
+const refreshAccessTokenOnce = () => {
+  if (!refreshPromise) {
+    refreshPromise = refreshAccessToken().finally(() => {
+      refreshPromise = null;
+    });
+  }
+  return refreshPromise;
 };
 
 const stringifyPatchParams = (params: any) => {
@@ -78,30 +93,39 @@ axiosInstance.interceptors.response.use(
     return res.data;
   },
   async (error: any) => {
-    logRequestResult(error.response);
+    // 네트워크 단절/타임아웃/요청 취소는 response 가 없다.
+    // 예전 코드는 error.response 를 그대로 참조해 이 경우 TypeError 로 바뀌었고,
+    // 결과적으로 사소한 네트워크 끊김이 화면의 실패 토스트로 이어졌다.
+    const response = error?.response;
+    const originalRequest = error?.config;
+    logRequestResult(response, error);
 
-    if (error.response.status === 401 && !error.config._retry) {
-      const originalRequest = error.config;
-      await refreshAccessToken();
+    if (
+      response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      // /token 자체의 401 에 다시 갱신을 시도하면 재귀 호출이 된다.
+      originalRequest.url !== '/token'
+    ) {
       originalRequest._retry = true;
-      const newResponse = axiosInstance(originalRequest);
-      return newResponse;
+      await refreshAccessTokenOnce();
+      return axiosInstance(originalRequest);
     }
 
     return Promise.reject(error);
   },
 );
 
-async function logRequestResult(response: AxiosResponse) {
-  const accessToken = await AsyncStorage.getItem('accessToken');
+function logRequestResult(response?: AxiosResponse, error?: any) {
+  const config = response?.config ?? error?.config;
   const message = [
-    response.config.method?.toUpperCase(),
-    [response.config.baseURL, response.config.url].join(''),
+    config?.method?.toUpperCase(),
+    [config?.baseURL ?? '', config?.url ?? ''].join(''),
     '|',
-    response.status,
+    response?.status ?? error?.message ?? 'NO_RESPONSE',
   ];
 
-  if (response.status !== 200) {
+  if (!response || response.status >= 400) {
     return console.warn(...message);
   }
   return console.log(...message);
