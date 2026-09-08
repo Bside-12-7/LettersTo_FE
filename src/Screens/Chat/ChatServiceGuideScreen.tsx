@@ -43,14 +43,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   content: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     paddingVertical: 16,
   },
   ruleText: {
     fontFamily: 'Galmuri11',
     fontSize: 14,
-    lineHeight: 22,
-    color: '#333333',
-    marginBottom: 12,
+    lineHeight: 23,
+    color: '#0000cc',
   },
 });
