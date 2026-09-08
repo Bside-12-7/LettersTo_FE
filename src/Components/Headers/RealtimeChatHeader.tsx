@@ -3,7 +3,7 @@ import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
 
 const back_white = require('@assets/back_white.png');
 const home_white = require('@assets/Icon/Home/home_white.png');
-const warning_white = require('@assets/warning_white.png');
+const info_white = require('@assets/info_white.png');
 
 interface Props {
   stampQuantity: number;
@@ -44,7 +44,7 @@ export const RealtimeChatHeader = ({
           activeOpacity={0.7}
           onPress={onPressNotice}
           style={styles.noticeButton}>
-          <Image source={warning_white} style={styles.noticeIcon} />
+          <Image source={info_white} style={styles.noticeIcon} />
         </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={0.7}
