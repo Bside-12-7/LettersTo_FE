@@ -7,8 +7,14 @@ import {Header2} from '@components/Headers/Header2';
 
 type Props = NativeStackScreenProps<StackParamsList, 'ChatServiceGuide'>;
 
-// 카피 미확정 — 헤딩만 placeholder 로 노출
-const SECTIONS = ['이용 룰 안내', '건전한 채팅', '신고 방법', '신고 적용 등등'];
+const RULES = [
+  '서로를 존중하는 대화를 나눠주세요. 욕설, 비하, 혐오 표현은 금지됩니다.',
+  '광고, 홍보, 영리 목적의 활동은 할 수 없어요.',
+  '성별, 연락처 등 타인의 개인정보를 요구하지 마세요.',
+  '오프라인 만남을 유도하는 행위는 금지됩니다.',
+  '음란물, 폭력적인 내용, 불법 콘텐츠 공유는 금지됩니다.',
+  '특정 유저를 반복적으로 괴롭히거나 불편하게 하는 행위는 제재 대상입니다.',
+];
 
 export const ChatServiceGuideScreen = ({navigation}: Props) => {
   return (
@@ -20,9 +26,10 @@ export const ChatServiceGuideScreen = ({navigation}: Props) => {
         onPressBack={() => navigation.goBack()}
       />
       <ScrollView contentContainerStyle={styles.content}>
-        {SECTIONS.map(section => (
-          <Text key={section} style={styles.sectionTitle}>
-            {section}
+        {RULES.map(rule => (
+          <Text key={rule} style={styles.ruleText}>
+            {'· '}
+            {rule}
           </Text>
         ))}
       </ScrollView>
@@ -39,10 +46,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 16,
   },
-  sectionTitle: {
+  ruleText: {
     fontFamily: 'Galmuri11',
-    fontSize: 16,
-    color: '#0000CC',
+    fontSize: 14,
+    lineHeight: 22,
+    color: '#333333',
     marginBottom: 12,
   },
 });
